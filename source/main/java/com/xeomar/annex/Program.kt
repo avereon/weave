@@ -21,22 +21,26 @@ object Program {
 	private fun readCommandsFromStdIn() {
 		println("Reading from stdin...")
 		try {
-			BufferedInputStream(System.`in`).use { input -> readCommandsFromBytes(input.readAllBytes()) }
+			readTasksFromStream(System.`in`)
 		} catch (e: IOException) {
 			e.printStackTrace()
 		}
 	}
 
-	fun readCommandsFromBytes(bytes: ByteArray): List<AnnexTask> {
+	fun readTasksFromBytes(bytes: ByteArray): List<AnnexTask> {
+		return readTasksFromStream(ByteArrayInputStream(bytes))
+	}
+
+	fun readTasksFromStream(stream: InputStream): List<AnnexTask> {
 		val tasks = ArrayList<AnnexTask>()
-		BufferedReader(InputStreamReader(ByteArrayInputStream(bytes))).lines().forEach { line -> tasks.add(parseTask(line)) }
+		BufferedReader(InputStreamReader(stream)).lines().forEach { line -> tasks.add(parseTask(line)) }
 		return tasks
 	}
 
 	fun parseTask(line: String): AnnexTask {
 		var parameters = line.split(" ")
 		val command = parameters[0]
-		parameters = parameters.subList( 1, parameters.size )
+		parameters = parameters.subList(1, parameters.size)
 		return when (command) {
 			"launch" -> LaunchTask(parameters)
 			"update" -> UpdateTask(parameters)

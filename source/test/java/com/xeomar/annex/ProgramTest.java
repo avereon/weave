@@ -11,7 +11,7 @@ public class ProgramTest {
 
 	@Test
 	public void testReadCommandsFromBytes() throws Exception {
-		List<AnnexTask> tasks = Program.INSTANCE.readCommandsFromBytes( "update source target\nupdate source2 target2".getBytes( "utf-8" ) );
+		List<AnnexTask> tasks = Program.INSTANCE.readTasksFromBytes( "update source target\nupdate source2 target2".getBytes( "utf-8" ) );
 
 		assertThat( tasks.get( 0 ).getParameters().get( 0 ), is( "source" ) );
 		assertThat( tasks.get( 0 ).getParameters().get( 1 ), is( "target" ) );
