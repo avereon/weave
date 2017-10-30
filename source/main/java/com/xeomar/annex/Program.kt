@@ -1,7 +1,7 @@
 package com.xeomar.annex
 
-import java.io.BufferedInputStream
-import java.io.IOException
+import java.io.*
+import java.util.*
 
 object Program {
 
@@ -18,7 +18,6 @@ object Program {
 		}
 	}
 
-
 	private fun readCommandsFromStdIn() {
 		println("Reading from stdin...")
 		try {
@@ -28,8 +27,22 @@ object Program {
 		}
 	}
 
-	private fun readCommandsFromBytes(bytes: ByteArray) {
+	fun readCommandsFromBytes(bytes: ByteArray): List<AnnexTask> {
+		val tasks = ArrayList<AnnexTask>()
+		BufferedReader(InputStreamReader(ByteArrayInputStream(bytes))).lines().forEach { line -> tasks.add(parseTask(line)) }
+		return tasks
+	}
 
+	fun parseTask(line: String): AnnexTask {
+		var parameters = line.split(" ")
+		val command = parameters[0]
+		parameters = parameters.subList( 1, parameters.size )
+		return when (command) {
+			"launch" -> LaunchTask(parameters)
+			"update" -> UpdateTask(parameters)
+			"unpack" -> UnpackTask(parameters)
+			else -> throw IllegalArgumentException("Unknown command: " + command)
+		}
 	}
 
 }
