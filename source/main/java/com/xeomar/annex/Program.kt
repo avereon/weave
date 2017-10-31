@@ -5,44 +5,50 @@ import java.util.*
 
 object Program {
 
-    @JvmStatic
-    fun main(commands: Array<String>) {
-        start(commands)
-    }
+	@JvmStatic
+	fun main(commands: Array<String>) {
+		run(commands)
+	}
 
-    fun start(commands: Array<String>) {
-        println("Parsing commands...")
+	fun run(commands: Array<String>) {
+		println("Parsing commands...")
 
-        when {
-            commands[0]=="--stream" -> readTasksFromStdIn()
-            commands[0]=="--file" -> readTasksFromFile(File(commands[1]))
-        }
-    }
+		val tasks = when {
+			commands[0] == "--stream" -> readTasksFromStdIn()
+			commands[0] == "--file" -> readTasksFromFile(File(commands[1]))
+			else -> ArrayList()
+		}
 
-    fun readTasksFromStdIn(): List<AnnexTask> {
-        return readTasksFromStream(System.`in`)
-    }
+		for(task in tasks ) {
+			task.execute()
+		}
+	}
 
-    fun readTasksFromFile( file: File ): List<AnnexTask> {
-        return readTasksFromStream( FileInputStream( file ));
-    }
+	fun readTasksFromStdIn(): List<AnnexTask> {
+		return readTasksFromStream(System.`in`)
+	}
 
-    fun readTasksFromStream(stream: InputStream): List<AnnexTask> {
-        val tasks = ArrayList<AnnexTask>()
-        BufferedReader(InputStreamReader(stream)).lines().forEach { line -> tasks.add(parseTask(line)) }
-        return tasks
-    }
+	fun readTasksFromFile(file: File): List<AnnexTask> {
+		return readTasksFromStream(FileInputStream(file));
+	}
 
-    fun parseTask(line: String): AnnexTask {
-        var parameters = line.split(" ")
-        val command = parameters[0]
-        parameters = parameters.subList(1, parameters.size)
-        return when (command) {
-            "launch" -> LaunchTask(parameters)
-            "update" -> UpdateTask(parameters)
-            "unpack" -> UnpackTask(parameters)
-            else -> throw IllegalArgumentException("Unknown command: " + command)
-        }
-    }
+	fun readTasksFromStream(stream: InputStream): List<AnnexTask> {
+		val tasks = ArrayList<AnnexTask>()
+		BufferedReader(InputStreamReader(stream)).lines().forEach { line -> tasks.add(parseTask(line)) }
+		return tasks
+	}
+
+	fun parseTask(line: String): AnnexTask {
+		var parameters = line.split(" ")
+		val command = parameters[0]
+		parameters = parameters.subList(1, parameters.size)
+		return when (command) {
+			"launch" -> LaunchTask(parameters)
+			"pause" -> PauseTask(parameters)
+			"update" -> UpdateTask(parameters)
+			"unpack" -> UnpackTask(parameters)
+			else -> throw IllegalArgumentException("Unknown command: " + command)
+		}
+	}
 
 }
