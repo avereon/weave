@@ -11,8 +11,7 @@ class PauseTaskTest {
 	@Test
 	fun testExecute() {
 		val delay = 1000L
-		val parameters = Arrays.asList(delay.toString())
-		val task = PauseTask(parameters)
+		val task = PauseTask(Arrays.asList(delay.toString()))
 
 		val start = System.currentTimeMillis()
 		task.execute()
