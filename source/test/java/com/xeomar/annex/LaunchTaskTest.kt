@@ -10,9 +10,11 @@ class LaunchTaskTest {
 	@Test
 	fun testExecute() {
 		val program = "xenon"
-		val task = LaunchTask(Arrays.asList(program))
-		assertThat( task.getParameters()[0], `is`( program ))
-		assertThat( task.getParameters().size, `is`(1))
+		val file = "test.txt"
+		val task = LaunchTask(Arrays.asList(program, file))
+		assertThat(task.getParameters()[0], `is`(program))
+		assertThat(task.getParameters()[1], `is`(file))
+		assertThat(task.getParameters().size, `is`(2))
 	}
 
 }
