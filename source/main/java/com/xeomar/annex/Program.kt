@@ -29,7 +29,9 @@ object Program {
 	fun runTasksFromStream(stream: InputStream, writer: Writer) {
 		val printWriter = PrintWriter( writer )
 		BufferedReader(InputStreamReader(stream)).lines().forEach { line ->
-			printWriter.println( executeTask( parseTask(line) ) )
+			// PrintWriter.println() uses OS specific line terminator
+			printWriter.print( executeTask( parseTask(line) ) )
+			printWriter.print( '\n' )
 			printWriter.flush()
 		}
 	}
