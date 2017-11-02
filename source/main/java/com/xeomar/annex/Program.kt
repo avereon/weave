@@ -19,7 +19,7 @@ object Program {
 			else -> ArrayList()
 		}
 
-		for(task in tasks ) {
+		for (task in tasks) {
 			task.execute()
 		}
 	}
@@ -45,8 +45,8 @@ object Program {
 		return when (command) {
 			"launch" -> LaunchTask(parameters)
 			"pause" -> PauseTask(parameters)
-			"update" -> UpdateTask(parameters)
 			"unpack" -> UnpackTask(parameters)
+			"update" -> UpdateTask(parameters)
 			else -> throw IllegalArgumentException("Unknown command: " + command)
 		}
 	}
