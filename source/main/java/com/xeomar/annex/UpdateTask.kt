@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class UpdateTask(parameters: List<String>) : AnnexTask(parameters) {
+class UpdateTask(command: String, parameters: List<String>) : AnnexTask(command, parameters) {
 
 	override fun needsElevation(): Boolean {
 		val target = Paths.get(getParameters()[1])
@@ -12,11 +12,11 @@ class UpdateTask(parameters: List<String>) : AnnexTask(parameters) {
 	}
 
 
-	override fun execute() {
+	override fun execute(): String {
 		val source = File(getParameters()[0])
 		val target = File(getParameters()[1])
 
-
+		return "success"
 	}
 
 

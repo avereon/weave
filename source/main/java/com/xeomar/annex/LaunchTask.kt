@@ -1,11 +1,13 @@
 package com.xeomar.annex
 
-class LaunchTask(parameters: List<String>) : AnnexTask(parameters) {
+class LaunchTask(command: String, parameters: List<String>) : AnnexTask(command, parameters) {
 
-	override fun execute() {
+	override fun execute(): String {
 		val builder = ProcessBuilder()
 		builder.command().addAll(getParameters())
-		builder.start()
+		val process = builder.start()
+
+		return "success"
 	}
 
 }

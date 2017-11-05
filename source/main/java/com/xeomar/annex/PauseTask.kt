@@ -1,9 +1,10 @@
 package com.xeomar.annex
 
-class PauseTask(parameters: List<String>) : AnnexTask(parameters) {
+class PauseTask(command: String, parameters: List<String>) : AnnexTask(command, parameters) {
 
-	override fun execute() {
+	override fun execute(): String {
 		Thread.sleep(getParameters()[0].toLong())
+		return "success"
 	}
 
 }

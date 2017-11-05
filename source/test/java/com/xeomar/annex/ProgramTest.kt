@@ -1,12 +1,11 @@
 package com.xeomar.annex
 
-import org.hamcrest.CoreMatchers.`is`
+import kotlinx.coroutines.experimental.launch
+import org.hamcrest.Matchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
-import java.io.StringWriter
+import java.io.*
+import java.nio.charset.Charset
 
 class ProgramTest {
 
@@ -15,44 +14,51 @@ class ProgramTest {
 	fun testReadCommandsFromStdin() {
 		val originalInput = System.`in`
 		val originalOutput = System.out
-		val outputBuffer = ByteArrayOutputStream()
-		val input = ByteArrayInputStream("update source target\nupdate source2 target2".toByteArray(charset("utf-8")))
-		val output = PrintStream(outputBuffer)
 
-		System.setIn(input)
-		System.setOut(output)
-		Program.runTasksFromStdIn()
-		System.setOut(originalOutput)
-		System.setIn(originalInput)
+		val outputPipe = PipedInputStream()
+		val inputPipe = PipedOutputStream()
 
-		// TODO Read the results from System.out
+		System.setIn(PipedInputStream(inputPipe))
+		System.setOut(PrintStream(PipedOutputStream(outputPipe)))
+		try {
+			launch {
+				Program.run(arrayOf("--stream"))
+			}
 
-		assertThat(outputBuffer.toString("utf-8"), `is`("com.xeomar.annex.UpdateTask\ncom.xeomar.annex.UpdateTask\n"))
+			inputPipe.write("update source target\n".toByteArray(Charset.forName("utf-8")))
+			inputPipe.flush()
+			assertThat(outputPipe.bufferedReader(charset("utf-8")).readLine(), `is`("success"))
 
-//		assertThat(tasks[0].getParameters()[0], `is`("source"))
-//		assertThat(tasks[0].getParameters()[1], `is`("target"))
-//		assertThat(tasks[1].getParameters()[0], `is`("source2"))
-//		assertThat(tasks[1].getParameters()[1], `is`("target2"))
-//		assertThat(tasks[0].getParameters().size, `is`(2))
-//		assertThat(tasks[1].getParameters().size, `is`(2))
-//		assertThat(tasks.size, `is`(2))
+			inputPipe.write("update source2 target2".toByteArray(Charset.forName("utf-8")))
+			inputPipe.close()
+			assertThat(outputPipe.bufferedReader(charset("utf-8")).readLine(), `is`("success"))
+		} finally {
+			// Restore the original streams
+			System.setOut(originalOutput)
+			System.setIn(originalInput)
+		}
 	}
 
 	@Test
 	@Throws(Exception::class)
 	fun testReadCommandsFromBytes() {
-		val input = ByteArrayInputStream("update source target\nupdate source2 target2".toByteArray(charset("utf-8")))
-		val output = StringWriter()
+		val outputPipe = PipedReader()
+		val inputPipe = PipedWriter()
 
-		val tasks = Program.runTasksFromStream(input, output)
+		val reader = PipedReader(inputPipe)
+		val writer = PipedWriter(outputPipe)
 
-//		assertThat(tasks[0].getParameters()[0], `is`("source"))
-//		assertThat(tasks[0].getParameters()[1], `is`("target"))
-//		assertThat(tasks[1].getParameters()[0], `is`("source2"))
-//		assertThat(tasks[1].getParameters()[1], `is`("target2"))
-//		assertThat(tasks[0].getParameters().size, `is`(2))
-//		assertThat(tasks[1].getParameters().size, `is`(2))
-//		assertThat(tasks.size, `is`(2))
+		launch {
+			Program.runTasksFromReader(reader, writer)
+		}
+
+		inputPipe.write("update source target\n")
+		inputPipe.flush()
+		assertThat(outputPipe.buffered().readLine(), `is`("success"))
+
+		inputPipe.write("update source2 target2")
+		inputPipe.close()
+		assertThat(outputPipe.buffered().readLine(), `is`("success"))
 	}
 
 }

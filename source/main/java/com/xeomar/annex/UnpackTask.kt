@@ -1,9 +1,9 @@
 package com.xeomar.annex
 
-class UnpackTask(parameters: List<String>) : AnnexTask(parameters) {
+class UnpackTask(command: String, parameters: List<String>) : AnnexTask(command, parameters) {
 
-	override fun execute() {
-
+	override fun execute(): String {
+		return "success"
 	}
 
 }
