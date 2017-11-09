@@ -87,11 +87,11 @@ object Program {
 				elevatedProcess = OperatingSystem.startProcessElevated(title, processBuilder)
 			}
 
-			elevatedProcess?.outputStream?.writer(Charset.forName("utf-8"))?.write(task.execute())
+			elevatedProcess?.outputStream?.writer(Charset.forName("utf-8"))?.write(task.execute().toString())
 			BufferedReader(InputStreamReader(elevatedProcess?.inputStream)).readLine()
 		}
 
-		return task.execute()
+		return task.execute().toString()
 	}
 
 	fun parseTask(line: String): AnnexTask {

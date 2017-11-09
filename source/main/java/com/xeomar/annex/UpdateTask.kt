@@ -12,11 +12,11 @@ class UpdateTask(command: String, parameters: List<String>) : AnnexTask(command,
 	}
 
 
-	override fun execute(): String {
+	override fun execute(): TaskResult {
 		val source = File(getParameters()[0])
 		val target = File(getParameters()[1])
 
-		return "success"
+		return TaskResult(200, "success")
 	}
 
 

@@ -2,7 +2,7 @@ package com.xeomar.annex
 
 abstract class AnnexTask(private val command: String, private val parameters: List<String>) {
 
-	abstract fun execute():String
+	abstract fun execute():TaskResult
 
 	open fun needsElevation(): Boolean {
 		return false
