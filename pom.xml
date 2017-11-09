@@ -196,49 +196,5 @@
 
 	</build>
 
-	<profiles>
-
-		<!-- Profile for Java 8 -->
-		<profile>
-			<id>java8</id>
-			<activation>
-				<jdk>1.8</jdk>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<configuration>
-							<source>8</source>
-							<target>8</target>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- Profile for Java 9 -->
-		<profile>
-			<id>java9</id>
-			<activation>
-				<jdk>9</jdk>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<configuration>
-							<source>9</source>
-							<target>9</target>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-	</profiles>
-
 </project>
 
