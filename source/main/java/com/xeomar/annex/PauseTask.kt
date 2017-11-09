@@ -4,7 +4,7 @@ class PauseTask(command: String, parameters: List<String>) : AnnexTask(command, 
 
 	override fun execute(): TaskResult {
 		Thread.sleep(getParameters()[0].toLong())
-		return TaskResult(200, "success")
+		return TaskResult(TaskStatus.SUCCESS, "success")
 	}
 
 }

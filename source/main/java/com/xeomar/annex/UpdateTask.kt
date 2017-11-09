@@ -16,7 +16,7 @@ class UpdateTask(command: String, parameters: List<String>) : AnnexTask(command,
 		val source = File(getParameters()[0])
 		val target = File(getParameters()[1])
 
-		return TaskResult(200, "success")
+		return TaskResult(TaskStatus.SUCCESS, "success")
 	}
 
 

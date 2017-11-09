@@ -7,7 +7,9 @@ class LaunchTask(command: String, parameters: List<String>) : AnnexTask(command,
 		builder.command().addAll(getParameters())
 		val process = builder.start()
 
-		return TaskResult(200, "success")
+		// Without waiting for the process to finish, this task is asynchronous
+
+		return TaskResult(TaskStatus.SUCCESS, "success")
 	}
 
 }

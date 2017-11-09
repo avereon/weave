@@ -28,13 +28,13 @@ class ProgramTest {
 			inputPipe.write("update source target\n".toByteArray(charset("utf-8")))
 			inputPipe.flush()
 			val result1 = TaskResult.parse(outputPipe.bufferedReader(charset("utf-8")).readLine())
-			assertThat(result1.code, `is`( 200))
+			assertThat(result1.code, `is`(TaskStatus.SUCCESS))
 			assertThat(result1.message, `is`("success"))
 
 			inputPipe.write("update source2 target2".toByteArray(charset("utf-8")))
 			inputPipe.close()
 			val result2 = TaskResult.parse(outputPipe.bufferedReader(charset("utf-8")).readLine())
-			assertThat(result2.code, `is`( 200))
+			assertThat(result2.code, `is`(TaskStatus.SUCCESS))
 			assertThat(result2.message, `is`("success"))
 		} finally {
 			// Restore the original streams
@@ -59,13 +59,13 @@ class ProgramTest {
 		inputPipe.write("update source target\n")
 		inputPipe.flush()
 		val result1 = TaskResult.parse(outputPipe.buffered().readLine())
-		assertThat(result1.code, `is`( 200))
+		assertThat(result1.code, `is`(TaskStatus.SUCCESS))
 		assertThat(result1.message, `is`("success"))
 
 		inputPipe.write("update source2 target2")
 		inputPipe.close()
 		val result2 = TaskResult.parse(outputPipe.buffered().readLine())
-		assertThat(result2.code, `is`( 200))
+		assertThat(result2.code, `is`(TaskStatus.SUCCESS))
 		assertThat(result2.message, `is`("success"))
 	}
 
