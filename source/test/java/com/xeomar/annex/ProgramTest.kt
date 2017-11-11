@@ -5,11 +5,10 @@ import org.hamcrest.Matchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
 import java.io.*
-import java.nio.charset.Charset
 
 class ProgramTest {
 
-	@Test
+	@Test(timeout=1000)
 	@Throws(Exception::class)
 	fun testReadCommandsFromStdin() {
 		val originalInput = System.`in`
@@ -25,13 +24,13 @@ class ProgramTest {
 				Program.run(arrayOf("--stream"))
 			}
 
-			inputPipe.write("update source target\n".toByteArray(charset("utf-8")))
+			inputPipe.write("pause 0\n".toByteArray(charset("utf-8")))
 			inputPipe.flush()
 			val result1 = TaskResult.parse(outputPipe.bufferedReader(charset("utf-8")).readLine())
 			assertThat(result1.code, `is`(TaskStatus.SUCCESS))
 			assertThat(result1.message, `is`("success"))
 
-			inputPipe.write("update source2 target2".toByteArray(charset("utf-8")))
+			inputPipe.write("pause 0".toByteArray(charset("utf-8")))
 			inputPipe.close()
 			val result2 = TaskResult.parse(outputPipe.bufferedReader(charset("utf-8")).readLine())
 			assertThat(result2.code, `is`(TaskStatus.SUCCESS))
@@ -43,7 +42,7 @@ class ProgramTest {
 		}
 	}
 
-	@Test
+	@Test(timeout=1000)
 	@Throws(Exception::class)
 	fun testReadCommandsFromBytes() {
 		val outputPipe = PipedReader()
@@ -56,13 +55,13 @@ class ProgramTest {
 			Program.runTasksFromReader(reader, writer)
 		}
 
-		inputPipe.write("update source target\n")
+		inputPipe.write("pause 0\n")
 		inputPipe.flush()
 		val result1 = TaskResult.parse(outputPipe.buffered().readLine())
 		assertThat(result1.code, `is`(TaskStatus.SUCCESS))
 		assertThat(result1.message, `is`("success"))
 
-		inputPipe.write("update source2 target2")
+		inputPipe.write("pause 0")
 		inputPipe.close()
 		val result2 = TaskResult.parse(outputPipe.buffered().readLine())
 		assertThat(result2.code, `is`(TaskStatus.SUCCESS))
