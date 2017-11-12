@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
-class UpdateTask(command: String, parameters: List<String>) : AnnexTask(command, parameters) {
+class UpdateTask(parameters: List<String>) : AnnexTask(command, parameters) {
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
@@ -23,13 +23,13 @@ class UpdateTask(command: String, parameters: List<String>) : AnnexTask(command,
 	private val ADD_SUFFIX = ".add"
 
 	override fun needsElevation(): Boolean {
-		val target = Paths.get(getParameters()[1])
+		val target = Paths.get(parameters[1])
 		return Files.exists(target) && !Files.isWritable(target)
 	}
 
 	override fun execute(): TaskResult {
-		val source = Paths.get(getParameters()[0])
-		val target = Paths.get(getParameters()[1])
+		val source = Paths.get(parameters[0])
+		val target = Paths.get(parameters[1])
 
 		if (!Files.exists(source)) throw IllegalArgumentException("Source parameter not found: " + source)
 		if (!Files.exists(target)) throw IllegalArgumentException("Target parameter not found: " + target)
@@ -59,7 +59,7 @@ class UpdateTask(command: String, parameters: List<String>) : AnnexTask(command,
 	}
 
 	override fun toString(): String {
-		return "Update " + getParameters()[1] + " ..."
+		return "$command ${parameters[0]} ${parameters[1]}"
 	}
 
 	private fun stage(source: Path, target: Path) {
@@ -132,6 +132,10 @@ class UpdateTask(command: String, parameters: List<String>) : AnnexTask(command,
 		val name = path.fileName.toString()
 		val index = name.indexOf(suffix)
 		return if (index < 0) path else path.parent.resolve(name.substring(0, index))
+	}
+
+	companion object {
+		val command = "update"
 	}
 
 }

@@ -1,19 +1,11 @@
 package com.xeomar.annex
 
-abstract class AnnexTask(private val command: String, private val parameters: List<String>) {
+abstract class AnnexTask(val command: String,  val parameters: List<String>) {
 
 	abstract fun execute():TaskResult
 
 	open fun needsElevation(): Boolean {
 		return false
-	}
-
-	fun getCommand(): String {
-		return command
-	}
-
-	fun getParameters(): List<String> {
-		return parameters
 	}
 
 	override fun toString(): String {

@@ -1,15 +1,19 @@
 package com.xeomar.annex
 
-class LaunchTask(command: String, parameters: List<String>) : AnnexTask(command, parameters) {
+class LaunchTask(parameters: List<String>) : AnnexTask(command, parameters) {
 
 	override fun execute(): TaskResult {
 		val builder = ProcessBuilder()
-		builder.command().addAll(getParameters())
+		builder.command().addAll(parameters)
 		val process = builder.start()
 
-		// Without waiting for the process to finish, this task is asynchronous
+		// TODO Without waiting for the process to finish, this task is asynchronous
 
 		return TaskResult(TaskStatus.SUCCESS, "success")
+	}
+
+	companion object {
+		val command = "launch"
 	}
 
 }

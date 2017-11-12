@@ -99,10 +99,9 @@ object Program {
 		val command = parameters[0]
 		parameters = parameters.subList(1, parameters.size)
 		return when (command) {
-			"launch" -> LaunchTask("launch", parameters)
-			"pause" -> PauseTask("pause", parameters)
-			"unpack" -> UnpackTask("unpack", parameters)
-			"update" -> UpdateTask("update", parameters)
+			LaunchTask.command -> LaunchTask( parameters)
+			PauseTask.command -> PauseTask( parameters)
+			UpdateTask.command -> UpdateTask( parameters)
 			else -> throw IllegalArgumentException("Unknown command: " + command)
 		}
 	}

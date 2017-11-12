@@ -1,10 +1,14 @@
 package com.xeomar.annex
 
-class PauseTask(command: String, parameters: List<String>) : AnnexTask(command, parameters) {
+class PauseTask(parameters: List<String>) : AnnexTask(command, parameters) {
 
 	override fun execute(): TaskResult {
-		Thread.sleep(getParameters()[0].toLong())
+		Thread.sleep(parameters[0].toLong())
 		return TaskResult(TaskStatus.SUCCESS, "success")
+	}
+
+	companion object {
+		val command = "pause"
 	}
 
 }
