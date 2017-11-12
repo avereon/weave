@@ -1,12 +1,16 @@
 package com.xeomar.annex
 
 import com.xeomar.razor.FileUtil
+import com.xeomar.razor.HashUtil
 import org.apache.commons.io.IOUtils
 import org.slf4j.LoggerFactory
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
-import java.nio.file.*
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
@@ -22,7 +26,6 @@ class UpdateTask(command: String, parameters: List<String>) : AnnexTask(command,
 		val target = Paths.get(getParameters()[1])
 		return Files.exists(target) && !Files.isWritable(target)
 	}
-
 
 	override fun execute(): TaskResult {
 		val source = Paths.get(getParameters()[0])
@@ -105,19 +108,18 @@ class UpdateTask(command: String, parameters: List<String>) : AnnexTask(command,
 	}
 
 	private fun commit(root: Path, target: Path) {
-		// NEXT Continue here
 		// Commit staged changes.
 		if (Files.isDirectory(target)) {
 			for (file in Files.list(target)!!) commit(root, file)
 		} else {
 			if (target.fileName.toString().endsWith(ADD_SUFFIX)) {
-//				val sourceHash = HashUtil.hash(target)
-//				val file = FileUtil.removeExtension(target)
-//				target.renameTo(file)
-//				val targetHash = HashUtil.hash(file)
-//				if (targetHash != sourceHash)
-//					throw RuntimeException("Hash code mismatch commiting file: " + file)
-//				Log.write(Log.TRACE, "Commit: " + relativize(root, file))
+				val sourceHash = HashUtil.hash(target)
+				val file = FileUtil.removeExtension(target)
+				Files.move(target, file)
+				val targetHash = HashUtil.hash(file)
+				if (targetHash != sourceHash)
+					throw RuntimeException("Hash code mismatch commiting file: " + file)
+				log.trace("Commit: " + root.relativize(file))
 			} else if (target.fileName.toString().endsWith(DEL_SUFFIX)) {
 				val file = removeSuffix(target, DEL_SUFFIX)
 				if (!Files.exists(file)) log.trace("Remove: " + root.relativize(file))
