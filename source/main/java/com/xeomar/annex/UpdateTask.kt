@@ -1,7 +1,7 @@
 package com.xeomar.annex
 
-import com.xeomar.razor.FileUtil
-import com.xeomar.razor.HashUtil
+import com.xeomar.util.FileUtil
+import com.xeomar.util.HashUtil
 import org.apache.commons.io.IOUtils
 import org.slf4j.LoggerFactory
 import java.io.FileOutputStream

@@ -1,7 +1,7 @@
 package com.xeomar.annex
 
-import com.xeomar.razor.FileUtil
-import com.xeomar.razor.IdGenerator
+import com.xeomar.util.FileUtil
+import com.xeomar.util.IdGenerator
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.`is`
 import org.junit.Assert

@@ -1,6 +1,6 @@
 package com.xeomar.annex
 
-import com.xeomar.razor.OperatingSystem
+import com.xeomar.util.OperatingSystem
 import org.slf4j.LoggerFactory
 import java.io.*
 import java.nio.charset.Charset
@@ -103,6 +103,16 @@ object Program {
 			PauseTask.command -> PauseTask( parameters)
 			UpdateTask.command -> UpdateTask( parameters)
 			else -> throw IllegalArgumentException("Unknown command: " + command)
+		}
+	}
+
+	private fun describe() {
+		try {
+			val uri = javaClass.getResource("/META-INF/product.yml").toURI()
+			// NEXT Finish method
+			//card = ProductCard(uri, Descriptor(uri))
+		} catch (exception: Exception) {
+			throw RuntimeException(exception)
 		}
 	}
 
