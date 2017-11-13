@@ -1,6 +1,7 @@
 package com.xeomar.annex
 
 import com.xeomar.util.OperatingSystem
+import com.xeomar.util.ProductMetadata
 import org.slf4j.LoggerFactory
 import java.io.*
 import java.nio.charset.Charset
@@ -11,7 +12,13 @@ object Program {
 
 	private var title = "Annex"
 
+	private var metadata: ProductMetadata
+
 	private var elevatedProcess: Process? = null
+
+	init {
+		metadata = ProductMetadata()
+	}
 
 	@JvmStatic
 	fun main(commands: Array<String>) {
@@ -19,6 +26,8 @@ object Program {
 	}
 
 	fun run(commands: Array<String>) {
+		printHeader(metadata)
+
 		log.debug("Parsing commands...")
 
 		for ((index, command) in commands.withIndex()) {
@@ -115,14 +124,9 @@ object Program {
 		}
 	}
 
-	private fun describe() {
-		try {
-			val uri = javaClass.getResource("/META-INF/product.yml").toURI()
-			// NEXT Finish method
-			//card = ProductCard(uri, Descriptor(uri))
-		} catch (exception: Exception) {
-			throw RuntimeException(exception)
-		}
+	private fun printHeader(metadata: ProductMetadata) {
+		System.err.println(metadata.name + " " + metadata.version)
+		System.err.println("Java " + System.getProperty("java.runtime.version"))
 	}
 
 }
