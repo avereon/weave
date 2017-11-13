@@ -3,10 +3,12 @@ package com.xeomar.annex
 import com.xeomar.util.FileUtil
 import com.xeomar.util.IdGenerator
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Assert.assertThat
 import org.junit.Test
+import java.io.StringReader
+import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -68,7 +70,7 @@ class UpdateTaskTest {
 			FileUtil.zip(sourceRoot, sourceZip)
 
 			// Create the update task
-			val task = UpdateTask(listOf(sourceZip.toAbsolutePath().toString(), targetRoot.toAbsolutePath().toString()))
+			//val task = UpdateTask(listOf(sourceZip.toAbsolutePath().toString(), targetRoot.toAbsolutePath().toString()))
 
 			// Verify the target values before executing the task
 			assertThat(FileUtil.load(targetFile1), `is`(targetData1))
@@ -77,7 +79,12 @@ class UpdateTaskTest {
 			assertThat(Files.exists(targetFile4), `is`(false))
 
 			// Execute the update task
-			task.execute()
+			val result = TaskResult.parse(Program.runTasksFromString("update ${sourceZip.toAbsolutePath()} ${targetRoot.toAbsolutePath()}"))
+
+			// Verify the result
+			assertThat(result.code, `is`(0))
+			assertThat(result.message, startsWith("Updated:"))
+			assertThat(result.message, endsWith(targetRoot.fileName.toString()))
 
 			// Verify the target values after executing the task
 			assertThat(FileUtil.load(targetFile1), `is`(sourceData1))
@@ -89,6 +96,13 @@ class UpdateTaskTest {
 			FileUtil.delete(sourceRoot)
 			FileUtil.delete(sourceZip)
 		}
+	}
+
+	@Test
+	fun testExecuteFailure() {
+		val result = TaskResult.parse(Program.runTasksFromString("update /invalidsource /invalidtarget"))
+		assertThat(result.code, `is`(1))
+		assertThat(result.message, startsWith("IllegalArgumentException: Source not found"))
 	}
 
 }

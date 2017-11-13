@@ -42,6 +42,13 @@ object Program {
 		runTasksFromReader(InputStreamReader(input, "utf-8"), OutputStreamWriter(output, "utf-8"))
 	}
 
+	fun runTasksFromString(commands: String): String {
+		val reader = StringReader(commands)
+		val writer = StringWriter()
+		Program.runTasksFromReader(reader, writer)
+		return writer.toString().trim()
+	}
+
 	fun runTasksFromReader(reader: Reader, writer: Writer) {
 		val buffer = BufferedReader(reader)
 		val printWriter = PrintWriter(writer)
@@ -58,7 +65,7 @@ object Program {
 		}
 	}
 
-	private fun executeTask(task: AnnexTask): String {
+	private fun executeTask(task: AnnexTask): TaskResult {
 		// NEXT Now for the hard part, figuring out how to execute the tasks
 		// The reason this is hard is because some of the update commands will
 		// require elevated privileges. But we don't want to execute programs
@@ -79,19 +86,21 @@ object Program {
 
 		// If needsElevation is true then a separate, elevated, process will need
 		// to be started to execute some tasks.
-		val needsElevation = task.needsElevation()
-		if (needsElevation) {
-			if (elevatedProcess == null) {
-				// TODO Create elevated updater
-				val processBuilder = ProcessBuilder()
-				elevatedProcess = OperatingSystem.startProcessElevated(title, processBuilder)
+		return try {
+			if (task.needsElevation()) {
+				if (elevatedProcess == null) {
+					// TODO Create elevated updater
+					val processBuilder = ProcessBuilder()
+					elevatedProcess = OperatingSystem.startProcessElevated(title, processBuilder)
+				}
+				elevatedProcess?.outputStream?.writer(Charset.forName("utf-8"))?.write(task.execute().toString())
+				TaskResult.parse(BufferedReader(InputStreamReader(elevatedProcess?.inputStream)).readLine())
+			} else {
+				task.execute()
 			}
-
-			elevatedProcess?.outputStream?.writer(Charset.forName("utf-8"))?.write(task.execute().toString())
-			BufferedReader(InputStreamReader(elevatedProcess?.inputStream)).readLine()
+		} catch (exception: Exception) {
+			TaskResult(TaskStatus.FAILURE, "${exception.javaClass.simpleName}: ${exception.message!!}")
 		}
-
-		return task.execute().toString()
 	}
 
 	fun parseTask(line: String): AnnexTask {
@@ -99,9 +108,9 @@ object Program {
 		val command = parameters[0]
 		parameters = parameters.subList(1, parameters.size)
 		return when (command) {
-			LaunchTask.command -> LaunchTask( parameters)
-			PauseTask.command -> PauseTask( parameters)
-			UpdateTask.command -> UpdateTask( parameters)
+			LaunchTask.command -> LaunchTask(parameters)
+			PauseTask.command -> PauseTask(parameters)
+			UpdateTask.command -> UpdateTask(parameters)
 			else -> throw IllegalArgumentException("Unknown command: " + command)
 		}
 	}

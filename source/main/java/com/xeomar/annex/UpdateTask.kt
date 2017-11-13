@@ -31,8 +31,8 @@ class UpdateTask(parameters: List<String>) : AnnexTask(command, parameters) {
 		val source = Paths.get(parameters[0])
 		val target = Paths.get(parameters[1])
 
-		if (!Files.exists(source)) throw IllegalArgumentException("Source parameter not found: " + source)
-		if (!Files.exists(target)) throw IllegalArgumentException("Target parameter not found: " + target)
+		if (!Files.exists(source)) throw IllegalArgumentException("Source not found: " + source)
+		if (!Files.exists(target)) throw IllegalArgumentException("Target not found: " + target)
 		if (!Files.isDirectory(target)) throw IOException("Target must be a folder: " + target)
 
 
@@ -54,8 +54,7 @@ class UpdateTask(parameters: List<String>) : AnnexTask(command, parameters) {
 
 		log.info("Updated: $target")
 
-
-		return TaskResult(TaskStatus.SUCCESS, "success")
+		return TaskResult(TaskStatus.SUCCESS, "Updated: $target")
 	}
 
 	override fun toString(): String {

@@ -1,5 +1,8 @@
 package com.xeomar.annex
 
+import com.xeomar.util.TextUtil
+import java.util.*
+
 class LaunchTask(parameters: List<String>) : AnnexTask(command, parameters) {
 
 	override fun execute(): TaskResult {
@@ -9,7 +12,8 @@ class LaunchTask(parameters: List<String>) : AnnexTask(command, parameters) {
 
 		// TODO Without waiting for the process to finish, this task is asynchronous
 
-		return TaskResult(TaskStatus.SUCCESS, "success")
+		val commands = TextUtil.toString(builder.command())
+		return TaskResult(TaskStatus.SUCCESS, commands.substring(1, commands.length - 1))
 	}
 
 	companion object {
