@@ -7,8 +7,6 @@ import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Assert.assertThat
 import org.junit.Test
-import java.io.StringReader
-import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -79,7 +77,7 @@ class UpdateTaskTest {
 			assertThat(Files.exists(targetFile4), `is`(false))
 
 			// Execute the update task
-			val result = TaskResult.parse(Program.runTasksFromString("update ${sourceZip.toAbsolutePath()} ${targetRoot.toAbsolutePath()}"))
+			val result = TaskResult.parse(Program().runTasksFromString("update ${sourceZip.toAbsolutePath()} ${targetRoot.toAbsolutePath()}"))
 
 			// Verify the result
 			assertThat(result.code, `is`(0))
@@ -100,7 +98,7 @@ class UpdateTaskTest {
 
 	@Test
 	fun testExecuteFailure() {
-		val result = TaskResult.parse(Program.runTasksFromString("update /invalidsource /invalidtarget"))
+		val result = TaskResult.parse(Program().runTasksFromString("update /invalidsource /invalidtarget"))
 		assertThat(result.code, `is`(1))
 		assertThat(result.message, startsWith("IllegalArgumentException: Source not found"))
 	}

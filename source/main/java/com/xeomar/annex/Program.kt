@@ -1,32 +1,27 @@
 package com.xeomar.annex
 
 import com.xeomar.util.OperatingSystem
-import com.xeomar.util.ProductMetadata
+import com.xeomar.product.ProductCard
 import org.slf4j.LoggerFactory
 import java.io.*
 import java.nio.charset.Charset
 
-object Program {
+class Program {
 
-	private val log = LoggerFactory.getLogger(Program.javaClass)
+	private val log = LoggerFactory.getLogger(Program::class.java)
 
-	private var title = "Annex"
+	private val card: ProductCard = ProductCard()
 
-	private var metadata: ProductMetadata
+	private var title = card.name
 
 	private var elevatedProcess: Process? = null
 
-	init {
-		metadata = ProductMetadata()
-	}
-
-	@JvmStatic
-	fun main(commands: Array<String>) {
-		run(commands)
+	fun getMetadata(): ProductCard {
+		return card
 	}
 
 	fun run(commands: Array<String>) {
-		printHeader(metadata)
+		printHeader(card)
 
 		log.debug("Parsing commands...")
 
@@ -54,7 +49,7 @@ object Program {
 	fun runTasksFromString(commands: String): String {
 		val reader = StringReader(commands)
 		val writer = StringWriter()
-		Program.runTasksFromReader(reader, writer)
+		runTasksFromReader(reader, writer)
 		return writer.toString().trim()
 	}
 
@@ -75,7 +70,7 @@ object Program {
 	}
 
 	private fun executeTask(task: AnnexTask): TaskResult {
-		// NEXT Now for the hard part, figuring out how to execute the tasks
+		// Now for the hard part, figuring out how to execute the tasks.
 		// The reason this is hard is because some of the update commands will
 		// require elevated privileges. But we don't want to execute programs
 		// with an elevated process. If this process is elevated, we need to take
@@ -124,9 +119,16 @@ object Program {
 		}
 	}
 
-	private fun printHeader(metadata: ProductMetadata) {
-		System.err.println(metadata.name + " " + metadata.version)
+	private fun printHeader(card: ProductCard) {
+		System.err.println(card.name + " " + card.version)
 		System.err.println("Java " + System.getProperty("java.runtime.version"))
+	}
+
+	companion object {
+		@JvmStatic
+		fun main(commands: Array<String>) {
+			Program().run(commands)
+		}
 	}
 
 }

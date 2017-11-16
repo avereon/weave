@@ -21,7 +21,7 @@ class ProgramTest {
 		System.setOut(PrintStream(PipedOutputStream(outputPipe)))
 		try {
 			launch {
-				Program.run(arrayOf("--stream"))
+				Program().run(arrayOf("--stream"))
 			}
 
 			inputPipe.write("pause 0\n".toByteArray(charset("utf-8")))
@@ -52,7 +52,7 @@ class ProgramTest {
 		val writer = PipedWriter(outputPipe)
 
 		launch {
-			Program.runTasksFromReader(reader, writer)
+			Program().runTasksFromReader(reader, writer)
 		}
 
 		inputPipe.write("pause 0\n")
