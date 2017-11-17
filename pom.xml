@@ -42,7 +42,7 @@
 		<product-name>${project.name}</product-name>
 		<product-identifier>annex</product-identifier>
 		<slf4j.version>1.8.0-alpha2</slf4j.version>
-		<kotlin.version>1.1.51</kotlin.version>
+		<kotlin.version>1.1.60</kotlin.version>
 	</properties>
 
 	<dependencies>
