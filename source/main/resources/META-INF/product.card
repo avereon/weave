@@ -1,28 +1,28 @@
-group: ${project.groupId}
-artifact: ${project.artifactId}
-version: ${project.version}
-timestamp: ${project.timestamp}
+group: "${project.groupId}"
+artifact: "${project.artifactId}"
+version: "${project.version}"
+timestamp: "${project.timestamp}"
 
-icon: http://www.xeomar.com/images/icons/${project.artifactId}.png
-name: ${project.name}
-provider: ${project.organization.name}
+icon: "http://www.xeomar.com/images/icons/${project.artifactId}.png"
+name: "${project.name}"
+provider: "${project.organization.name}"
 inception: ${project.inceptionYear}
 
-summary: Java-based update utility
-description: ${project.description}
-copyright: All rights reserved.
-license: ${project.name} comes with ABSOLUTELY NO WARRANTY. This is open software, and you are welcome to redistribute it under certain conditions.
+summary: "Java-based update utility"
+description: "${project.description}"
+copyright: "All rights reserved."
+license: "${project.name} comes with ABSOLUTELY NO WARRANTY. This is open software, and you are welcome to redistribute it under certain conditions."
 
 card: "http://www.xeomar.com/download/product/${project.artifactId}/product.card"
 pack: "http://www.xeomar.com/download/product/${project.artifactId}/product.pack"
 main: "com.xeomar.annex.Program"
-java: 9
+java: "9"
 
 maintainers:
   - !!com.xeomar.util.Maintainer
-    name: Mark Soderquist
-    email: mark.soderquist@xeomar.com
+    name: "Mark Soderquist"
+    email: "mark.soderquist@xeomar.com"
     roles:
-      - Architect
-    organization: Xeomar
-    organizationUrl: http://xeomar.com/
+      - "Architect"
+    organization: "Xeomar"
+    organizationUrl: "http://xeomar.com/"
