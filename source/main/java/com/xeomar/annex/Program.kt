@@ -1,24 +1,35 @@
 package com.xeomar.annex
 
-import com.xeomar.util.OperatingSystem
+import com.xeomar.product.Product
+import com.xeomar.product.ProductBundle
 import com.xeomar.product.ProductCard
+import com.xeomar.util.OperatingSystem
 import org.slf4j.LoggerFactory
 import java.io.*
 import java.nio.charset.Charset
+import java.nio.file.Path
 
-class Program {
+class Program : Product {
 
 	private val log = LoggerFactory.getLogger(Program::class.java)
 
-	private val card: ProductCard = ProductCard()
+	private val card = ProductCard()
+
+	private val resourceBundle = ProductBundle(javaClass.classLoader)
+
+	private val programDataFolder = OperatingSystem.getUserProgramDataFolder(card.artifact, card.name)
 
 	private var title = card.name
 
 	private var elevatedProcess: Process? = null
 
-	fun getMetadata(): ProductCard {
-		return card
-	}
+	override fun getCard(): ProductCard = card
+
+	override fun getClassLoader(): ClassLoader = javaClass.classLoader
+
+	override fun getResourceBundle(): ProductBundle = resourceBundle
+
+	override fun getDataFolder(): Path = programDataFolder
 
 	fun run(commands: Array<String>) {
 		printHeader(card)
