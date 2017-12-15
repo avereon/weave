@@ -17,7 +17,7 @@ class LaunchTask(parameters: List<String>) : AnnexTask(command, parameters) {
 	}
 
 	companion object {
-		val command = "launch"
+		val command = UpdateFlag.LAUNCH
 	}
 
 }

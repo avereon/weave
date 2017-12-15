@@ -8,7 +8,7 @@ class PauseTask(parameters: List<String>) : AnnexTask(command, parameters) {
 	}
 
 	companion object {
-		val command = "pause"
+		val command = UpdateFlag.PAUSE
 	}
 
 }

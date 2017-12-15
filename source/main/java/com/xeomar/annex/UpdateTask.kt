@@ -134,7 +134,7 @@ class UpdateTask(parameters: List<String>) : AnnexTask(command, parameters) {
 	}
 
 	companion object {
-		val command = "update"
+		val command = UpdateFlag.UPDATE
 	}
 
 }

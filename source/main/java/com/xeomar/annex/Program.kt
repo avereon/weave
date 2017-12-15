@@ -38,9 +38,9 @@ class Program : Product {
 
 		for ((index, command) in commands.withIndex()) {
 			when (command) {
-				"--title" -> title = commands[index + 1]
-				"--stream" -> runTasksFromStdIn()
-				"--file" -> runTasksFromFile(File(commands[1]))
+				UpdateFlag.TITLE -> title = commands[index + 1]
+				UpdateFlag.STREAM -> runTasksFromStdIn()
+				UpdateFlag.FILE -> runTasksFromFile(File(commands[1]))
 			}
 		}
 	}
