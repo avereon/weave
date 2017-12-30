@@ -1,28 +1,26 @@
-group: "${project.groupId}"
-artifact: "${project.artifactId}"
-version: "${project.version}"
-timestamp: "${project.timestamp}"
-
-icon: "http://www.xeomar.com/images/icons/${project.artifactId}.png"
-name: "${project.name}"
-provider: "${project.organization.name}"
-inception: ${project.inceptionYear}
-
-summary: "Java-based update utility"
-description: "${project.description}"
-copyright: "All rights reserved."
-license: "${project.name} comes with ABSOLUTELY NO WARRANTY. This is open software, and you are welcome to redistribute it under certain conditions."
-
-card: "http://www.xeomar.com/download/product/${project.artifactId}/product.card"
-pack: "http://www.xeomar.com/download/product/${project.artifactId}/product.pack"
-main: "com.xeomar.annex.Program"
-java: "9"
-
-maintainers:
-  - !!com.xeomar.util.Maintainer
-    name: "Mark Soderquist"
-    email: "mark.soderquist@xeomar.com"
-    roles:
-      - "Architect"
-    organization: "Xeomar"
-    organizationUrl: "http://xeomar.com/"
+{
+  "group" : "${project.groupId}",
+  "artifact" : "${project.artifactId}",
+  "version" : "${project.version}",
+  "timestamp" : "${project.timestamp}",
+  "iconUri" : "http://xeomar.com/images/icons/${project.artifactId}.png",
+  "name" : "${project.name}",
+  "provider" : "${project.organization.name}",
+  "inception" : "${project.inceptionYear}",
+  "summary" : "Java update utility",
+  "description" : "${project.description}",
+  "copyrightSummary" : "All rights reserved.",
+  "licenseSummary" : "${project.name} comes with ABSOLUTELY NO WARRANTY. This is open software, and you are welcome to redistribute it under certain conditions.",
+  "cardUri" : "http://xeomar.com/download/${project.artifactId}/product/card/{0}",
+  "packUri" : "http://xeomar.com/download/${project.artifactId}/product/pack/{0}",
+  "mainClass" : "com.xeomar.annex.Program",
+  "javaVersion" : "9",
+  "maintainers" : [ {
+    "name" : "Mark Soderquist",
+    "email" : "mark.soderquist@xeomar.com",
+    "timezone" : null,
+    "organization" : "Xeomar",
+    "organizationUrl" : "http://www.xeomar.com",
+    "roles" : [ "Architect", "Developer" ]
+  } ]
+}

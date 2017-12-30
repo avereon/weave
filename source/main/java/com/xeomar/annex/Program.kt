@@ -33,6 +33,7 @@ class Program : Product {
 
 	fun run(commands: Array<String>) {
 		printHeader(card)
+		card.updateWith(ProductCard.loadCard(), null)
 
 		log.debug("Parsing commands...")
 
