@@ -132,7 +132,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.xeomar.xenon.Program</mainClass>
+							<mainClass>com.xeomar.annex.Program</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
