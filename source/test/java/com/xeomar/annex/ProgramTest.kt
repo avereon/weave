@@ -8,7 +8,7 @@ import java.io.*
 
 class ProgramTest {
 
-	@Test(timeout=2500)
+	@Test(timeout=2000)
 	@Throws(Exception::class)
 	fun testReadCommandsFromStdin() {
 		val originalInput = System.`in`
@@ -42,7 +42,7 @@ class ProgramTest {
 		}
 	}
 
-	@Test(timeout=2500)
+	@Test(timeout=2000)
 	@Throws(Exception::class)
 	fun testReadCommandsFromBytes() {
 		val outputPipe = PipedReader()
