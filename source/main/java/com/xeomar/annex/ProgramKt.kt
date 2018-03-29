@@ -9,9 +9,9 @@ import java.io.*
 import java.nio.charset.Charset
 import java.nio.file.Path
 
-class Program : Product {
+class ProgramKt : Product {
 
-	private val log = LoggerFactory.getLogger(Program::class.java)
+	private val log = LoggerFactory.getLogger(ProgramKt::class.java)
 
 	private val card = ProductCard()
 
@@ -81,7 +81,7 @@ class Program : Product {
 		}
 	}
 
-	private fun executeTask(task: AnnexTask): TaskResult {
+	private fun executeTask(task: AnnexTaskKt): TaskResultKt {
 		// Now for the hard part, figuring out how to execute the tasks.
 		// The reason this is hard is because some of the update commands will
 		// require elevated privileges. But we don't want to execute programs
@@ -110,23 +110,23 @@ class Program : Product {
 					elevatedProcess = OperatingSystem.startProcessElevated(title, processBuilder)
 				}
 				elevatedProcess?.outputStream?.writer(Charset.forName("utf-8"))?.write(task.execute().toString())
-				TaskResult.parse(BufferedReader(InputStreamReader(elevatedProcess?.inputStream)).readLine())
+				TaskResultKt.parse(BufferedReader(InputStreamReader(elevatedProcess?.inputStream)).readLine())
 			} else {
 				task.execute()
 			}
 		} catch (exception: Exception) {
-			TaskResult(TaskStatus.FAILURE, "${exception.javaClass.simpleName}: ${exception.message!!}")
+			TaskResultKt(TaskStatusKt.FAILURE, "${exception.javaClass.simpleName}: ${exception.message!!}")
 		}
 	}
 
-	fun parseTask(line: String): AnnexTask {
+	fun parseTask(line: String): AnnexTaskKt {
 		var parameters = line.split(" ")
 		val command = parameters[0]
 		parameters = parameters.subList(1, parameters.size)
 		return when (command) {
-			LaunchTask.command -> LaunchTask(parameters)
-			PauseTask.command -> PauseTask(parameters)
-			UpdateTask.command -> UpdateTask(parameters)
+			LaunchTaskKt.command -> LaunchTaskKt(parameters)
+			PauseTaskKt.command -> PauseTaskKt(parameters)
+			UpdateTaskKt.command -> UpdateTaskKt(parameters)
 			else -> throw IllegalArgumentException("Unknown command: " + command)
 		}
 	}
@@ -139,7 +139,7 @@ class Program : Product {
 	companion object {
 		@JvmStatic
 		fun main(commands: Array<String>) {
-			Program().run(commands)
+			ProgramKt().run(commands)
 		}
 	}
 

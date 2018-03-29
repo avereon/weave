@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
-class UpdateTask(parameters: List<String>) : AnnexTask(command, parameters) {
+class UpdateTaskKt(parameters: List<String>) : AnnexTaskKt(command, parameters) {
 
 	private val log = LoggerFactory.getLogger(javaClass)
 
@@ -27,7 +27,7 @@ class UpdateTask(parameters: List<String>) : AnnexTask(command, parameters) {
 		return Files.exists(target) && !Files.isWritable(target)
 	}
 
-	override fun execute(): TaskResult {
+	override fun execute(): TaskResultKt {
 		val source = Paths.get(parameters[0])
 		val target = Paths.get(parameters[1])
 
@@ -54,7 +54,7 @@ class UpdateTask(parameters: List<String>) : AnnexTask(command, parameters) {
 
 		log.info("Updated: $target")
 
-		return TaskResult(TaskStatus.SUCCESS, "Updated: $target")
+		return TaskResultKt(TaskStatusKt.SUCCESS, "Updated: $target")
 	}
 
 	override fun toString(): String {

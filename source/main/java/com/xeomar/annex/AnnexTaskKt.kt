@@ -1,8 +1,8 @@
 package com.xeomar.annex
 
-abstract class AnnexTask(val command: String,  val parameters: List<String>) {
+abstract class AnnexTaskKt(val command: String, val parameters: List<String>) {
 
-	abstract fun execute():TaskResult
+	abstract fun execute():TaskResultKt
 
 	open fun needsElevation(): Boolean {
 		return false

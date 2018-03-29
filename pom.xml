@@ -132,7 +132,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.xeomar.annex.Program</mainClass>
+							<mainClass>com.xeomar.annex.ProgramKt</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

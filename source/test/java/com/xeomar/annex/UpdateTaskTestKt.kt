@@ -11,13 +11,13 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
 
-class UpdateTaskTest {
+class UpdateTaskTestKt {
 
 	@Test
 	fun testConstructor() {
 		val source = "source"
 		val target = "target"
-		val task = LaunchTask(Arrays.asList(source, target))
+		val task = LaunchTaskKt(Arrays.asList(source, target))
 		Assert.assertThat(task.parameters[0], Matchers.`is`(source))
 		Assert.assertThat(task.parameters[1], Matchers.`is`(target))
 		Assert.assertThat(task.parameters.size, Matchers.`is`(2))
@@ -68,7 +68,7 @@ class UpdateTaskTest {
 			FileUtil.zip(sourceRoot, sourceZip)
 
 			// Create the update task
-			//val task = UpdateTask(listOf(sourceZip.toAbsolutePath().toString(), targetRoot.toAbsolutePath().toString()))
+			//val task = UpdateTaskKt(listOf(sourceZip.toAbsolutePath().toString(), targetRoot.toAbsolutePath().toString()))
 
 			// Verify the target values before executing the task
 			assertThat(FileUtil.load(targetFile1), `is`(targetData1))
@@ -77,7 +77,7 @@ class UpdateTaskTest {
 			assertThat(Files.exists(targetFile4), `is`(false))
 
 			// Execute the update task
-			val result = TaskResult.parse(Program().runTasksFromString("update ${sourceZip.toAbsolutePath()} ${targetRoot.toAbsolutePath()}"))
+			val result = TaskResultKt.parse(ProgramKt().runTasksFromString("update ${sourceZip.toAbsolutePath()} ${targetRoot.toAbsolutePath()}"))
 
 			// Verify the result
 			assertThat(result.code, `is`(0))
@@ -98,7 +98,7 @@ class UpdateTaskTest {
 
 	@Test
 	fun testExecuteFailure() {
-		val result = TaskResult.parse(Program().runTasksFromString("update /invalidsource /invalidtarget"))
+		val result = TaskResultKt.parse(ProgramKt().runTasksFromString("update /invalidsource /invalidtarget"))
 		assertThat(result.code, `is`(1))
 		assertThat(result.message, startsWith("IllegalArgumentException: Source not found"))
 	}
