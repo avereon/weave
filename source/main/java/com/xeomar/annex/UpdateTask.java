@@ -6,7 +6,6 @@ import com.xeomar.util.LogUtil;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,8 +98,9 @@ public class UpdateTask extends AnnexTask {
 			Path addFile = file.getParent().resolve( file.getFileName().toString() + ADD_SUFFIX );
 			if( Files.exists( file ) ) Files.move( file, delFile, StandardCopyOption.ATOMIC_MOVE );
 			Files.createDirectories( file.getParent() );
-			FileOutputStream output = new FileOutputStream( addFile.toFile() );
-			IOUtils.copy( input, output );
+			try( FileOutputStream output = new FileOutputStream( addFile.toFile() ) ) {
+				IOUtils.copy( input, output );
+			}
 		}
 
 		log.debug( "Staging: {}", entry );
