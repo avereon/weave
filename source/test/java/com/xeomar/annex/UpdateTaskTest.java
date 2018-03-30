@@ -81,8 +81,6 @@ public class UpdateTaskTest {
 			String targetRootPath = targetRoot.toAbsolutePath().toString();
 			TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.UPDATE + " " + sourceZipPath + " " + targetRootPath ) );
 
-			System.out.println( result );
-
 			// Verify the result
 			assertThat( result.getStatus(), is( TaskStatus.SUCCESS ) );
 			assertThat( result.getMessage(), startsWith( "Updated:" ) );
@@ -94,9 +92,9 @@ public class UpdateTaskTest {
 			assertThat( FileUtil.load( targetFile3 ), is( sourceData2 ) );
 			assertThat( FileUtil.load( targetFile4 ), is( sourceData4 ) );
 		} finally {
-			FileUtil.deleteOnExit( targetRoot );
-			FileUtil.deleteOnExit( sourceRoot );
-			FileUtil.deleteOnExit( sourceZip );
+			FileUtil.delete( targetRoot );
+			FileUtil.delete( sourceRoot );
+			FileUtil.delete( sourceZip );
 		}
 	}
 

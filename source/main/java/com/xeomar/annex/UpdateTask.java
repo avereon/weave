@@ -17,6 +17,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -48,7 +49,7 @@ public class UpdateTask extends AnnexTask {
 		if( !Files.exists( target ) ) throw new IllegalArgumentException( "Target not found: " + target );
 		if( !Files.isDirectory( target ) ) throw new IOException( "Target must be a folder: " + target );
 
-		log.info( "Staging: {}", source );
+		log.debug( "Staging: {}", source );
 
 		try {
 			stage( source, target );
@@ -60,7 +61,7 @@ public class UpdateTask extends AnnexTask {
 			throw throwable;
 		}
 
-		log.info( "Committing: {}", target );
+		log.debug( "Committing: {}", target );
 		commit( target, target );
 
 		log.info( "Updated: {}", target );
@@ -76,12 +77,13 @@ public class UpdateTask extends AnnexTask {
 	private void stage( Path source, Path target ) throws IOException {
 		log.trace( "Staging: {} to {}...", source.getFileName(), target );
 
-		ZipFile zip = new ZipFile( source.toFile() );
-		Enumeration<? extends ZipEntry> entries = zip.entries();
-		while( entries.hasMoreElements() ) {
-			ZipEntry entry = entries.nextElement();
-			boolean staged = stage( zip.getInputStream( entry ), target, entry.getName() );
-			if( !staged ) throw new RuntimeException( "Could not stage: " + target.resolve( entry.getName() ) );
+		try( ZipFile zip = new ZipFile( source.toFile() ) ) {
+			Enumeration<? extends ZipEntry> entries = zip.entries();
+			while( entries.hasMoreElements() ) {
+				ZipEntry entry = entries.nextElement();
+				boolean staged = stage( zip.getInputStream( entry ), target, entry.getName() );
+				if( !staged ) throw new RuntimeException( "Could not stage: " + target.resolve( entry.getName() ) );
+			}
 		}
 
 		log.debug( "Staged: {} to {}", source.getFileName(), target );
@@ -110,7 +112,9 @@ public class UpdateTask extends AnnexTask {
 	private void revert( Path root, Path target ) throws IOException {
 		// Revert staged changes.
 		if( Files.isDirectory( target ) ) {
-			for( Path file : Files.list( target ).collect( Collectors.toList() ) ) revert( root, file );
+			try( Stream<Path> paths = Files.list( target ) ) {
+				for( Path file : paths.collect( Collectors.toList() ) ) revert( root, file );
+			}
 		} else {
 			if( target.getFileName().toString().endsWith( DEL_SUFFIX ) ) {
 				Files.move( target, FileUtil.removeExtension( target ), StandardCopyOption.ATOMIC_MOVE );
@@ -123,7 +127,9 @@ public class UpdateTask extends AnnexTask {
 	private void commit( Path root, Path target ) throws IOException {
 		// Commit staged changes.
 		if( Files.isDirectory( target ) ) {
-			for( Path file : Files.list( target ).collect( Collectors.toList() ) ) commit( root, file );
+			try( Stream<Path> paths = Files.list( target ) ) {
+				for( Path file : paths.collect( Collectors.toList() ) ) commit( root, file );
+			}
 		} else {
 			if( target.getFileName().toString().endsWith( ADD_SUFFIX ) ) {
 				String sourceHash = HashUtil.hash( target );
