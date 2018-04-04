@@ -28,8 +28,12 @@ public class Program implements Product {
 	private Process elevatedProcess;
 
 	public Program() {
-		this.card = new ProductCard();
-		this.resourceBundle = new ProductBundle( getClass().getClassLoader() );
+		try( InputStream input = getClass().getResourceAsStream( ProductCard.INFO ) ) {
+			this.card = new ProductCard().init( input );
+		} catch( IOException exception ) {
+			exception.printStackTrace( System.err );
+		}
+		this.resourceBundle = new ProductBundle( getClass() );
 		this.programDataFolder = OperatingSystem.getUserProgramDataFolder( card.getArtifact(), card.getName() );
 		this.title = card.getName();
 	}
