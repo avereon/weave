@@ -28,10 +28,10 @@ public class Program implements Product {
 	private Process elevatedProcess;
 
 	public Program() {
-		try( InputStream input = getClass().getResourceAsStream( ProductCard.INFO ) ) {
-			this.card = new ProductCard().init( input );
+		try {
+			this.card = new ProductCard().init( getClass() );
 		} catch( IOException exception ) {
-			exception.printStackTrace( System.err );
+			throw new RuntimeException( "Error loading product card", exception );
 		}
 		this.resourceBundle = new ProductBundle( getClass() );
 		this.programDataFolder = OperatingSystem.getUserProgramDataFolder( card.getArtifact(), card.getName() );

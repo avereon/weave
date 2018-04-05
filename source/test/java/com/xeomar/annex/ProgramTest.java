@@ -1,16 +1,22 @@
 package com.xeomar.annex;
 
+import com.xeomar.product.ProductCard;
 import org.junit.Test;
 
 import java.io.*;
-import java.nio.charset.Charset;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 public class ProgramTest {
 
 	private static final String CHARSET = "utf-8";
+
+	@Test
+	public void testProductCard() {
+		ProductCard card = new Program().getCard();
+		assertThat( card, not( is( nullValue() ) ) );
+	}
 
 	@Test( timeout = 2000 )
 	public void testReadCommandsFromStdin() throws IOException {
