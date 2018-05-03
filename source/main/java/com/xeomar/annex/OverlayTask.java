@@ -22,7 +22,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-public class UpdateTask extends AnnexTask {
+public class OverlayTask extends AnnexTask {
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 
@@ -30,8 +30,8 @@ public class UpdateTask extends AnnexTask {
 
 	private static final String ADD_SUFFIX = ".add";
 
-	public UpdateTask( List<String> parameters ) {
-		super( UpdateFlag.UPDATE, parameters );
+	public OverlayTask( List<String> parameters ) {
+		super( UpdateFlag.OVERLAY, parameters );
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class UpdateTask extends AnnexTask {
 		} catch( ZipException exception ) {
 			throw new IOException( "Source not a valid zip file: " + source );
 		} catch( Throwable throwable ) {
-			log.warn( "Update failed: " + target, throwable.getMessage() );
+			log.warn( "Overlay failed: " + target, throwable.getMessage() );
 			revert( target, target );
 			throw throwable;
 		}
@@ -64,9 +64,9 @@ public class UpdateTask extends AnnexTask {
 		log.debug( "Committing: {}", target );
 		commit( target, target );
 
-		log.info( "Updated: {}", target );
+		log.info( "Overlaid: {}", target );
 
-		return new TaskResult( TaskStatus.SUCCESS, "Updated: " + target );
+		return new TaskResult( TaskStatus.SUCCESS, "Overlaid: " + target );
 	}
 
 	@Override

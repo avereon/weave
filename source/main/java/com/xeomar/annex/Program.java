@@ -191,8 +191,8 @@ public class Program implements Product {
 			case UpdateFlag.PAUSE: {
 				return new PauseTask( parameterList );
 			}
-			case UpdateFlag.UPDATE: {
-				return new UpdateTask( parameterList );
+			case UpdateFlag.OVERLAY: {
+				return new OverlayTask( parameterList );
 			}
 			default: {
 				throw new IllegalArgumentException( "Unknown command: " + command );

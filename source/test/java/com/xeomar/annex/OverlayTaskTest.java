@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
-public class UpdateTaskTest {
+public class OverlayTaskTest {
 
 	@Test
 	public void testConstructor() {
@@ -37,13 +37,13 @@ public class UpdateTaskTest {
 		String sourceData3 = IdGenerator.getId();
 		String sourceData4 = IdGenerator.getId();
 
-		// Set up the update target
+		// Set up the overlay target
 		Path targetRoot = Files.createTempDirectory( getClass().getSimpleName() );
 		Path targetFile1 = Files.createTempFile( targetRoot, getClass().getSimpleName(), "" );
 		Path targetSubFolder = Files.createTempDirectory( targetRoot, getClass().getSimpleName() );
 		Path targetFile2 = Files.createTempFile( targetSubFolder, getClass().getSimpleName(), "" );
 
-		// Set up the update source
+		// Set up the overlay source
 		Path sourceRoot = Files.createTempDirectory( getClass().getSimpleName() );
 		Path sourceFile1 = sourceRoot.resolve( targetFile1.getFileName() );
 		Path sourceFile2 = Files.createTempFile( sourceRoot, getClass().getSimpleName(), "" );
@@ -63,11 +63,11 @@ public class UpdateTaskTest {
 		FileUtil.save( sourceData3, sourceFile3 );
 		FileUtil.save( sourceData4, sourceFile4 );
 
-		// Create the update package
+		// Create the overlay package
 		Path sourceZip = Paths.get( sourceRoot.toString() + ".zip" );
 
 		try {
-			// Create the update source
+			// Create the overlay source
 			FileUtil.zip( sourceRoot, sourceZip );
 
 			// Verify the target values before executing the task
@@ -76,14 +76,14 @@ public class UpdateTaskTest {
 			assertThat( Files.exists( targetFile3 ), is( false ) );
 			assertThat( Files.exists( targetFile4 ), is( false ) );
 
-			// Execute the update task
+			// Execute the overlay task
 			String sourceZipPath = sourceZip.toAbsolutePath().toString();
 			String targetRootPath = targetRoot.toAbsolutePath().toString();
-			TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.UPDATE + " " + sourceZipPath + " " + targetRootPath ) );
+			TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.OVERLAY + " " + sourceZipPath + " " + targetRootPath ) );
 
 			// Verify the result
 			assertThat( result.getStatus(), is( TaskStatus.SUCCESS ) );
-			assertThat( result.getMessage(), startsWith( "Updated:" ) );
+			assertThat( result.getMessage(), startsWith( "Overlaid:" ) );
 			assertThat( result.getMessage(), endsWith( targetRoot.getFileName().toString() ) );
 
 			// Verify the target values after executing the task
@@ -102,7 +102,7 @@ public class UpdateTaskTest {
 	public void testInvalidSource() throws Exception {
 		String source = "/invalidsource";
 		String target = "/invalidtarget";
-		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.UPDATE + " " + source + " " + target ) );
+		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.OVERLAY + " " + source + " " + target ) );
 		assertThat( result.getStatus(), is( TaskStatus.FAILURE ) );
 		assertThat( result.getMessage(), startsWith( "IllegalArgumentException: Source not found" ) );
 	}
@@ -111,7 +111,7 @@ public class UpdateTaskTest {
 	public void testInvalidTarget() throws Exception {
 		String source = new File( "" ).getCanonicalPath();
 		String target = "/invalidtarget";
-		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.UPDATE + " " + source + " " + target ) );
+		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.OVERLAY + " " + source + " " + target ) );
 		assertThat( result.getStatus(), is( TaskStatus.FAILURE ) );
 		assertThat( result.getMessage(), startsWith( "IllegalArgumentException: Target not found" ) );
 	}
