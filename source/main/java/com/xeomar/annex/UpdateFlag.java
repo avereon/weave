@@ -1,6 +1,8 @@
 package com.xeomar.annex;
 
-public interface UpdateFlag {
+import com.xeomar.util.LogFlag;
+
+public interface UpdateFlag extends LogFlag {
 
 	/**
 	 * The file flag indicates the program should read commands from the

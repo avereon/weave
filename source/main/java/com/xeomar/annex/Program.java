@@ -71,9 +71,15 @@ public class Program implements Product {
 
 		log.debug( "Parsing commands..." );
 
+		// NEXT Fix parameter handling in Annex
+
 		for( int index = 0; index < commands.length; index++ ) {
 			String command = commands[ index ];
 			switch( command ) {
+				case UpdateFlag.LOG_LEVEL: {
+					//logFile = commands[ index + 1 ];
+					break;
+				}
 				case UpdateFlag.TITLE: {
 					title = commands[ index + 1 ];
 					break;
