@@ -5,6 +5,7 @@ import com.xeomar.product.ProductBundle;
 import com.xeomar.product.ProductCard;
 import com.xeomar.util.LogUtil;
 import com.xeomar.util.OperatingSystem;
+import com.xeomar.util.Parameters;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -26,6 +27,8 @@ public class Program implements Product {
 	private String title;
 
 	private Process elevatedProcess;
+
+	private Parameters parameters;
 
 	public Program() {
 		try {
@@ -67,9 +70,18 @@ public class Program implements Product {
 	}
 
 	public void run( String[] commands ) throws IOException {
+		// Parse parameters
+		parameters = Parameters.parse(commands);
+
+		// Configure logging
+		LogUtil.configureLogging( card.getArtifact(), this, parameters );
+
+		// Print the program header
 		printHeader( card );
 
 		log.debug( "Parsing commands..." );
+		log.info( "Hello Annex!");
+		log.info( "Parameters: " + parameters );
 
 		// NEXT Fix parameter handling in Annex
 
@@ -98,6 +110,7 @@ public class Program implements Product {
 
 	private void runTasksFromStdIn() throws IOException {
 		runTasksFromStream( System.in, System.out );
+		System.out.close();
 	}
 
 	private void runTasksFromFile( File file ) throws IOException {
@@ -130,6 +143,7 @@ public class Program implements Product {
 
 			line = buffer.readLine();
 		}
+		printWriter.close();
 	}
 
 	private void printHeader( ProductCard card ) {
