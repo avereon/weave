@@ -79,7 +79,7 @@ public class OverlayTaskTest {
 			// Execute the overlay task
 			String sourceZipPath = sourceZip.toAbsolutePath().toString();
 			String targetRootPath = targetRoot.toAbsolutePath().toString();
-			TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.OVERLAY + " " + sourceZipPath + " " + targetRootPath ) );
+			TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateTask.OVERLAY + " " + sourceZipPath + " " + targetRootPath ) );
 
 			// Verify the result
 			assertThat( result.getStatus(), is( TaskStatus.SUCCESS ) );
@@ -102,7 +102,7 @@ public class OverlayTaskTest {
 	public void testInvalidSource() throws Exception {
 		String source = "/invalidsource";
 		String target = "/invalidtarget";
-		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.OVERLAY + " " + source + " " + target ) );
+		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateTask.OVERLAY + " " + source + " " + target ) );
 		assertThat( result.getStatus(), is( TaskStatus.FAILURE ) );
 		assertThat( result.getMessage(), startsWith( "IllegalArgumentException: Source not found" ) );
 	}
@@ -111,7 +111,7 @@ public class OverlayTaskTest {
 	public void testInvalidTarget() throws Exception {
 		String source = new File( "" ).getCanonicalPath();
 		String target = "/invalidtarget";
-		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.OVERLAY + " " + source + " " + target ) );
+		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateTask.OVERLAY + " " + source + " " + target ) );
 		assertThat( result.getStatus(), is( TaskStatus.FAILURE ) );
 		assertThat( result.getMessage(), startsWith( "IllegalArgumentException: Target not found" ) );
 	}

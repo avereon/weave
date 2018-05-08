@@ -12,7 +12,7 @@ public class PauseTest {
 	public void testExecute() throws Exception {
 		long delay = 50L;
 		long start = System.currentTimeMillis();
-		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.PAUSE + " " + delay ) );
+		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateTask.PAUSE + " " + delay ) );
 		long stop = System.currentTimeMillis();
 
 		assertThat( stop - start, is( greaterThanOrEqualTo( delay ) ) );
@@ -22,7 +22,7 @@ public class PauseTest {
 
 	@Test
 	public void testExecuteFailure() throws Exception {
-		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateFlag.PAUSE + " forever" ) );
+		TaskResult result = TaskResult.parse( new Program().runTasksFromString( UpdateTask.PAUSE + " forever" ) );
 
 		assertThat( result.getStatus(), is( TaskStatus.FAILURE ) );
 		assertThat( result.getMessage(), is( "NumberFormatException: For input string: \"forever\"" ) );

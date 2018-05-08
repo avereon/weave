@@ -36,9 +36,9 @@ public class Program implements Product {
 		} catch( IOException exception ) {
 			throw new RuntimeException( "Error loading product card", exception );
 		}
+		this.title = card.getName();
 		this.resourceBundle = new ProductBundle( getClass() );
 		this.programDataFolder = OperatingSystem.getUserProgramDataFolder( card.getArtifact(), card.getName() );
-		this.title = card.getName();
 	}
 
 	public static void main( String[] commands ) {
@@ -71,7 +71,7 @@ public class Program implements Product {
 
 	public void run( String[] commands ) throws IOException {
 		// Parse parameters
-		parameters = Parameters.parse(commands);
+		parameters = Parameters.parse( commands );
 
 		// Configure logging
 		LogUtil.configureLogging( card.getArtifact(), this, parameters );
@@ -79,38 +79,29 @@ public class Program implements Product {
 		// Print the program header
 		printHeader( card );
 
-		log.debug( "Parsing commands..." );
-		log.info( "Hello Annex!");
-		log.info( "Parameters: " + parameters );
+		log.info( card.getName() + " program started" );
 
-		// NEXT Fix parameter handling in Annex
+		if( parameters.isSet( UpdateFlag.TITLE )) title = parameters.get( UpdateFlag.TITLE );
 
-		for( int index = 0; index < commands.length; index++ ) {
-			String command = commands[ index ];
-			switch( command ) {
-				case UpdateFlag.LOG_LEVEL: {
-					//logFile = commands[ index + 1 ];
-					break;
-				}
-				case UpdateFlag.TITLE: {
-					title = commands[ index + 1 ];
-					break;
-				}
-				case UpdateFlag.STREAM: {
-					runTasksFromStdIn();
-					break;
-				}
-				case UpdateFlag.FILE: {
-					runTasksFromFile( new File( commands[ index + 1 ] ) );
-					break;
-				}
-			}
+		boolean stream = parameters.isSet( UpdateFlag.STREAM );
+		boolean file = parameters.isSet( UpdateFlag.FILE );
+
+		if( stream & file ) {
+			log.error( "Cannot use both stream and file parameters at the same time");
+			return;
+		} else if( !( stream | file ) ) {
+			log.error( "Must use either stream or file to provide update commands");
 		}
+
+		if( file) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
+		if( stream ) runTasksFromStdIn();
+
+		log.info( card.getName() + " program finished" );
 	}
 
 	private void runTasksFromStdIn() throws IOException {
 		runTasksFromStream( System.in, System.out );
-		System.out.close();
+		//System.out.close();
 	}
 
 	private void runTasksFromFile( File file ) throws IOException {
@@ -135,9 +126,11 @@ public class Program implements Product {
 		String line = buffer.readLine();
 		while( line != null ) {
 			AnnexTask task = parseTask( line );
+			log.info( "Task: " + task );
 			TaskResult result = executeTask( task );
+			log.info( "Result: " + result );
+
 			printWriter.print( result );
-			//printWriter.print("\r\n")
 			printWriter.print( "\n" );
 			printWriter.flush();
 
@@ -147,7 +140,7 @@ public class Program implements Product {
 	}
 
 	private void printHeader( ProductCard card ) {
-		// These use System.err because System.in is used for communication
+		// These use System.err because System.out is used for communication
 		System.err.println( card.getName() + " " + card.getVersion() );
 		System.err.println( "Java " + System.getProperty( "java.runtime.version" ) );
 	}
@@ -205,13 +198,16 @@ public class Program implements Product {
 		List<String> parameterList = Arrays.asList( Arrays.copyOfRange( parameters, 1, parameters.length ) );
 
 		switch( command ) {
-			case UpdateFlag.LAUNCH: {
+			case UpdateTask.LAUNCH: {
 				return new LaunchTask( parameterList );
 			}
-			case UpdateFlag.PAUSE: {
+			case UpdateTask.LOG: {
+				return new LogTask( parameterList );
+			}
+			case UpdateTask.PAUSE: {
 				return new PauseTask( parameterList );
 			}
-			case UpdateFlag.OVERLAY: {
+			case UpdateTask.OVERLAY: {
 				return new OverlayTask( parameterList );
 			}
 			default: {

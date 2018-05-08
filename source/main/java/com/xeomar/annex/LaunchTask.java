@@ -7,7 +7,7 @@ import java.util.List;
 public class LaunchTask extends AnnexTask {
 
 	public LaunchTask( List<String> parameters ) {
-		super( UpdateFlag.LAUNCH, parameters );
+		super( UpdateTask.LAUNCH, parameters );
 	}
 
 	@Override

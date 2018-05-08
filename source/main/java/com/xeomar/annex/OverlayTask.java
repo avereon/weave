@@ -31,7 +31,7 @@ public class OverlayTask extends AnnexTask {
 	private static final String ADD_SUFFIX = ".add";
 
 	public OverlayTask( List<String> parameters ) {
-		super( UpdateFlag.OVERLAY, parameters );
+		super( UpdateTask.OVERLAY, parameters );
 	}
 
 	@Override

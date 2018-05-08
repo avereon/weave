@@ -43,7 +43,7 @@ public class ProgramTest {
 			assertThat( result1.getStatus(), is( TaskStatus.SUCCESS ) );
 			assertThat( result1.getMessage(), is( "success" ) );
 
-			inputPipe.write( "pause 0".getBytes( CHARSET ) );
+			inputPipe.write( "pause 0\n".getBytes( CHARSET ) );
 			inputPipe.close();
 			TaskResult result2 = TaskResult.parse( new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine() );
 			assertThat( result2.getStatus(), is( TaskStatus.SUCCESS ) );

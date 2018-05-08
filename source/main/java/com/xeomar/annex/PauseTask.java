@@ -5,7 +5,7 @@ import java.util.List;
 public class PauseTask extends AnnexTask {
 
 	public PauseTask( List<String> parameters ) {
-		super( UpdateFlag.PAUSE, parameters );
+		super( UpdateTask.PAUSE, parameters );
 	}
 
 	@Override
