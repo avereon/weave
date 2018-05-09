@@ -1,5 +1,6 @@
 package com.xeomar.annex;
 
+import com.xeomar.annex.task.*;
 import com.xeomar.product.Product;
 import com.xeomar.product.ProductBundle;
 import com.xeomar.product.ProductCard;
@@ -46,6 +47,7 @@ public class Program implements Product {
 			new Program().run( commands );
 		} catch( Throwable throwable ) {
 			throwable.printStackTrace( System.err );
+			log.error( "Execution error", throwable );
 		}
 	}
 
@@ -167,9 +169,12 @@ public class Program implements Product {
 		// If needsElevation is true then a separate, elevated, process will need
 		// to be started to execute some tasks.
 
-		TaskResult result = null;
+		TaskResult result;
 
 		try {
+			// Validate the task parameters before asking if it needs elevation
+			task.validate();
+
 			if( task.needsElevation() ) {
 				if( elevatedProcess == null ) {
 					// TODO Create elevated updater
@@ -203,6 +208,9 @@ public class Program implements Product {
 			}
 			case UpdateTask.LOG: {
 				return new LogTask( parameterList );
+			}
+			case UpdateTask.MOVE: {
+				return new MoveTask( parameterList );
 			}
 			case UpdateTask.PAUSE: {
 				return new PauseTask( parameterList );
