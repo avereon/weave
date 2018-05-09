@@ -39,15 +39,13 @@ public class ProgramTest {
 
 			inputPipe.write( "pause 0\n".getBytes( CHARSET ) );
 			inputPipe.flush();
-			TaskResult result1 = TaskResult.parse( new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine() );
-			assertThat( result1.getStatus(), is( TaskStatus.SUCCESS ) );
-			assertThat( result1.getMessage(), is( "success" ) );
+			String result1 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
+			assertThat( result1, is( "SUCCESS success" ) );
 
 			inputPipe.write( "pause 0\n".getBytes( CHARSET ) );
 			inputPipe.close();
-			TaskResult result2 = TaskResult.parse( new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine() );
-			assertThat( result2.getStatus(), is( TaskStatus.SUCCESS ) );
-			assertThat( result2.getMessage(), is( "success" ) );
+			String result2 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
+			assertThat( result2, is( "SUCCESS success" ) );
 		} finally {
 			// Restore the original streams
 			System.setOut( originalOutput );
@@ -73,15 +71,13 @@ public class ProgramTest {
 
 		inputPipe.write( "pause 0\n" );
 		inputPipe.flush();
-		TaskResult result1 = TaskResult.parse( new BufferedReader( outputPipe ).readLine() );
-		assertThat( result1.getStatus(), is( TaskStatus.SUCCESS ) );
-		assertThat( result1.getMessage(), is( "success" ) );
+		String result1 = new BufferedReader( outputPipe ).readLine();
+		assertThat( result1, is( "SUCCESS success" ) );
 
 		inputPipe.write( "pause 0" );
 		inputPipe.close();
-		TaskResult result2 = TaskResult.parse( new BufferedReader( outputPipe ).readLine() );
-		assertThat( result2.getStatus(), is( TaskStatus.SUCCESS ) );
-		assertThat( result2.getMessage(), is( "success" ) );
+		String result2 = new BufferedReader( outputPipe ).readLine();
+		assertThat( result2, is( "SUCCESS success" ) );
 	}
 
 }

@@ -1,4 +1,9 @@
-package com.xeomar.annex;
+package com.xeomar.annex.task;
+
+import com.xeomar.annex.AnnexTask;
+import com.xeomar.annex.TaskResult;
+import com.xeomar.annex.TaskStatus;
+import com.xeomar.annex.UpdateTask;
 
 import java.util.List;
 
@@ -11,7 +16,7 @@ public class PauseTask extends AnnexTask {
 	@Override
 	public TaskResult execute() throws Exception {
 		Thread.sleep( Long.parseLong( getParameters().get( 0 ) ) );
-		return new TaskResult( TaskStatus.SUCCESS, "success" );
+		return new TaskResult( this, TaskStatus.SUCCESS, "success" );
 	}
 
 }

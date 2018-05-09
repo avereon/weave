@@ -1,5 +1,9 @@
-package com.xeomar.annex;
+package com.xeomar.annex.task;
 
+import com.xeomar.annex.AnnexTask;
+import com.xeomar.annex.TaskResult;
+import com.xeomar.annex.TaskStatus;
+import com.xeomar.annex.UpdateTask;
 import com.xeomar.util.FileUtil;
 import com.xeomar.util.HashUtil;
 import com.xeomar.util.LogUtil;
@@ -35,19 +39,25 @@ public class OverlayTask extends AnnexTask {
 	}
 
 	@Override
+	public void validate() {
+		Path source = Paths.get( getParameters().get( 0 ) );
+		Path target = Paths.get( getParameters().get( 1 ) );
+
+		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source does not exist: " + source );
+		if( !Files.exists( target ) ) throw new IllegalArgumentException( "Target does not exist: " + target );
+		if( !Files.isDirectory( target ) ) throw new IllegalArgumentException( "Target must be a folder: " + target );
+	}
+
+	@Override
 	public boolean needsElevation() {
 		Path target = Paths.get( getParameters().get( 1 ) );
-		return Files.exists( target ) && !Files.isWritable( target );
+		return !Files.isWritable( target );
 	}
 
 	@Override
 	public TaskResult execute() throws Exception {
 		Path source = Paths.get( getParameters().get( 0 ) );
 		Path target = Paths.get( getParameters().get( 1 ) );
-
-		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source not found: " + source );
-		if( !Files.exists( target ) ) throw new IllegalArgumentException( "Target not found: " + target );
-		if( !Files.isDirectory( target ) ) throw new IOException( "Target must be a folder: " + target );
 
 		log.debug( "Staging: {}", source );
 
@@ -66,7 +76,7 @@ public class OverlayTask extends AnnexTask {
 
 		log.info( "Overlaid: {}", target );
 
-		return new TaskResult( TaskStatus.SUCCESS, "Overlaid: " + target );
+		return new TaskResult( this, TaskStatus.SUCCESS, "Overlaid: " + target );
 	}
 
 	@Override

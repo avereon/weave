@@ -1,5 +1,9 @@
-package com.xeomar.annex;
+package com.xeomar.annex.task;
 
+import com.xeomar.annex.AnnexTask;
+import com.xeomar.annex.TaskResult;
+import com.xeomar.annex.TaskStatus;
+import com.xeomar.annex.UpdateTask;
 import com.xeomar.util.TextUtil;
 
 import java.util.List;
@@ -19,7 +23,7 @@ public class LaunchTask extends AnnexTask {
 		// TODO Without waiting for the process to finish, this task is asynchronous
 
 		String commands = TextUtil.toString( builder.command() );
-		return new TaskResult( TaskStatus.SUCCESS, commands.substring( 1, commands.length() - 1 ) );
+		return new TaskResult( this, TaskStatus.SUCCESS, commands.substring( 1, commands.length() - 1 ) );
 	}
 
 }

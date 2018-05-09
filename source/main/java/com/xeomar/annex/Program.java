@@ -7,13 +7,16 @@ import com.xeomar.product.ProductCard;
 import com.xeomar.util.LogUtil;
 import com.xeomar.util.OperatingSystem;
 import com.xeomar.util.Parameters;
+import com.xeomar.util.TextUtil;
 import org.slf4j.Logger;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Program implements Product {
 
@@ -101,36 +104,37 @@ public class Program implements Product {
 		log.info( card.getName() + " program finished" );
 	}
 
-	private void runTasksFromStdIn() throws IOException {
-		runTasksFromStream( System.in, System.out );
-		//System.out.close();
+	private List<TaskResult> runTasksFromStdIn() throws IOException {
+		return runTasksFromStream( System.in, System.out );
 	}
 
-	private void runTasksFromFile( File file ) throws IOException {
-		runTasksFromStream( new FileInputStream( file ), new ByteArrayOutputStream() );
+	private List<TaskResult> runTasksFromFile( File file ) throws IOException {
+		return runTasksFromStream( new FileInputStream( file ), new ByteArrayOutputStream() );
 	}
 
-	private void runTasksFromStream( InputStream input, OutputStream output ) throws IOException {
-		runTasksFromReader( new InputStreamReader( input, "utf-8" ), new OutputStreamWriter( output, "utf-8" ) );
+	private List<TaskResult> runTasksFromStream( InputStream input, OutputStream output ) throws IOException {
+		return runTasksFromReader( new InputStreamReader( input, "utf-8" ), new OutputStreamWriter( output, "utf-8" ) );
 	}
 
-	public String runTasksFromString( String commands ) throws IOException {
+	public List<TaskResult> runTasksFromString( String commands ) throws IOException {
 		StringReader reader = new StringReader( commands );
 		StringWriter writer = new StringWriter();
-		runTasksFromReader( reader, writer );
-		return writer.toString().trim();
+		return runTasksFromReader( reader, writer );
 	}
 
-	public void runTasksFromReader( Reader reader, Writer writer ) throws IOException {
+	public List<TaskResult> runTasksFromReader( Reader reader, Writer writer ) throws IOException {
 		BufferedReader buffer = new BufferedReader( reader );
 		PrintWriter printWriter = new PrintWriter( writer );
 
+		List<TaskResult> results = new ArrayList<>();
 		String line = buffer.readLine();
 		while( line != null ) {
 			AnnexTask task = parseTask( line );
 			log.info( "Task: " + task );
 			TaskResult result = executeTask( task );
 			log.info( "Result: " + result );
+
+			results.add( result );
 
 			printWriter.print( result );
 			printWriter.print( "\n" );
@@ -139,6 +143,8 @@ public class Program implements Product {
 			line = buffer.readLine();
 		}
 		printWriter.close();
+
+		return results;
 	}
 
 	private void printHeader( ProductCard card ) {
@@ -185,22 +191,46 @@ public class Program implements Product {
 				if( elevatedProcess == null ) throw new RuntimeException( "Unable to create elevated process" );
 
 				new BufferedWriter( new OutputStreamWriter( elevatedProcess.getOutputStream(), "utf-8" ) ).write( task.execute().toString() );
-				result = TaskResult.parse( new BufferedReader( new InputStreamReader( elevatedProcess.getInputStream() ) ).readLine() );
+				result = TaskResult.parse( task, new BufferedReader( new InputStreamReader( elevatedProcess.getInputStream() ) ).readLine() );
 			} else {
 				result = task.execute();
 			}
 		} catch( Exception exception ) {
 			String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
-			result = new TaskResult( TaskStatus.FAILURE, message );
+			result = new TaskResult( task, TaskStatus.FAILURE, message );
 		}
 
 		return result;
 	}
 
 	private AnnexTask parseTask( String line ) {
-		String[] parameters = line.split( " " );
-		String command = parameters[ 0 ];
-		List<String> parameterList = Arrays.asList( Arrays.copyOfRange( parameters, 1, parameters.length ) );
+		List<String> commands = new ArrayList<>();
+		StreamTokenizer tokenizer = new StreamTokenizer( new StringReader( line ) );
+		try {
+			while( tokenizer.nextToken() != StreamTokenizer.TT_EOF ) {
+				switch( tokenizer.ttype ) {
+					case StreamTokenizer.TT_NUMBER: {
+						commands.add( String.valueOf( (int)tokenizer.nval ) );
+						break;
+					}
+					case StreamTokenizer.TT_WORD: {
+						commands.add( tokenizer.sval );
+						break;
+					}
+					case '"': {
+						commands.add( tokenizer.sval );
+						break;
+					}
+				}
+			}
+		} catch( IOException exception ) {
+			log.error( "Error parsing commands: " + line );
+		}
+
+		System.err.println( " - Commands: " + TextUtil.toString( commands, " " ) );
+
+		String command = commands.get( 0 );
+		List<String> parameterList = commands.subList( 1, commands.size() );
 
 		switch( command ) {
 			case UpdateTask.LAUNCH: {

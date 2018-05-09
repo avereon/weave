@@ -21,6 +21,8 @@ public abstract class AnnexTask {
 		return parameters;
 	}
 
+	public void validate() {}
+
 	public boolean needsElevation() {
 		return false;
 	}
