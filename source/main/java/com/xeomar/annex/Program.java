@@ -74,26 +74,26 @@ public class Program implements Product {
 		parameters = Parameters.parse( commands );
 
 		// Configure logging
-		LogUtil.configureLogging( card.getArtifact(), this, parameters );
+		LogUtil.configureLogging( this, parameters );
 
 		// Print the program header
 		printHeader( card );
 
 		log.info( card.getName() + " program started" );
 
-		if( parameters.isSet( UpdateFlag.TITLE )) title = parameters.get( UpdateFlag.TITLE );
+		if( parameters.isSet( UpdateFlag.TITLE ) ) title = parameters.get( UpdateFlag.TITLE );
 
 		boolean stream = parameters.isSet( UpdateFlag.STREAM );
 		boolean file = parameters.isSet( UpdateFlag.FILE );
 
 		if( stream & file ) {
-			log.error( "Cannot use both stream and file parameters at the same time");
+			log.error( "Cannot use both stream and file parameters at the same time" );
 			return;
-		} else if( !( stream | file ) ) {
-			log.error( "Must use either stream or file to provide update commands");
+		} else if( !(stream | file) ) {
+			log.error( "Must use either stream or file to provide update commands" );
 		}
 
-		if( file) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
+		if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
 		if( stream ) runTasksFromStdIn();
 
 		log.info( card.getName() + " program finished" );
