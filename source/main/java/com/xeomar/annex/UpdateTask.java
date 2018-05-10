@@ -3,19 +3,6 @@ package com.xeomar.annex;
 public interface UpdateTask {
 
 	/**
-	 * The overlay command indicates that a file or directory should be overlaid
-	 * with a file, directory or the contents of a zip file. Syntax:
-	 * {@code
-	 * overlay [source path] [target path]
-	 * }
-	 * Example:
-	 * {@code
-	 * overlay modules/editor editor.pack
-	 * }
-	 */
-	String OVERLAY = "overlay";
-
-	/**
 	 * The delete command indicates that a path be deleted.
 	 */
 	String DELETE = "delete";
@@ -47,4 +34,18 @@ public interface UpdateTask {
 	 * The rename command indicates that a path be given a different name.
 	 */
 	String RENAME = "rename";
+
+	/**
+	 * The unpack command indicates that a file or directory should be overlaid
+	 * with the contents of a zip file. Syntax:
+	 * {@code
+	 * overlay [source path] [target path]
+	 * }
+	 * Example:
+	 * {@code
+	 * overlay modules/editor editor.pack
+	 * }
+	 */
+	String UNPACK = "unpack";
+
 }

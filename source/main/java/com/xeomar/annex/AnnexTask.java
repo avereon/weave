@@ -31,11 +31,9 @@ public abstract class AnnexTask {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append( command );
+		StringBuilder builder = new StringBuilder( command );
 		for( String parameter : parameters ) {
-			builder.append( " " );
-			builder.append( parameter );
+			builder.append( " " ).append( parameter );
 		}
 		return builder.toString();
 	}

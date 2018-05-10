@@ -6,7 +6,6 @@ import com.xeomar.annex.TaskStatus;
 import com.xeomar.annex.UpdateTask;
 import com.xeomar.util.FileUtil;
 import com.xeomar.util.IdGenerator;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.File;
@@ -20,13 +19,13 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
-public class OverlayTaskTest extends TaskTest {
+public class UnpackTaskTest extends TaskTest {
 
 	@Test
 	public void testConstructor() {
 		String source = "source";
 		String target = "target";
-		LaunchTask task = new LaunchTask( Arrays.asList( source, target ) );
+		UnpackTask task = new UnpackTask( Arrays.asList( source, target ) );
 		assertThat( task.getParameters().get( 0 ), is( source ) );
 		assertThat( task.getParameters().get( 1 ), is( target ) );
 		assertThat( task.getParameters().size(), is( 2 ) );
@@ -85,11 +84,11 @@ public class OverlayTaskTest extends TaskTest {
 			// Execute the overlay task
 			String sourceZipPath = sourceZip.toAbsolutePath().toString();
 			String targetRootPath = targetRoot.toAbsolutePath().toString();
-			List<TaskResult> results = new Program().runTasksFromString( UpdateTask.OVERLAY + " " + sourceZipPath + " " + targetRootPath );
+			List<TaskResult> results = new Program().runTasksFromString( UpdateTask.UNPACK + " " + sourceZipPath + " " + targetRootPath );
 
 			// Verify the result
 			assertTaskResult( results.get( 0 ), TaskStatus.SUCCESS );
-			assertThat( results.get( 0 ).getMessage(), startsWith( "Overlaid:" ) );
+			assertThat( results.get( 0 ).getMessage(), startsWith( "Unpacked:" ) );
 			assertThat( results.get( 0 ).getMessage(), endsWith( targetRoot.getFileName().toString() ) );
 
 			// Verify the target values after executing the task
@@ -108,7 +107,7 @@ public class OverlayTaskTest extends TaskTest {
 	public void testInvalidSource() throws Exception {
 		String source = "invalidsource";
 		String target = "invalidtarget";
-		List<TaskResult> results =  new Program().runTasksFromString( UpdateTask.OVERLAY + " " + source + " " + target );
+		List<TaskResult> results =  new Program().runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );
 		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE , "IllegalArgumentException: Source does not exist: invalidsource" );
 	}
 
@@ -116,7 +115,7 @@ public class OverlayTaskTest extends TaskTest {
 	public void testInvalidTarget() throws Exception {
 		String source = new File( "" ).getCanonicalPath();
 		String target = "invalidtarget";
-		List<TaskResult> results = new Program().runTasksFromString( UpdateTask.OVERLAY + " " + source + " " + target );
+		List<TaskResult> results = new Program().runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );
 		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE , "IllegalArgumentException: Target does not exist: invalidtarget" );
 	}
 

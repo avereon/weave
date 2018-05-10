@@ -13,7 +13,7 @@ public abstract class TaskTest {
 	}
 
 	protected void assertTaskResult( TaskResult result, TaskStatus status, String message ) {
-		assertThat( result.getStatus(), is( status ) );
+		assertThat(result.getMessage(), result.getStatus(), is( status ) );
 		if( message != null ) assertThat( result.getMessage(), is( message ) );
 	}
 

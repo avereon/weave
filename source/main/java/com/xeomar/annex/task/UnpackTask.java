@@ -26,7 +26,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-public class OverlayTask extends AnnexTask {
+public class UnpackTask extends AnnexTask {
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 
@@ -34,8 +34,8 @@ public class OverlayTask extends AnnexTask {
 
 	private static final String ADD_SUFFIX = ".add";
 
-	public OverlayTask( List<String> parameters ) {
-		super( UpdateTask.OVERLAY, parameters );
+	public UnpackTask( List<String> parameters ) {
+		super( UpdateTask.UNPACK, parameters );
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class OverlayTask extends AnnexTask {
 		} catch( ZipException exception ) {
 			throw new IOException( "Source not a valid zip file: " + source );
 		} catch( Throwable throwable ) {
-			log.warn( "Overlay failed: " + target, throwable.getMessage() );
+			log.warn( "Unpack failed: " + target, throwable.getMessage() );
 			revert( target, target );
 			throw throwable;
 		}
@@ -74,14 +74,7 @@ public class OverlayTask extends AnnexTask {
 		log.debug( "Committing: {}", target );
 		commit( target, target );
 
-		log.info( "Overlaid: {}", target );
-
-		return new TaskResult( this, TaskStatus.SUCCESS, "Overlaid: " + target );
-	}
-
-	@Override
-	public String toString() {
-		return getCommand() + getParameters().get( 0 ) + " " + getParameters().get( 1 );
+		return new TaskResult( this, TaskStatus.SUCCESS, "Unpacked: " + source + " to " + target );
 	}
 
 	private void stage( Path source, Path target ) throws IOException {

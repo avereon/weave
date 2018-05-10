@@ -15,8 +15,6 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class Program implements Product {
 
@@ -130,9 +128,9 @@ public class Program implements Product {
 		String line = buffer.readLine();
 		while( line != null ) {
 			AnnexTask task = parseTask( line );
-			log.info( "Task: " + task );
+			//log.info( "Task: " + task );
 			TaskResult result = executeTask( task );
-			log.info( "Result: " + result );
+			//log.info( "Result: " + result );
 
 			results.add( result );
 
@@ -204,31 +202,7 @@ public class Program implements Product {
 	}
 
 	private AnnexTask parseTask( String line ) {
-		List<String> commands = new ArrayList<>();
-		StreamTokenizer tokenizer = new StreamTokenizer( new StringReader( line ) );
-		try {
-			while( tokenizer.nextToken() != StreamTokenizer.TT_EOF ) {
-				switch( tokenizer.ttype ) {
-					case StreamTokenizer.TT_NUMBER: {
-						commands.add( String.valueOf( (int)tokenizer.nval ) );
-						break;
-					}
-					case StreamTokenizer.TT_WORD: {
-						commands.add( tokenizer.sval );
-						break;
-					}
-					case '"': {
-						commands.add( tokenizer.sval );
-						break;
-					}
-				}
-			}
-		} catch( IOException exception ) {
-			log.error( "Error parsing commands: " + line );
-		}
-
-		System.err.println( " - Commands: " + TextUtil.toString( commands, " " ) );
-
+		List<String> commands = TextUtil.split( line );
 		String command = commands.get( 0 );
 		List<String> parameterList = commands.subList( 1, commands.size() );
 
@@ -245,8 +219,8 @@ public class Program implements Product {
 			case UpdateTask.PAUSE: {
 				return new PauseTask( parameterList );
 			}
-			case UpdateTask.OVERLAY: {
-				return new OverlayTask( parameterList );
+			case UpdateTask.UNPACK: {
+				return new UnpackTask( parameterList );
 			}
 			default: {
 				throw new IllegalArgumentException( "Unknown command: " + command );
