@@ -61,7 +61,7 @@ public class MoveTaskTest extends TaskTest {
 	@Test
 	public void testInvalidSource() throws Exception {
 		String source = "invalidsource";
-		String target = "validtarget";
+		String target = "invalidtarget";
 		List<TaskResult> results = new Program().runTasksFromString( UpdateTask.MOVE + " " + source + " " + target );
 		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE, "IllegalArgumentException: Source does not exist: invalidsource" );
 	}

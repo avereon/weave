@@ -108,15 +108,7 @@ public class UnpackTaskTest extends TaskTest {
 		String source = "invalidsource";
 		String target = "invalidtarget";
 		List<TaskResult> results =  new Program().runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );
-		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE , "IllegalArgumentException: Source does not exist: invalidsource" );
-	}
-
-	@Test
-	public void testInvalidTarget() throws Exception {
-		String source = new File( "" ).getCanonicalPath();
-		String target = "invalidtarget";
-		List<TaskResult> results = new Program().runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );
-		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE , "IllegalArgumentException: Target does not exist: invalidtarget" );
+		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE , "IllegalArgumentException: Source not found: invalidsource" );
 	}
 
 }
