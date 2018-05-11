@@ -189,11 +189,18 @@ public class Program implements Product {
 						processBuilder.command().add( LogFlag.LOG_LEVEL );
 						processBuilder.command().add( parameters.get( LogFlag.LOG_LEVEL ) );
 					}
-					processBuilder.redirectOutput( ProcessBuilder.Redirect.INHERIT ).redirectError( ProcessBuilder.Redirect.INHERIT );
+
+					File home = new File( System.getProperty( "user.home" ));
+					File logFile = new File( parameters.get( LogFlag.LOG_FILE ).replace( "%h", home.toString() ).replace( ".log", "-mvs.log" ) );
+					log.info( "MVS log file: " + logFile );
+					processBuilder.redirectOutput( ProcessBuilder.Redirect.to( logFile ) ).redirectError( ProcessBuilder.Redirect.to( logFile ) );
+					//processBuilder.redirectOutput( ProcessBuilder.Redirect.INHERIT ).redirectError( ProcessBuilder.Redirect.INHERIT );
+					log.info( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
 					elevatedProcess = OperatingSystem.startProcessElevated( title, processBuilder );
 				}
 
 				elevatedProcess.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
+				elevatedProcess.getOutputStream().write( '\n' );
 				elevatedProcess.getOutputStream().flush();
 
 				result = TaskResult.parse( task, new BufferedReader( new InputStreamReader( elevatedProcess.getInputStream() ) ).readLine() );
