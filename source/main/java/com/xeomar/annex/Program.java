@@ -128,7 +128,6 @@ public class Program implements Product {
 		String line = buffer.readLine().trim();
 		while( !TextUtil.isEmpty( line ) ) {
 			AnnexTask task = parseTask( line );
-			//log.info( "Task: " + task );
 			TaskResult result = executeTask( task );
 			log.info( result.toString() );
 
@@ -137,6 +136,8 @@ public class Program implements Product {
 			printWriter.print( result );
 			printWriter.print( "\n" );
 			printWriter.flush();
+
+			if( result.getStatus() == TaskStatus.FAILURE ) break;
 
 			line = buffer.readLine();
 		}
@@ -207,11 +208,14 @@ public class Program implements Product {
 		List<String> parameterList = commands.subList( 1, commands.size() );
 
 		switch( command ) {
-			case UpdateTask.LAUNCH: {
-				return new LaunchTask( parameterList );
+			case UpdateTask.DELETE: {
+				return new DeleteTask( parameterList );
 			}
 			case UpdateTask.ECHO: {
 				return new EchoTask( parameterList );
+			}
+			case UpdateTask.LAUNCH: {
+				return new LaunchTask( parameterList );
 			}
 			case UpdateTask.MOVE: {
 				return new MoveTask( parameterList );

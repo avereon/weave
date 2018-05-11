@@ -20,8 +20,7 @@ public class MoveTask extends AnnexTask {
 		Path target = Paths.get( getParameters().get( 1 ) );
 
 		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source does not exist: " + source );
-		if( Files.exists( target ) ) throw new IllegalArgumentException( "Target should not exist: " + target );
-		//if( !Files.isDirectory( target ) ) throw new IllegalArgumentException( "Target is not a folder: " + target );
+		if( Files.exists( target ) ) throw new IllegalArgumentException( "Target already exists: " + target );
 	}
 
 	@Override
@@ -39,6 +38,7 @@ public class MoveTask extends AnnexTask {
 	public TaskResult execute() throws Exception {
 		Path source = Paths.get( getParameters().get( 0 ) );
 		Path target = Paths.get( getParameters().get( 1 ) );
+		Files.createDirectories( target.getParent() );
 
 		Files.move( source, target );
 

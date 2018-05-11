@@ -43,21 +43,21 @@ public class UnpackTask extends AnnexTask {
 		Path source = Paths.get( getParameters().get( 0 ) );
 		Path target = Paths.get( getParameters().get( 1 ) );
 
-		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source does not exist: " + source );
-		if( !Files.exists( target ) ) throw new IllegalArgumentException( "Target does not exist: " + target );
-		if( !Files.isDirectory( target ) ) throw new IllegalArgumentException( "Target must be a folder: " + target );
+		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source not found: " + source );
+		if( Files.exists( target ) && !Files.isDirectory( target ) ) throw new IllegalArgumentException( "Target already exists and is not a folder: " + target );
 	}
 
 	@Override
 	public boolean needsElevation() {
 		Path target = Paths.get( getParameters().get( 1 ) );
-		return !Files.isWritable( target );
+		return Files.exists( target ) && !Files.isWritable( target );
 	}
 
 	@Override
 	public TaskResult execute() throws Exception {
 		Path source = Paths.get( getParameters().get( 0 ) );
 		Path target = Paths.get( getParameters().get( 1 ) );
+		Files.createDirectories( target );
 
 		log.debug( "Staging: {}", source );
 
