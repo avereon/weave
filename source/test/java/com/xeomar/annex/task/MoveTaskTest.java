@@ -1,26 +1,21 @@
 package com.xeomar.annex.task;
 
-import com.xeomar.annex.Program;
 import com.xeomar.annex.TaskResult;
 import com.xeomar.annex.TaskStatus;
 import com.xeomar.annex.UpdateTask;
 import com.xeomar.util.FileUtil;
 import org.junit.Test;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class MoveTaskTest extends TaskTest {
+public class MoveTaskTest extends AnnexTaskTest {
 
 	@Test
 	public void testConstructor() {
@@ -44,7 +39,7 @@ public class MoveTaskTest extends TaskTest {
 		try {
 			String sourcePath = sourceRoot.toString();
 			String targetPath = targetRoot.toString();
-			List<TaskResult> results = new Program().runTasksFromString( UpdateTask.MOVE + " " + sourcePath + " " + targetPath );
+			List<TaskResult> results = program.runTasksFromString( UpdateTask.MOVE + " " + sourcePath + " " + targetPath );
 
 			assertTaskResult( results.get( 0 ), TaskStatus.SUCCESS );
 			assertThat( results.get( 0 ).getMessage(), startsWith( "Moved:" ) );
@@ -62,7 +57,7 @@ public class MoveTaskTest extends TaskTest {
 	public void testInvalidSource() throws Exception {
 		String source = "invalidsource";
 		String target = "invalidtarget";
-		List<TaskResult> results = new Program().runTasksFromString( UpdateTask.MOVE + " " + source + " " + target );
+		List<TaskResult> results = program.runTasksFromString( UpdateTask.MOVE + " " + source + " " + target );
 		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE, "IllegalArgumentException: Source does not exist: invalidsource" );
 	}
 

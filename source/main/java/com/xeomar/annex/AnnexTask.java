@@ -8,6 +8,8 @@ public abstract class AnnexTask {
 
 	private List<String> parameters;
 
+	private String originalLine;
+
 	public AnnexTask( String command, List<String> parameters ) {
 		this.command = command;
 		this.parameters = parameters;
@@ -19,6 +21,14 @@ public abstract class AnnexTask {
 
 	public List<String> getParameters() {
 		return parameters;
+	}
+
+	public String getOriginalLine() {
+		return originalLine;
+	}
+
+	public void setOriginalLine( String originalLine ) {
+		this.originalLine = originalLine;
 	}
 
 	public void validate() {}

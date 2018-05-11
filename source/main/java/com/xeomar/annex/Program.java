@@ -4,10 +4,8 @@ import com.xeomar.annex.task.*;
 import com.xeomar.product.Product;
 import com.xeomar.product.ProductBundle;
 import com.xeomar.product.ProductCard;
-import com.xeomar.util.LogUtil;
-import com.xeomar.util.OperatingSystem;
-import com.xeomar.util.Parameters;
-import com.xeomar.util.TextUtil;
+import com.xeomar.util.*;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -182,14 +180,22 @@ public class Program implements Product {
 
 			if( task.needsElevation() ) {
 				if( elevatedProcess == null ) {
-					// TODO Create elevated updater
-					ProcessBuilder processBuilder = new ProcessBuilder();
+					ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule() );
+					if( parameters.isSet( LogFlag.LOG_FILE ) ) {
+						processBuilder.command().add( LogFlag.LOG_LEVEL );
+						processBuilder.command().add( parameters.get( LogFlag.LOG_FILE ).replace( ".log", "-elevated.log" ) );
+					}
+					if( parameters.isSet( LogFlag.LOG_LEVEL ) ) {
+						processBuilder.command().add( LogFlag.LOG_LEVEL );
+						processBuilder.command().add( parameters.get( LogFlag.LOG_LEVEL ) );
+					}
+					processBuilder.redirectOutput( ProcessBuilder.Redirect.INHERIT ).redirectError( ProcessBuilder.Redirect.INHERIT );
 					elevatedProcess = OperatingSystem.startProcessElevated( title, processBuilder );
 				}
 
-				if( elevatedProcess == null ) throw new RuntimeException( "Unable to create elevated process" );
+				elevatedProcess.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
+				elevatedProcess.getOutputStream().flush();
 
-				new BufferedWriter( new OutputStreamWriter( elevatedProcess.getOutputStream(), "utf-8" ) ).write( task.execute().toString() );
 				result = TaskResult.parse( task, new BufferedReader( new InputStreamReader( elevatedProcess.getInputStream() ) ).readLine() );
 			} else {
 				result = task.execute();
@@ -207,29 +213,40 @@ public class Program implements Product {
 		String command = commands.get( 0 );
 		List<String> parameterList = commands.subList( 1, commands.size() );
 
+		AnnexTask task = null;
 		switch( command ) {
 			case UpdateTask.DELETE: {
-				return new DeleteTask( parameterList );
+				task = new DeleteTask( parameterList );
+				break;
 			}
 			case UpdateTask.ECHO: {
-				return new EchoTask( parameterList );
+				task = new EchoTask( parameterList );
+				break;
 			}
 			case UpdateTask.LAUNCH: {
-				return new LaunchTask( parameterList );
+				task = new LaunchTask( parameterList );
+				break;
 			}
 			case UpdateTask.MOVE: {
-				return new MoveTask( parameterList );
+				task = new MoveTask( parameterList );
+				break;
 			}
 			case UpdateTask.PAUSE: {
-				return new PauseTask( parameterList );
+				task = new PauseTask( parameterList );
+				break;
 			}
 			case UpdateTask.UNPACK: {
-				return new UnpackTask( parameterList );
+				task = new UnpackTask( parameterList );
+				break;
 			}
 			default: {
 				throw new IllegalArgumentException( "Unknown command: " + command );
 			}
 		}
+
+		task.setOriginalLine( line );
+
+		return task;
 	}
 
 }

@@ -1,6 +1,5 @@
 package com.xeomar.annex.task;
 
-import com.xeomar.annex.Program;
 import com.xeomar.annex.TaskResult;
 import com.xeomar.annex.TaskStatus;
 import com.xeomar.annex.UpdateTask;
@@ -11,11 +10,11 @@ import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class EchoTaskTest extends TaskTest {
+public class EchoTaskTest extends AnnexTaskTest {
 
 	@Test
 	public void testExecute() throws Exception {
-		List<TaskResult> results = new Program().runTasksFromString( UpdateTask.ECHO + " \"HELLO WORLD\"" );
+		List<TaskResult> results = program.runTasksFromString( UpdateTask.ECHO + " \"HELLO WORLD\"" );
 		assertTaskResult( results.get( 0 ), TaskStatus.SUCCESS );
 
 		assertThat( results.get( 0 ).getTask().getParameters().get( 0 ), is( "HELLO WORLD" ) );

@@ -1,6 +1,5 @@
 package com.xeomar.annex.task;
 
-import com.xeomar.annex.Program;
 import com.xeomar.annex.TaskResult;
 import com.xeomar.annex.TaskStatus;
 import com.xeomar.annex.UpdateTask;
@@ -8,7 +7,6 @@ import com.xeomar.util.FileUtil;
 import com.xeomar.util.IdGenerator;
 import org.junit.Test;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,10 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
-public class UnpackTaskTest extends TaskTest {
+public class UnpackTaskTest extends AnnexTaskTest {
 
 	@Test
 	public void testConstructor() {
@@ -84,7 +81,7 @@ public class UnpackTaskTest extends TaskTest {
 			// Execute the overlay task
 			String sourceZipPath = sourceZip.toAbsolutePath().toString();
 			String targetRootPath = targetRoot.toAbsolutePath().toString();
-			List<TaskResult> results = new Program().runTasksFromString( UpdateTask.UNPACK + " " + sourceZipPath + " " + targetRootPath );
+			List<TaskResult> results = program.runTasksFromString( UpdateTask.UNPACK + " " + sourceZipPath + " " + targetRootPath );
 
 			// Verify the result
 			assertTaskResult( results.get( 0 ), TaskStatus.SUCCESS );
@@ -107,7 +104,7 @@ public class UnpackTaskTest extends TaskTest {
 	public void testInvalidSource() throws Exception {
 		String source = "invalidsource";
 		String target = "invalidtarget";
-		List<TaskResult> results =  new Program().runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );
+		List<TaskResult> results =  program.runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );
 		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE , "IllegalArgumentException: Source not found: invalidsource" );
 	}
 
