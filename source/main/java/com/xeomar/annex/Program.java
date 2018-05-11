@@ -82,7 +82,7 @@ public class Program implements Product {
 		// Print the program header
 		printHeader( card );
 
-		log.info( card.getName() + " program started" );
+		log.info( card.getName() + " started" );
 
 		if( parameters.isSet( UpdateFlag.TITLE ) ) title = parameters.get( UpdateFlag.TITLE );
 
@@ -99,7 +99,7 @@ public class Program implements Product {
 		if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
 		if( stream ) runTasksFromStdIn();
 
-		log.info( card.getName() + " program finished" );
+		log.info( card.getName() + " finished" );
 	}
 
 	private List<TaskResult> runTasksFromStdIn() throws IOException {
@@ -125,12 +125,12 @@ public class Program implements Product {
 		PrintWriter printWriter = new PrintWriter( writer );
 
 		List<TaskResult> results = new ArrayList<>();
-		String line = buffer.readLine();
-		while( line != null ) {
+		String line = buffer.readLine().trim();
+		while( !TextUtil.isEmpty( line ) ) {
 			AnnexTask task = parseTask( line );
 			//log.info( "Task: " + task );
 			TaskResult result = executeTask( task );
-			//log.info( "Result: " + result );
+			log.info( result.toString() );
 
 			results.add( result );
 
@@ -210,8 +210,8 @@ public class Program implements Product {
 			case UpdateTask.LAUNCH: {
 				return new LaunchTask( parameterList );
 			}
-			case UpdateTask.LOG: {
-				return new LogTask( parameterList );
+			case UpdateTask.ECHO: {
+				return new EchoTask( parameterList );
 			}
 			case UpdateTask.MOVE: {
 				return new MoveTask( parameterList );

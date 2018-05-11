@@ -40,12 +40,12 @@ public class ProgramTest {
 			inputPipe.write( "pause 0\n".getBytes( CHARSET ) );
 			inputPipe.flush();
 			String result1 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
-			assertThat( result1, is( "SUCCESS success" ) );
+			assertThat( result1, is( "SUCCESS pause 0" ) );
 
 			inputPipe.write( "pause 0\n".getBytes( CHARSET ) );
 			inputPipe.close();
 			String result2 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
-			assertThat( result2, is( "SUCCESS success" ) );
+			assertThat( result2, is( "SUCCESS pause 0" ) );
 		} finally {
 			// Restore the original streams
 			System.setOut( originalOutput );
@@ -72,12 +72,12 @@ public class ProgramTest {
 		inputPipe.write( "pause 0\n" );
 		inputPipe.flush();
 		String result1 = new BufferedReader( outputPipe ).readLine();
-		assertThat( result1, is( "SUCCESS success" ) );
+		assertThat( result1, is( "SUCCESS pause 0" ) );
 
 		inputPipe.write( "pause 0" );
 		inputPipe.close();
 		String result2 = new BufferedReader( outputPipe ).readLine();
-		assertThat( result2, is( "SUCCESS success" ) );
+		assertThat( result2, is( "SUCCESS pause 0" ) );
 	}
 
 }

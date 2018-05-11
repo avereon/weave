@@ -11,18 +11,15 @@ import org.slf4j.Logger;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-public class LogTask extends AnnexTask {
+public class EchoTask extends AnnexTask {
 
-	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
-
-	public LogTask( List<String> parameters ) {
-		super( UpdateTask.LOG, parameters );
+	public EchoTask( List<String> parameters ) {
+		super( UpdateTask.ECHO, parameters );
 	}
 
 	@Override
 	public TaskResult execute() throws Exception {
-		log.info( TextUtil.toString( getParameters(), " " ) );
-		return new TaskResult( this, TaskStatus.SUCCESS, "" );
+		return new TaskResult( this, TaskStatus.SUCCESS, TextUtil.toString( getParameters(), " " ) );
 	}
 
 }

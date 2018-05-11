@@ -9,7 +9,7 @@ public class TaskResult {
 	private String message;
 
 	public TaskResult( AnnexTask task, TaskStatus status ) {
-		this( task, status, "No message" );
+		this( task, status, null );
 	}
 
 	public TaskResult( AnnexTask task, TaskStatus status, String message ) {
@@ -41,7 +41,10 @@ public class TaskResult {
 
 	@Override
 	public String toString() {
-		return status + " " + message;
+		StringBuilder builder = new StringBuilder( status.toString() );
+		builder.append( " " ).append( task.getCommand() );
+		if( message != null ) builder.append( " " ).append( message );
+		return builder.toString();
 	}
 
 }

@@ -8,13 +8,16 @@ public interface UpdateTask {
 	String DELETE = "delete";
 
 	/**
+	 * Echo the command parameters to the log.
+	 */
+	String ECHO = "echo";
+
+	/**
 	 * The launch command indicates that a new process should be launched. This
 	 * typically used at the end of an update process to start the updated
 	 * application.
 	 */
 	String LAUNCH = "launch";
-
-	String LOG = "log";
 
 	/**
 	 * The move command indicates that a source path be moved to a target path.

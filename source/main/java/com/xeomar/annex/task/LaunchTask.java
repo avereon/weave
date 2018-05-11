@@ -16,14 +16,13 @@ public class LaunchTask extends AnnexTask {
 
 	@Override
 	public TaskResult execute() throws Exception {
-		ProcessBuilder builder = new ProcessBuilder();
+		ProcessBuilder builder = new ProcessBuilder().inheritIO();
 		builder.command().addAll( getParameters() );
-		Process process = builder.start();
+		builder.start();
 
 		// TODO Without waiting for the process to finish, this task is asynchronous
 
-		String commands = TextUtil.toString( builder.command() );
-		return new TaskResult( this, TaskStatus.SUCCESS, commands.substring( 1, commands.length() - 1 ) );
+		return new TaskResult( this, TaskStatus.SUCCESS, TextUtil.toString( builder.command(), " " ) );
 	}
 
 }

@@ -23,7 +23,7 @@ public class PauseTest extends TaskTest {
 		long stop = System.currentTimeMillis();
 
 		assertThat( stop - start, is( greaterThanOrEqualTo( delay ) ) );
-		assertTaskResult( results.get(0), TaskStatus.SUCCESS, "success" );
+		assertTaskResult( results.get(0), TaskStatus.SUCCESS );
 	}
 
 	@Test

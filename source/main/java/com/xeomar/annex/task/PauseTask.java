@@ -15,8 +15,9 @@ public class PauseTask extends AnnexTask {
 
 	@Override
 	public TaskResult execute() throws Exception {
-		Thread.sleep( Long.parseLong( getParameters().get( 0 ) ) );
-		return new TaskResult( this, TaskStatus.SUCCESS, "success" );
+		long time = Long.parseLong( getParameters().get( 0 ) );
+		Thread.sleep( time );
+		return new TaskResult( this, TaskStatus.SUCCESS, String.valueOf( time ) );
 	}
 
 }
