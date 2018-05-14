@@ -182,7 +182,7 @@ public class Program implements Product {
 				if( elevatedProcess == null ) {
 					ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule() );
 					if( parameters.isSet( LogFlag.LOG_FILE ) ) {
-						processBuilder.command().add( LogFlag.LOG_LEVEL );
+						processBuilder.command().add( LogFlag.LOG_FILE );
 						processBuilder.command().add( parameters.get( LogFlag.LOG_FILE ).replace( ".log", "-elevated.log" ) );
 					}
 					if( parameters.isSet( LogFlag.LOG_LEVEL ) ) {
