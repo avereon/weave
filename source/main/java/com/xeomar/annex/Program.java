@@ -206,16 +206,16 @@ public class Program implements Product {
 					elevatedProcess = OperatingSystem.startProcessElevated( title, processBuilder );
 				}
 
-				log.trace( "Sending task commands to elevated process...");
-				log.trace( "  commands: " + task.getOriginalLine() );
+				log.warn( "Sending task commands to elevated process...");
+				log.warn( "  commands: " + task.getOriginalLine() );
 
 				elevatedProcess.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
 				elevatedProcess.getOutputStream().write( '\n' );
 				elevatedProcess.getOutputStream().flush();
 
-				log.trace( "Reading task result from elevated process...");
+				log.warn( "Reading task result from elevated process...");
 				result = TaskResult.parse( task, new BufferedReader( new InputStreamReader( elevatedProcess.getInputStream() ) ).readLine() );
-				log.trace( "  result: " + result );
+				log.warn( "  result: " + result );
 			} else {
 				result = task.execute();
 			}
