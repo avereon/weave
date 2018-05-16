@@ -141,6 +141,9 @@ public class Program implements Product {
 		}
 		printWriter.close();
 
+		// Closing the elevated process output stream should cause it to exit
+		if( elevatedProcess != null ) elevatedProcess.getOutputStream().close();
+
 		return results;
 	}
 
@@ -181,6 +184,9 @@ public class Program implements Product {
 			if( task.needsElevation() ) {
 				if( elevatedProcess == null ) {
 					ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule() );
+
+					processBuilder.command().add( UpdateFlag.STREAM );
+
 					if( parameters.isSet( LogFlag.LOG_FILE ) ) {
 						processBuilder.command().add( LogFlag.LOG_FILE );
 						processBuilder.command().add( parameters.get( LogFlag.LOG_FILE ).replace( ".log", "-elevated.log" ) );
@@ -190,20 +196,26 @@ public class Program implements Product {
 						processBuilder.command().add( parameters.get( LogFlag.LOG_LEVEL ) );
 					}
 
-					File home = new File( System.getProperty( "user.home" ));
-					File logFile = new File( parameters.get( LogFlag.LOG_FILE ).replace( "%h", home.toString() ).replace( ".log", "-mvs.log" ) );
-					log.info( "MVS log file: " + logFile );
-					processBuilder.redirectOutput( ProcessBuilder.Redirect.to( logFile ) ).redirectError( ProcessBuilder.Redirect.to( logFile ) );
-					//processBuilder.redirectOutput( ProcessBuilder.Redirect.INHERIT ).redirectError( ProcessBuilder.Redirect.INHERIT );
+//					File home = new File( System.getProperty( "user.home" ));
+//					File logFile = new File( parameters.get( LogFlag.LOG_FILE ).replace( "%h", home.toString() ).replace( ".log", "-mvs.log" ) );
+//					log.info( "MVS log file: " + logFile );
+//					processBuilder.redirectOutput( ProcessBuilder.Redirect.to( logFile ) ).redirectError( ProcessBuilder.Redirect.to( logFile ) );
+
+					//processBuilder.redirectError( ProcessBuilder.Redirect.INHERIT );
 					log.info( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
 					elevatedProcess = OperatingSystem.startProcessElevated( title, processBuilder );
 				}
+
+				log.trace( "Sending task commands to elevated process...");
+				log.trace( "  commands: " + task.getOriginalLine() );
 
 				elevatedProcess.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
 				elevatedProcess.getOutputStream().write( '\n' );
 				elevatedProcess.getOutputStream().flush();
 
+				log.trace( "Reading task result from elevated process...");
 				result = TaskResult.parse( task, new BufferedReader( new InputStreamReader( elevatedProcess.getInputStream() ) ).readLine() );
+				log.trace( "  result: " + result );
 			} else {
 				result = task.execute();
 			}
