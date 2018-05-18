@@ -12,6 +12,8 @@ public interface UpdateTask {
 	 */
 	String ECHO = "echo";
 
+	String ELEVATED_ECHO  = "elevated-echo";
+
 	/**
 	 * The launch command indicates that a new process should be launched. This
 	 * typically used at the end of an update process to start the updated

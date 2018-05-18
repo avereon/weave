@@ -88,14 +88,14 @@ public class Program implements Product {
 		boolean file = parameters.isSet( UpdateFlag.FILE );
 
 		if( stream & file ) {
-			log.error( "Cannot use both stream and file parameters at the same time" );
+			log.error( "Cannot use both --stream and --file parameters at the same time" );
 			return;
 		} else if( !(stream | file) ) {
-			log.error( "Must use either stream or file to provide update commands" );
+			log.error( "Must use either --stream or --file to provide update commands" );
 		}
 
-		if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
 		if( stream ) runTasksFromStdIn();
+		if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
 
 		log.info( card.getName() + " finished" );
 	}
@@ -119,6 +119,10 @@ public class Program implements Product {
 	}
 
 	public List<TaskResult> runTasksFromReader( Reader reader, Writer writer ) throws IOException {
+		return runTasks( reader, writer );
+	}
+
+	private List<TaskResult> runTasks( Reader reader, Writer writer ) throws IOException {
 		BufferedReader buffer = new BufferedReader( reader );
 		PrintWriter printWriter = new PrintWriter( writer );
 
@@ -181,39 +185,47 @@ public class Program implements Product {
 			// Validate the task parameters before asking if it needs elevation
 			task.validate();
 
+			log.info( "Task needs elevation?: " + task.getCommand() + " = " + task.needsElevation() );
+
 			if( task.needsElevation() ) {
 				if( elevatedProcess == null ) {
+					log.info( "Need to create an elevated process..." );
+
+					// FIXME When not running as a module, the following doesn't work correctly
 					ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule() );
 
 					processBuilder.command().add( UpdateFlag.STREAM );
 
-					if( parameters.isSet( LogFlag.LOG_FILE ) ) {
-						processBuilder.command().add( LogFlag.LOG_FILE );
-						processBuilder.command().add( parameters.get( LogFlag.LOG_FILE ).replace( ".log", "-elevated.log" ) );
-					}
-					if( parameters.isSet( LogFlag.LOG_LEVEL ) ) {
-						processBuilder.command().add( LogFlag.LOG_LEVEL );
-						processBuilder.command().add( parameters.get( LogFlag.LOG_LEVEL ) );
+					if( parameters != null ) {
+						if( parameters.isSet( LogFlag.LOG_FILE ) ) {
+							processBuilder.command().add( LogFlag.LOG_FILE );
+							processBuilder.command().add( parameters.get( LogFlag.LOG_FILE ).replace( ".log", "-elevated.log" ) );
+						}
+						if( parameters.isSet( LogFlag.LOG_LEVEL ) ) {
+							processBuilder.command().add( LogFlag.LOG_LEVEL );
+							processBuilder.command().add( parameters.get( LogFlag.LOG_LEVEL ) );
+						}
 					}
 
-//					File home = new File( System.getProperty( "user.home" ));
-//					File logFile = new File( parameters.get( LogFlag.LOG_FILE ).replace( "%h", home.toString() ).replace( ".log", "-mvs.log" ) );
-//					log.info( "MVS log file: " + logFile );
-//					processBuilder.redirectOutput( ProcessBuilder.Redirect.to( logFile ) ).redirectError( ProcessBuilder.Redirect.to( logFile ) );
+					//					File home = new File( System.getProperty( "user.home" ));
+					//					File logFile = new File( parameters.get( LogFlag.LOG_FILE ).replace( "%h", home.toString() ).replace( ".log", "-mvs.log" ) );
+					//					log.info( "MVS log file: " + logFile );
+					//					processBuilder.redirectOutput( ProcessBuilder.Redirect.to( logFile ) ).redirectError( ProcessBuilder.Redirect.to( logFile ) );
 
 					//processBuilder.redirectError( ProcessBuilder.Redirect.INHERIT );
+					OperatingSystem.elevateProcessBuilder( title, processBuilder );
 					log.info( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
-					elevatedProcess = OperatingSystem.startProcessElevated( title, processBuilder );
+					elevatedProcess = processBuilder.start();
 				}
 
-				log.warn( "Sending task commands to elevated process...");
+				log.warn( "Sending task commands to elevated process..." );
 				log.warn( "  commands: " + task.getOriginalLine() );
 
 				elevatedProcess.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
 				elevatedProcess.getOutputStream().write( '\n' );
 				elevatedProcess.getOutputStream().flush();
 
-				log.warn( "Reading task result from elevated process...");
+				log.warn( "Reading task result from elevated process..." );
 				result = TaskResult.parse( task, new BufferedReader( new InputStreamReader( elevatedProcess.getInputStream() ) ).readLine() );
 				log.warn( "  result: " + result );
 			} else {
@@ -240,6 +252,10 @@ public class Program implements Product {
 			}
 			case UpdateTask.ECHO: {
 				task = new EchoTask( parameterList );
+				break;
+			}
+			case UpdateTask.ELEVATED_ECHO: {
+				task = new ElevatedEchoTask( parameterList );
 				break;
 			}
 			case UpdateTask.LAUNCH: {
