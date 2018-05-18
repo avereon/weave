@@ -26,7 +26,7 @@ public class Program implements Product {
 
 	private String title;
 
-	private Process elevatedProcess;
+	private ElevatedHandler elevatedHandler;
 
 	private Parameters parameters;
 
@@ -70,6 +70,14 @@ public class Program implements Product {
 		return programDataFolder;
 	}
 
+	public Parameters getParameters() {
+		return parameters;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
 	public void run( String[] commands ) throws IOException {
 		// Parse parameters
 		parameters = Parameters.parse( commands );
@@ -80,7 +88,8 @@ public class Program implements Product {
 		// Print the program header
 		printHeader( card );
 
-		log.info( card.getName() + " started" );
+		log.info( card.getName() + " started " + (isElevated() ? "(elevated)" : "") );
+		log.info( "Parameters: " + parameters );
 
 		if( parameters.isSet( UpdateFlag.TITLE ) ) title = parameters.get( UpdateFlag.TITLE );
 
@@ -93,6 +102,8 @@ public class Program implements Product {
 		} else if( !(stream | file) ) {
 			log.error( "Must use either --stream or --file to provide update commands" );
 		}
+
+		log.error( "Available stdin: " + System.in.available() );
 
 		if( stream ) runTasksFromStdIn();
 		if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
@@ -127,9 +138,9 @@ public class Program implements Product {
 		PrintWriter printWriter = new PrintWriter( writer );
 
 		List<TaskResult> results = new ArrayList<>();
-		String line = buffer.readLine().trim();
-		while( !TextUtil.isEmpty( line ) ) {
-			AnnexTask task = parseTask( line );
+		String line;
+		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
+			AnnexTask task = parseTask( line.trim() );
 			TaskResult result = executeTask( task );
 			log.info( result.toString() );
 
@@ -140,15 +151,17 @@ public class Program implements Product {
 			printWriter.flush();
 
 			if( result.getStatus() == TaskStatus.FAILURE ) break;
-
-			line = buffer.readLine();
 		}
 		printWriter.close();
 
 		// Closing the elevated process output stream should cause it to exit
-		if( elevatedProcess != null ) elevatedProcess.getOutputStream().close();
+		if( elevatedHandler != null ) elevatedHandler.stop();
 
 		return results;
+	}
+
+	private boolean isElevated() {
+		return OperatingSystem.isProcessElevated();
 	}
 
 	private void printHeader( ProductCard card ) {
@@ -181,53 +194,18 @@ public class Program implements Product {
 
 		TaskResult result;
 
+		log.debug( "Task: " + task.getOriginalLine() );
+
 		try {
 			// Validate the task parameters before asking if it needs elevation
 			task.validate();
 
-			log.info( "Task needs elevation?: " + task.getCommand() + " = " + task.needsElevation() );
+			log.info( "Task needs elevation?: " + task.needsElevation() );
+			if( isElevated() ) log.warn( "Process is already running with elevated privilege." );
 
-			if( task.needsElevation() ) {
-				if( elevatedProcess == null ) {
-					log.info( "Need to create an elevated process..." );
-
-					// FIXME When not running as a module, the following doesn't work correctly
-					ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule() );
-
-					processBuilder.command().add( UpdateFlag.STREAM );
-
-					if( parameters != null ) {
-						if( parameters.isSet( LogFlag.LOG_FILE ) ) {
-							processBuilder.command().add( LogFlag.LOG_FILE );
-							processBuilder.command().add( parameters.get( LogFlag.LOG_FILE ).replace( ".log", "-elevated.log" ) );
-						}
-						if( parameters.isSet( LogFlag.LOG_LEVEL ) ) {
-							processBuilder.command().add( LogFlag.LOG_LEVEL );
-							processBuilder.command().add( parameters.get( LogFlag.LOG_LEVEL ) );
-						}
-					}
-
-					//					File home = new File( System.getProperty( "user.home" ));
-					//					File logFile = new File( parameters.get( LogFlag.LOG_FILE ).replace( "%h", home.toString() ).replace( ".log", "-mvs.log" ) );
-					//					log.info( "MVS log file: " + logFile );
-					//					processBuilder.redirectOutput( ProcessBuilder.Redirect.to( logFile ) ).redirectError( ProcessBuilder.Redirect.to( logFile ) );
-
-					//processBuilder.redirectError( ProcessBuilder.Redirect.INHERIT );
-					OperatingSystem.elevateProcessBuilder( title, processBuilder );
-					log.info( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
-					elevatedProcess = processBuilder.start();
-				}
-
-				log.warn( "Sending task commands to elevated process..." );
-				log.warn( "  commands: " + task.getOriginalLine() );
-
-				elevatedProcess.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
-				elevatedProcess.getOutputStream().write( '\n' );
-				elevatedProcess.getOutputStream().flush();
-
-				log.warn( "Reading task result from elevated process..." );
-				result = TaskResult.parse( task, new BufferedReader( new InputStreamReader( elevatedProcess.getInputStream() ) ).readLine() );
-				log.warn( "  result: " + result );
+			if( task.needsElevation() && !isElevated() ) {
+				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
+				result = elevatedHandler.execute( task );
 			} else {
 				result = task.execute();
 			}
@@ -235,6 +213,8 @@ public class Program implements Product {
 			String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
 			result = new TaskResult( task, TaskStatus.FAILURE, message );
 		}
+
+		log.debug( "Result: " + result );
 
 		return result;
 	}
