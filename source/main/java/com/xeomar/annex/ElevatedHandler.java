@@ -3,17 +3,24 @@ package com.xeomar.annex;
 import com.xeomar.util.*;
 import org.slf4j.Logger;
 
+import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 class ElevatedHandler {
+
+	static final String CALLBACK_SECRET = "--callback-secret";
+
+	static final String CALLBACK_PORT = "--callback-port";
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 
@@ -38,28 +45,55 @@ class ElevatedHandler {
 	}
 
 	public ElevatedHandler stop() throws IOException {
-		if( socket != null ) socket.getOutputStream().close();
+		if( socket != null ) socket.close();
+		if( server != null ) server.close();
 		return this;
 	}
 
+	public synchronized TaskResult execute( AnnexTask task ) throws IOException, InterruptedException, TimeoutException {
+		int attemptLimit = 10;
+		int attemptCount = 0;
+		while( socket == null && attemptCount < attemptLimit ) {
+			log.info( "Attempt: " + attemptCount );
+			attemptCount++;
+			wait( 1000 );
+		}
+
+		if( attemptCount == attemptLimit ) throw new TimeoutException( "Timeout waiting for elevated updater to start" );
+		if( throwable != null ) throw new IOException( throwable );
+
+		log.debug( "Sending task commands to elevated process..." );
+		socket.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
+		socket.getOutputStream().write( '\n' );
+		socket.getOutputStream().flush();
+		log.debug( "  commands: " + task.getOriginalLine() );
+
+		log.debug( "Reading task result from elevated process..." );
+		String taskOutput = readLine( socket.getInputStream() );
+		TaskResult result = TaskResult.parse( task, taskOutput );
+		log.debug( "  result: " + result );
+
+		return result;
+	}
+
 	private void startServerSocket() throws IOException {
-		server = SSLServerSocketFactory.getDefault().createServerSocket();
+		server = ServerSocketFactory.getDefault().createServerSocket( 0, 1, InetAddress.getLoopbackAddress() );
 		new ClientAcceptThread().start();
 	}
 
 	private void startElevatedUpdater() throws IOException {
-		// TODO Finish implementation
+		secret = UUID.randomUUID().toString();
 
 		// NOTE IntelliJ keys off the folder whether to run this as a module
 		// It needs to be run from the java folder, not the test folder
 		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule() );
+		processBuilder.inheritIO();
 
-		// TODO Need to send the callback port and secret
-		processBuilder.command().add( "--callback-port" );
-		processBuilder.command().add( String.valueOf( server.getLocalPort() ) );
-		processBuilder.command().add( "--callback-secret" );
+		// Send the callback port and secret
+		processBuilder.command().add( CALLBACK_SECRET );
 		processBuilder.command().add( secret );
-		processBuilder.command().add( UpdateFlag.STREAM );
+		processBuilder.command().add( CALLBACK_PORT );
+		processBuilder.command().add( String.valueOf( server.getLocalPort() ) );
 
 		Parameters parameters = program.getParameters();
 
@@ -77,35 +111,9 @@ class ElevatedHandler {
 		//					log.info( "MVS log file: " + logFile );
 		//					processBuilder.redirectOutput( ProcessBuilder.Redirect.to( logFile ) ).redirectError( ProcessBuilder.Redirect.to( logFile ) );
 
-		//processBuilder.redirectError( ProcessBuilder.Redirect.INHERIT );
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
-		log.info( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
+		//log.info( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
 		processBuilder.start();
-	}
-
-	public synchronized TaskResult execute( AnnexTask task ) throws IOException, InterruptedException, TimeoutException {
-		int attempt = 0;
-		int attemptCount = 5;
-		while( socket == null && attempt < attemptCount ) {
-			wait( 20 );
-			attemptCount++;
-		}
-		if( attempt > attemptCount ) throw new TimeoutException( "Timeout waiting for elevated updater to start" );
-
-		log.debug( "Sending task commands to elevated process..." );
-		log.debug( "  commands: " + task.getOriginalLine() );
-
-		socket.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
-		socket.getOutputStream().write( '\n' );
-		socket.getOutputStream().flush();
-
-		log.debug( "Reading task result from elevated process..." );
-		String taskOutput = readLine( socket.getInputStream() );
-		log.debug( "Task output: " + taskOutput );
-		TaskResult result = TaskResult.parse( task, taskOutput );
-		log.debug( "  result: " + result );
-
-		return result;
 	}
 
 	private synchronized void setSocket( Socket socket ) {
@@ -119,12 +127,20 @@ class ElevatedHandler {
 
 	private class ClientAcceptThread extends Thread {
 
+		private ClientAcceptThread() {
+			setDaemon( true );
+		}
+
 		@Override
 		public void run() {
 			try {
-				while( socket == null ) {
-					Socket client = server.accept();
-					if( readLine( client.getInputStream() ).equals( secret ) ) setSocket( client );
+				Socket peer = null;
+				while( peer == null ) {
+					peer = server.accept();
+					if( readLine( peer.getInputStream() ).equals( secret ) ) {
+						setSocket( peer );
+						server.close();
+					}
 				}
 			} catch( Throwable throwable ) {
 				ElevatedHandler.this.throwable = throwable;

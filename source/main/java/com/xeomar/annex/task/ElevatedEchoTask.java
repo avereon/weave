@@ -4,6 +4,7 @@ import com.xeomar.annex.AnnexTask;
 import com.xeomar.annex.TaskResult;
 import com.xeomar.annex.TaskStatus;
 import com.xeomar.annex.UpdateTask;
+import com.xeomar.util.OperatingSystem;
 import com.xeomar.util.TextUtil;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class ElevatedEchoTask extends AnnexTask {
 
 	@Override
 	public boolean needsElevation() {
-		return true;
+		return !OperatingSystem.isProcessElevated();
 	}
 
 	@Override

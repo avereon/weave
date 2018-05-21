@@ -8,8 +8,13 @@ import com.xeomar.util.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,20 +100,37 @@ public class Program implements Product {
 
 		boolean stream = parameters.isSet( UpdateFlag.STREAM );
 		boolean file = parameters.isSet( UpdateFlag.FILE );
+		boolean callback = parameters.isSet( ElevatedHandler.CALLBACK_SECRET );
+
+		if( callback ) {
+			runTasksFromSocket();
+			return;
+		}
 
 		if( stream & file ) {
 			log.error( "Cannot use both --stream and --file parameters at the same time" );
 			return;
 		} else if( !(stream | file) ) {
 			log.error( "Must use either --stream or --file to provide update commands" );
+			return;
 		}
-
-		log.error( "Available stdin: " + System.in.available() );
 
 		if( stream ) runTasksFromStdIn();
 		if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
 
 		log.info( card.getName() + " finished" );
+	}
+
+	private List<TaskResult> runTasksFromSocket() throws IOException {
+		String secret = parameters.get( ElevatedHandler.CALLBACK_SECRET );
+		int port = Integer.parseInt( parameters.get( ElevatedHandler.CALLBACK_PORT ) );
+		if( port < 1 ) return null;
+
+		Socket socket = SocketFactory.getDefault().createSocket( InetAddress.getLoopbackAddress(), port );
+		socket.getOutputStream().write( secret.getBytes( TextUtil.CHARSET ) );
+		socket.getOutputStream().write( '\n' );
+		socket.getOutputStream().flush();
+		return runTasksFromStream( socket.getInputStream(), socket.getOutputStream() );
 	}
 
 	private List<TaskResult> runTasksFromStdIn() throws IOException {
@@ -142,7 +164,6 @@ public class Program implements Product {
 		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
 			AnnexTask task = parseTask( line.trim() );
 			TaskResult result = executeTask( task );
-			log.info( result.toString() );
 
 			results.add( result );
 
@@ -200,8 +221,7 @@ public class Program implements Product {
 			// Validate the task parameters before asking if it needs elevation
 			task.validate();
 
-			log.info( "Task needs elevation?: " + task.needsElevation() );
-			if( isElevated() ) log.warn( "Process is already running with elevated privilege." );
+			log.debug( "Task needs elevation?: " + task.needsElevation() );
 
 			if( task.needsElevation() && !isElevated() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
@@ -210,6 +230,7 @@ public class Program implements Product {
 				result = task.execute();
 			}
 		} catch( Exception exception ) {
+			log.error( "Error executing task", exception );
 			String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
 			result = new TaskResult( task, TaskStatus.FAILURE, message );
 		}

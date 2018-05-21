@@ -42,7 +42,7 @@ public class TaskResult {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder( status.toString() );
-		builder.append( " " ).append( task.getCommand() );
+		// The parse() method does not handle the task name so do not add it
 		if( message != null ) builder.append( " " ).append( message );
 		return builder.toString();
 	}
