@@ -147,7 +147,7 @@ public class Program implements Product {
 		return runTasksFromReader( reader, writer );
 	}
 
-	public List<TaskResult> runTasksFromReader( Reader reader, Writer writer ) throws IOException {
+	List<TaskResult> runTasksFromReader( Reader reader, Writer writer ) throws IOException {
 		return runTasks( reader, writer );
 	}
 
@@ -241,7 +241,7 @@ public class Program implements Product {
 		String command = commands.get( 0 );
 		List<String> parameterList = commands.subList( 1, commands.size() );
 
-		AnnexTask task = null;
+		AnnexTask task;
 		switch( command ) {
 			case UpdateTask.DELETE: {
 				task = new DeleteTask( parameterList );

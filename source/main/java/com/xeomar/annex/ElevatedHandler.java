@@ -4,7 +4,6 @@ import com.xeomar.util.*;
 import org.slf4j.Logger;
 
 import javax.net.ServerSocketFactory;
-import javax.net.ssl.SSLServerSocketFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,8 +83,6 @@ class ElevatedHandler {
 	private void startElevatedUpdater() throws IOException {
 		secret = UUID.randomUUID().toString();
 
-		// NOTE IntelliJ keys off the folder whether to run this as a module
-		// It needs to be run from the java folder, not the test folder
 		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule() );
 		processBuilder.inheritIO();
 
