@@ -17,10 +17,10 @@ public interface UpdateFlag extends LogFlag {
 	 * The stream flag indicates the program should read commands from STDIN.
 	 * Example:
 	 * {@code
-	 * updater.jar --stream
+	 * updater.jar --stdin
 	 * }
 	 */
-	String STREAM = "--stream";
+	String STDIN = "--stdin";
 
 	/**
 	 * The title flag specifies a title for the update window while the updates

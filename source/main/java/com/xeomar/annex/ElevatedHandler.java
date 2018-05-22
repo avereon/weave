@@ -54,7 +54,7 @@ class ElevatedHandler {
 		int attemptLimit = 10;
 		int attemptCount = 0;
 		while( socket == null && attemptCount < attemptLimit ) {
-			log.info( "Attempt: " + attemptCount );
+			log.trace( "Attempt: " + attemptCount );
 			attemptCount++;
 			wait( 1000 );
 		}
@@ -106,13 +106,8 @@ class ElevatedHandler {
 			processBuilder.command().add( parameters.get( LogFlag.LOG_LEVEL ) );
 		}
 
-		//					File home = new File( System.getProperty( "user.home" ));
-		//					File logFile = new File( parameters.get( LogFlag.LOG_FILE ).replace( "%h", home.toString() ).replace( ".log", "-mvs.log" ) );
-		//					log.info( "MVS log file: " + logFile );
-		//					processBuilder.redirectOutput( ProcessBuilder.Redirect.to( logFile ) ).redirectError( ProcessBuilder.Redirect.to( logFile ) );
-
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
-		//log.info( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
+		log.debug( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
 		processBuilder.start();
 	}
 

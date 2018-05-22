@@ -31,8 +31,8 @@ public class ProgramTest {
 		try {
 			new Thread( () -> {
 				try {
-					new Program().run( new String[]{ UpdateFlag.STREAM } );
-				} catch( IOException exception ) {
+					new Program().run( new String[]{ UpdateFlag.STDIN } );
+				} catch( Exception exception ) {
 					exception.printStackTrace( System.err );
 				}
 			} ).start();

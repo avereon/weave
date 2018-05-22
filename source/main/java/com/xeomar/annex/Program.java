@@ -5,12 +5,9 @@ import com.xeomar.product.Product;
 import com.xeomar.product.ProductBundle;
 import com.xeomar.product.ProductCard;
 import com.xeomar.util.*;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import javax.net.SocketFactory;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.net.InetAddress;
@@ -83,7 +80,7 @@ public class Program implements Product {
 		return title;
 	}
 
-	public void run( String[] commands ) throws IOException {
+	public void run( String[] commands ) throws Exception {
 		// Parse parameters
 		parameters = Parameters.parse( commands );
 
@@ -98,25 +95,24 @@ public class Program implements Product {
 
 		if( parameters.isSet( UpdateFlag.TITLE ) ) title = parameters.get( UpdateFlag.TITLE );
 
-		boolean stream = parameters.isSet( UpdateFlag.STREAM );
+		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
 		boolean file = parameters.isSet( UpdateFlag.FILE );
 		boolean callback = parameters.isSet( ElevatedHandler.CALLBACK_SECRET );
 
 		if( callback ) {
 			runTasksFromSocket();
-			return;
-		}
+		} else {
+			if( stdin & file ) {
+				log.error( "Cannot use both --stream and --file parameters at the same time" );
+				return;
+			} else if( !(stdin | file) ) {
+				log.error( "Must use either --stream or --file to provide update commands" );
+				return;
+			}
 
-		if( stream & file ) {
-			log.error( "Cannot use both --stream and --file parameters at the same time" );
-			return;
-		} else if( !(stream | file) ) {
-			log.error( "Must use either --stream or --file to provide update commands" );
-			return;
+			if( stdin ) runTasksFromStdIn();
+			if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
 		}
-
-		if( stream ) runTasksFromStdIn();
-		if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
 
 		log.info( card.getName() + " finished" );
 	}
@@ -221,7 +217,7 @@ public class Program implements Product {
 			// Validate the task parameters before asking if it needs elevation
 			task.validate();
 
-			log.debug( "Task needs elevation?: " + task.needsElevation() );
+			log.trace( "Task needs elevation?: " + task.needsElevation() );
 
 			if( task.needsElevation() && !isElevated() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
@@ -235,7 +231,7 @@ public class Program implements Product {
 			result = new TaskResult( task, TaskStatus.FAILURE, message );
 		}
 
-		log.debug( "Result: " + result );
+		log.info( "Result: " + result.getTask().getCommand() + " " + result );
 
 		return result;
 	}
