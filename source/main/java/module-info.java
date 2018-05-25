@@ -1,9 +1,10 @@
 module com.xeomar.annex {
 
-	requires com.xeomar.razor;
-	requires org.slf4j;
-	requires commons.io;
 	requires java.logging;
+	requires javafx.controls;
+	requires com.xeomar.razor;
+	requires commons.io;
+	requires org.slf4j;
 
 	exports com.xeomar.annex;
 

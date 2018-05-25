@@ -5,6 +5,11 @@ import com.xeomar.product.Product;
 import com.xeomar.product.ProductBundle;
 import com.xeomar.product.ProductCard;
 import com.xeomar.util.*;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 
 import javax.net.SocketFactory;
@@ -15,6 +20,7 @@ import java.net.Socket;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Program implements Product {
 
@@ -93,7 +99,30 @@ public class Program implements Product {
 		log.info( card.getName() + " started " + (isElevated() ? "(elevated)" : "") );
 		log.info( "Parameters: " + parameters );
 
-		if( parameters.isSet( UpdateFlag.TITLE ) ) title = parameters.get( UpdateFlag.TITLE );
+		if( parameters.isSet( UpdateFlag.TITLE ) ) {
+			title = parameters.get( UpdateFlag.TITLE );
+			// NEXT Configure and show the progress window
+			Platform.startup( () -> {
+//				Stage stage = new Stage();
+//				stage.setScene( new Scene( new ProgramProgress(), 400, 300 ) );
+//				stage.show();
+
+				Alert alert = new Alert( Alert.AlertType.NONE, "MVS", ButtonType.CANCEL );
+//				alert.setTitle( getResourceBundle().getString( "program", "program.close.title" ) );
+//				alert.setHeaderText( getResourceBundle().getString( "program", "program.close.message" ) );
+//				alert.setContentText( getResourceBundle().getString( "program", "program.close.prompt" ) );
+				alert.setTitle( title );
+				alert.setHeaderText( "Header Text" );
+				alert.setContentText( "Content text..." );
+
+				// The following line is a workaround to dialogs showing with zero size on Linux
+				alert.setResizable( true );
+
+				Optional<ButtonType> result = alert.showAndWait();
+
+				if( result.isPresent() && result.get() == ButtonType.CANCEL ) return;
+			} );
+		}
 
 		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
 		boolean file = parameters.isSet( UpdateFlag.FILE );
