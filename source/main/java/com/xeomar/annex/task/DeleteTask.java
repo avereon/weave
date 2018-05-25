@@ -13,21 +13,22 @@ import java.util.List;
 
 public class DeleteTask extends AnnexTask {
 
+	private Path target;
+
 	public DeleteTask( List<String> parameters ) {
 		super( UpdateTask.DELETE, parameters );
+		target = Paths.get( getParameters().get( 0 ) );
 	}
 
 	@Override
 	public boolean needsElevation() {
-		Path source = Paths.get( getParameters().get( 0 ) );
-		return !Files.isWritable( source );
+		return !Files.isWritable( Paths.get( getParameters().get( 0 ) ) );
 	}
 
 	@Override
 	public TaskResult execute() throws Exception {
-		Path source = Paths.get( getParameters().get( 0 ) );
-		FileUtil.delete( source );
-		return new TaskResult( this, TaskStatus.SUCCESS, source.toString() );
+		FileUtil.delete( target );
+		return new TaskResult( this, TaskStatus.SUCCESS, target.toString() );
 	}
 
 }
