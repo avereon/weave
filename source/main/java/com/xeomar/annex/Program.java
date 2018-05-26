@@ -146,12 +146,9 @@ public class Program implements Product {
 			if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
 		}
 
-		if( alert != null ) Platform.runLater( () -> {
-			alert.close();
-			Platform.exit();
-		} );
-
 		log.info( card.getName() + " finished" );
+
+		Runtime.getRuntime().exit( 0 );
 	}
 
 	private List<TaskResult> runTasksFromSocket() throws IOException {
