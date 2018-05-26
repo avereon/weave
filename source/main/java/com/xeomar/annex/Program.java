@@ -4,12 +4,13 @@ import com.xeomar.annex.task.*;
 import com.xeomar.product.Product;
 import com.xeomar.product.ProductBundle;
 import com.xeomar.product.ProductCard;
-import com.xeomar.util.*;
+import com.xeomar.util.LogUtil;
+import com.xeomar.util.OperatingSystem;
+import com.xeomar.util.Parameters;
+import com.xeomar.util.TextUtil;
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 
 import javax.net.SocketFactory;
@@ -37,6 +38,8 @@ public class Program implements Product {
 	private ElevatedHandler elevatedHandler;
 
 	private Parameters parameters;
+
+	private Alert alert;
 
 	public Program() {
 		try {
@@ -103,14 +106,14 @@ public class Program implements Product {
 			title = parameters.get( UpdateFlag.TITLE );
 			// NEXT Configure and show the progress window
 			Platform.startup( () -> {
-//				Stage stage = new Stage();
-//				stage.setScene( new Scene( new ProgramProgress(), 400, 300 ) );
-//				stage.show();
+				//				Stage stage = new Stage();
+				//				stage.setScene( new Scene( new ProgramProgress(), 400, 300 ) );
+				//				stage.show();
 
-				Alert alert = new Alert( Alert.AlertType.NONE, "MVS", ButtonType.CANCEL );
-//				alert.setTitle( getResourceBundle().getString( "program", "program.close.title" ) );
-//				alert.setHeaderText( getResourceBundle().getString( "program", "program.close.message" ) );
-//				alert.setContentText( getResourceBundle().getString( "program", "program.close.prompt" ) );
+				alert = new Alert( Alert.AlertType.NONE, "MVS", ButtonType.CANCEL );
+				//				alert.setTitle( getResourceBundle().getString( "program", "program.close.title" ) );
+				//				alert.setHeaderText( getResourceBundle().getString( "program", "program.close.message" ) );
+				//				alert.setContentText( getResourceBundle().getString( "program", "program.close.prompt" ) );
 				alert.setTitle( title );
 				alert.setHeaderText( "Header Text" );
 				alert.setContentText( "Content text..." );
@@ -142,6 +145,8 @@ public class Program implements Product {
 			if( stdin ) runTasksFromStdIn();
 			if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
 		}
+
+		if( alert != null ) Platform.runLater( () -> alert.close() );
 
 		log.info( card.getName() + " finished" );
 	}
