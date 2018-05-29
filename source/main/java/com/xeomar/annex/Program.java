@@ -130,13 +130,13 @@ public class Program implements Product {
 		Runtime.getRuntime().exit( 0 );
 	}
 
-	private void showProgressDialog() {
+	private void showProgressDialog() throws InterruptedException {
 		title = parameters.get( UpdateFlag.TITLE );
 
 		Platform.startup( () -> {} );
 
 		Platform.runLater( () -> {
-			alert = new Alert( Alert.AlertType.INFORMATION, "", ButtonType.CANCEL );
+			alert = new Alert( Alert.AlertType.INFORMATION, "Starting update", ButtonType.CANCEL );
 			alert.setTitle( title );
 			alert.setHeaderText( "Performing update" );
 
