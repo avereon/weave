@@ -64,7 +64,7 @@ public class ProgramTest {
 		new Thread( () -> {
 			try {
 				new Program().runTasksFromReader( reader, writer );
-			} catch( IOException exception ) {
+			} catch( Exception exception ) {
 				exception.printStackTrace( System.err );
 			}
 		} ).start();

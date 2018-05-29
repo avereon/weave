@@ -138,7 +138,7 @@ public class Program implements Product {
 		Platform.runLater( () -> {
 			alert = new Alert( Alert.AlertType.INFORMATION, "", ButtonType.CANCEL );
 			alert.setTitle( title );
-			alert.setHeaderText( "Running update tasks" );
+			alert.setHeaderText( "Performing update" );
 
 			// The following line is a workaround to dialogs showing with zero size on Linux
 			alert.setResizable( true );
@@ -149,7 +149,7 @@ public class Program implements Product {
 		} );
 	}
 
-	private List<TaskResult> runTasksFromSocket() throws IOException {
+	private List<TaskResult> runTasksFromSocket() throws IOException, InterruptedException {
 		String secret = parameters.get( ElevatedHandler.CALLBACK_SECRET );
 		int port = Integer.parseInt( parameters.get( ElevatedHandler.CALLBACK_PORT ) );
 		if( port < 1 ) return null;
@@ -161,29 +161,29 @@ public class Program implements Product {
 		return runTasksFromStream( socket.getInputStream(), socket.getOutputStream() );
 	}
 
-	private List<TaskResult> runTasksFromStdIn() throws IOException {
+	private List<TaskResult> runTasksFromStdIn() throws IOException, InterruptedException {
 		return runTasksFromStream( System.in, System.out );
 	}
 
-	private List<TaskResult> runTasksFromFile( File file ) throws IOException {
+	private List<TaskResult> runTasksFromFile( File file ) throws IOException, InterruptedException {
 		return runTasksFromStream( new FileInputStream( file ), new ByteArrayOutputStream() );
 	}
 
-	private List<TaskResult> runTasksFromStream( InputStream input, OutputStream output ) throws IOException {
+	private List<TaskResult> runTasksFromStream( InputStream input, OutputStream output ) throws IOException, InterruptedException {
 		return runTasksFromReader( new InputStreamReader( input, "utf-8" ), new OutputStreamWriter( output, "utf-8" ) );
 	}
 
-	public List<TaskResult> runTasksFromString( String commands ) throws IOException {
+	public List<TaskResult> runTasksFromString( String commands ) throws IOException, InterruptedException {
 		StringReader reader = new StringReader( commands );
 		StringWriter writer = new StringWriter();
 		return runTasksFromReader( reader, writer );
 	}
 
-	List<TaskResult> runTasksFromReader( Reader reader, Writer writer ) throws IOException {
+	List<TaskResult> runTasksFromReader( Reader reader, Writer writer ) throws IOException, InterruptedException {
 		return runTasks( reader, writer );
 	}
 
-	private List<TaskResult> runTasks( Reader reader, Writer writer ) throws IOException {
+	private List<TaskResult> runTasks( Reader reader, Writer writer ) throws IOException, InterruptedException {
 		BufferedReader buffer = new BufferedReader( reader );
 		PrintWriter printWriter = new PrintWriter( writer );
 
@@ -208,6 +208,9 @@ public class Program implements Product {
 
 		// Closing the elevated process output stream should cause it to exit
 		if( elevatedHandler != null ) elevatedHandler.stop();
+
+		if( alert != null ) Platform.runLater( () -> alert.setContentText( "Update complete" ) );
+		Thread.sleep( 500 );
 
 		return results;
 	}
