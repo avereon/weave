@@ -34,29 +34,34 @@ public class UnpackTask extends AnnexTask {
 
 	private static final String ADD_SUFFIX = ".add";
 
+	private Path source;
+
+	private Path target;
+
 	public UnpackTask( List<String> parameters ) {
 		super( UpdateTask.UNPACK, parameters );
+		source = Paths.get( getParameters().get( 0 ) );
+		target = Paths.get( getParameters().get( 1 ) );
+	}
+
+	@Override
+	public String getMessage() {
+		return "Update " + target;
 	}
 
 	@Override
 	public void validate() {
-		Path source = Paths.get( getParameters().get( 0 ) );
-		Path target = Paths.get( getParameters().get( 1 ) );
-
 		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source not found: " + source );
 		if( Files.exists( target ) && !Files.isDirectory( target ) ) throw new IllegalArgumentException( "Target already exists and is not a folder: " + target );
 	}
 
 	@Override
 	public boolean needsElevation() {
-		Path target = Paths.get( getParameters().get( 1 ) );
 		return Files.exists( target ) && !Files.isWritable( target );
 	}
 
 	@Override
 	public TaskResult execute() throws Exception {
-		Path source = Paths.get( getParameters().get( 0 ) );
-		Path target = Paths.get( getParameters().get( 1 ) );
 		Files.createDirectories( target );
 
 		log.debug( "Staging: {}", source );

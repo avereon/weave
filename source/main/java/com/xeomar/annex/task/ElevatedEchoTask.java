@@ -16,6 +16,11 @@ public class ElevatedEchoTask extends AnnexTask {
 	}
 
 	@Override
+	public String getMessage() {
+		return getParameters().get( 0 );
+	}
+
+	@Override
 	public boolean needsElevation() {
 		return !OperatingSystem.isProcessElevated();
 	}

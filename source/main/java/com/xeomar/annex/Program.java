@@ -41,6 +41,8 @@ public class Program implements Product {
 
 	private Alert alert;
 
+	private boolean cancelled;
+
 	public Program() {
 		try {
 			this.card = new ProductCard().init( getClass() );
@@ -102,30 +104,7 @@ public class Program implements Product {
 		log.info( card.getName() + " started " + (isElevated() ? "(elevated)" : "") );
 		log.info( "Parameters: " + parameters );
 
-		if( parameters.isSet( UpdateFlag.TITLE ) ) {
-			title = parameters.get( UpdateFlag.TITLE );
-			// NEXT Configure and show the progress window
-			Platform.startup( () -> {
-				//				Stage stage = new Stage();
-				//				stage.setScene( new Scene( new ProgramProgress(), 400, 300 ) );
-				//				stage.show();
-
-				alert = new Alert( Alert.AlertType.NONE, "MVS", ButtonType.CANCEL );
-				//				alert.setTitle( getResourceBundle().getString( "program", "program.close.title" ) );
-				//				alert.setHeaderText( getResourceBundle().getString( "program", "program.close.message" ) );
-				//				alert.setContentText( getResourceBundle().getString( "program", "program.close.prompt" ) );
-				alert.setTitle( title );
-				alert.setHeaderText( "Header Text" );
-				alert.setContentText( "Content text..." );
-
-				// The following line is a workaround to dialogs showing with zero size on Linux
-				alert.setResizable( true );
-
-				Optional<ButtonType> result = alert.showAndWait();
-
-				if( result.isPresent() && result.get() == ButtonType.CANCEL ) return;
-			} );
-		}
+		if( parameters.isSet( UpdateFlag.TITLE ) ) showProgressDialog();
 
 		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
 		boolean file = parameters.isSet( UpdateFlag.FILE );
@@ -149,6 +128,25 @@ public class Program implements Product {
 		log.info( card.getName() + " finished" );
 
 		Runtime.getRuntime().exit( 0 );
+	}
+
+	private void showProgressDialog() {
+		title = parameters.get( UpdateFlag.TITLE );
+
+		Platform.startup( () -> {} );
+
+		Platform.runLater( () -> {
+			alert = new Alert( Alert.AlertType.INFORMATION, "", ButtonType.CANCEL );
+			alert.setTitle( title );
+			alert.setHeaderText( "Running update tasks" );
+
+			// The following line is a workaround to dialogs showing with zero size on Linux
+			alert.setResizable( true );
+
+			Optional<ButtonType> result = alert.showAndWait();
+
+			if( result.isPresent() && result.get() == ButtonType.CANCEL ) cancelled = true;
+		} );
 	}
 
 	private List<TaskResult> runTasksFromSocket() throws IOException {
@@ -191,8 +189,11 @@ public class Program implements Product {
 
 		List<TaskResult> results = new ArrayList<>();
 		String line;
-		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
+		while( !cancelled && !TextUtil.isEmpty( line = buffer.readLine() ) ) {
 			AnnexTask task = parseTask( line.trim() );
+
+			if( alert != null ) Platform.runLater( () -> alert.setContentText( task.getMessage() ) );
+
 			TaskResult result = executeTask( task );
 
 			results.add( result );
@@ -222,27 +223,6 @@ public class Program implements Product {
 	}
 
 	private TaskResult executeTask( AnnexTask task ) {
-		// Now for the hard part, figuring out how to execute the tasks.
-		// The reason this is hard is because some of the update commands will
-		// require elevated privileges. But we don't want to execute programs
-		// with an elevated process. If this process is elevated, we need to take
-		// care not to become a security issue by allowing others to execute
-		// elevated processes through the program.
-		//
-		// That means that executing the tasks in sequence may be challenging if
-		// there are some that need to be elevated and some that should not. If
-		// the tasks all need to be elevated, or all do not need to be elevated,
-		// the task execution is pretty straight forward. If they need to be mixed
-		// then it is not trivial.
-		//
-		// If all the tasks do not need elevation then all the tasks can be
-		// executed in this process, otherwise an elevated process will need to be
-		// started and some tasks executed on the elevated process. This will also
-		// cover the situation where all tasks need to be elevated.
-
-		// If needsElevation is true then a separate, elevated, process will need
-		// to be started to execute some tasks.
-
 		TaskResult result;
 
 		log.debug( "Task: " + task.getOriginalLine() );

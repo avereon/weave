@@ -14,6 +14,11 @@ public class PauseTask extends AnnexTask {
 	}
 
 	@Override
+	public String getMessage() {
+		return getParameters().get( 1 );
+	}
+
+	@Override
 	public TaskResult execute() throws Exception {
 		long time = Long.parseLong( getParameters().get( 0 ) );
 		Thread.sleep( time );

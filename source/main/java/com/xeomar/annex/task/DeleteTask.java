@@ -21,6 +21,11 @@ public class DeleteTask extends AnnexTask {
 	}
 
 	@Override
+	public String getMessage() {
+		return "Delete " + target;
+	}
+
+	@Override
 	public boolean needsElevation() {
 		return !Files.isWritable( Paths.get( getParameters().get( 0 ) ) );
 	}

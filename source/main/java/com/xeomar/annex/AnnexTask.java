@@ -37,6 +37,10 @@ public abstract class AnnexTask {
 		return false;
 	}
 
+	public String getMessage() {
+		return toString();
+	}
+
 	public abstract TaskResult execute() throws Exception;
 
 	@Override

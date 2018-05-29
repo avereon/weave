@@ -1,5 +1,8 @@
-package com.xeomar.annex;
+package com.xeomar.annex.check;
 
+import com.xeomar.annex.Program;
+import com.xeomar.annex.UpdateFlag;
+import com.xeomar.annex.UpdateTask;
 import com.xeomar.util.LogFlag;
 import com.xeomar.util.ProcessCommands;
 import com.xeomar.util.TextUtil;

@@ -15,6 +15,11 @@ public class LaunchTask extends AnnexTask {
 	}
 
 	@Override
+	public String getMessage() {
+		return "Launch " + getParameters().get( 0 );
+	}
+
+	@Override
 	public TaskResult execute() throws Exception {
 		ProcessBuilder builder = new ProcessBuilder().inheritIO();
 		builder.command().addAll( getParameters() );
