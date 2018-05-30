@@ -27,6 +27,12 @@ public class Program implements Product {
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 
+	private boolean execute;
+
+	private Thread executeThread;
+
+	private final Object waitLock;
+
 	private ProductCard card;
 
 	private ProductBundle resourceBundle;
@@ -35,15 +41,17 @@ public class Program implements Product {
 
 	private String title;
 
+	private InputSource inputSource;
+
 	private ElevatedHandler elevatedHandler;
 
 	private Parameters parameters;
 
 	private Alert alert;
 
-	private boolean cancelled;
-
 	public Program() {
+		this.execute = true;
+		this.waitLock = new Object();
 		try {
 			this.card = new ProductCard().init( getClass() );
 		} catch( IOException exception ) {
@@ -55,12 +63,7 @@ public class Program implements Product {
 	}
 
 	public static void main( String[] commands ) {
-		try {
-			new Program().run( commands );
-		} catch( Throwable throwable ) {
-			throwable.printStackTrace( System.err );
-			log.error( "Execution error", throwable );
-		}
+		new Program().start( commands );
 	}
 
 	@Override
@@ -91,7 +94,7 @@ public class Program implements Product {
 		return title;
 	}
 
-	public void run( String[] commands ) throws Exception {
+	public void start( String[] commands ) {
 		// Parse parameters
 		parameters = Parameters.parse( commands );
 
@@ -104,14 +107,15 @@ public class Program implements Product {
 		log.info( card.getName() + " started " + (isElevated() ? "(elevated)" : "") );
 		log.info( "Parameters: " + parameters );
 
-		if( parameters.isSet( UpdateFlag.TITLE ) ) showProgressDialog();
-
-		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
 		boolean file = parameters.isSet( UpdateFlag.FILE );
+		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
+		boolean string = parameters.isSet( InternalFlag.STRING );
 		boolean callback = parameters.isSet( ElevatedHandler.CALLBACK_SECRET );
 
 		if( callback ) {
-			runTasksFromSocket();
+			inputSource = InputSource.SOCKET;
+		} else if( string ) {
+			inputSource = InputSource.STRING;
 		} else {
 			if( stdin & file ) {
 				log.error( "Cannot use both --stream and --file parameters at the same time" );
@@ -120,24 +124,74 @@ public class Program implements Product {
 				log.error( "Must use either --stream or --file to provide update commands" );
 				return;
 			}
-
-			if( stdin ) runTasksFromStdIn();
-			if( file ) runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
+			if( stdin ) inputSource = InputSource.STDIN;
+			if( file ) inputSource = InputSource.FILE;
 		}
 
-		log.info( card.getName() + " finished" );
-
-		Runtime.getRuntime().exit( 0 );
+		executeThread = new Thread( new Runner() );
+		executeThread.setName( "Annex execute thread" );
+		executeThread.start();
 	}
 
-	private void showProgressDialog() throws InterruptedException {
-		title = parameters.get( UpdateFlag.TITLE );
+	private class Runner implements Runnable {
 
+		@Override
+		public void run() {
+			try {
+				if( isUi() ) showProgressDialog();
+				execute();
+			} catch( Throwable throwable ) {
+				throwable.printStackTrace( System.err );
+				log.error( "Execution error", throwable );
+			} finally {
+				if( isUi() ) hideProgressDialog();
+				log.info( card.getName() + " finished" );
+			}
+
+		}
+	}
+
+	private boolean isUi() {
+		return parameters != null && parameters.isSet( UpdateFlag.TITLE ) || alert != null;
+	}
+
+	private void execute() throws Exception {
+		switch( inputSource ) {
+			case FILE: {
+				runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
+				break;
+			}
+			case STDIN: {
+				runTasksFromStdIn();
+				break;
+			}
+			case SOCKET: {
+				runTasksFromSocket();
+				break;
+			}
+			case STRING: {
+				synchronized( waitLock ) {
+					while( execute && !Thread.currentThread().isInterrupted() ) {
+						waitLock.wait( 100 );
+					}
+				}
+				break;
+			}
+		}
+
+	}
+
+	private void terminate() {
+		execute = false;
+		executeThread.interrupt();
+	}
+
+	private void showProgressDialog() {
 		Platform.startup( () -> {} );
 
 		Platform.runLater( () -> {
 			alert = new Alert( Alert.AlertType.INFORMATION, "Starting update", ButtonType.CANCEL );
-			alert.setTitle( title );
+			alert.setTitle( parameters.get( UpdateFlag.TITLE ) );
 			alert.setHeaderText( "Performing update" );
 
 			// The following line is a workaround to dialogs showing with zero size on Linux
@@ -145,8 +199,20 @@ public class Program implements Product {
 
 			Optional<ButtonType> result = alert.showAndWait();
 
-			if( result.isPresent() && result.get() == ButtonType.CANCEL ) cancelled = true;
+			if( result.isPresent() && result.get() == ButtonType.CANCEL ) terminate();
 		} );
+	}
+
+	private void hideProgressDialog() {
+		Platform.runLater( () -> {
+			if( alert != null ) alert.close();
+		} );
+	}
+
+	public List<TaskResult> runTasksFromString( String commands ) throws IOException, InterruptedException {
+		StringReader reader = new StringReader( commands );
+		StringWriter writer = new StringWriter();
+		return runTasksFromReader( reader, writer );
 	}
 
 	private List<TaskResult> runTasksFromSocket() throws IOException, InterruptedException {
@@ -162,7 +228,9 @@ public class Program implements Product {
 	}
 
 	private List<TaskResult> runTasksFromStdIn() throws IOException, InterruptedException {
-		return runTasksFromStream( System.in, System.out );
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		System.in.transferTo( buffer );
+		return runTasksFromStream( new ByteArrayInputStream( buffer.toByteArray() ), System.out );
 	}
 
 	private List<TaskResult> runTasksFromFile( File file ) throws IOException, InterruptedException {
@@ -170,13 +238,7 @@ public class Program implements Product {
 	}
 
 	private List<TaskResult> runTasksFromStream( InputStream input, OutputStream output ) throws IOException, InterruptedException {
-		return runTasksFromReader( new InputStreamReader( input, "utf-8" ), new OutputStreamWriter( output, "utf-8" ) );
-	}
-
-	public List<TaskResult> runTasksFromString( String commands ) throws IOException, InterruptedException {
-		StringReader reader = new StringReader( commands );
-		StringWriter writer = new StringWriter();
-		return runTasksFromReader( reader, writer );
+		return runTasksFromReader( new InputStreamReader( input, TextUtil.CHARSET ), new OutputStreamWriter( output, TextUtil.CHARSET ) );
 	}
 
 	List<TaskResult> runTasksFromReader( Reader reader, Writer writer ) throws IOException, InterruptedException {
@@ -189,10 +251,12 @@ public class Program implements Product {
 
 		List<TaskResult> results = new ArrayList<>();
 		String line;
-		while( !cancelled && !TextUtil.isEmpty( line = buffer.readLine() ) ) {
+		while( execute && !TextUtil.isEmpty( line = buffer.readLine() ) ) {
 			AnnexTask task = parseTask( line.trim() );
 
-			if( alert != null ) Platform.runLater( () -> alert.setContentText( task.getMessage() ) );
+			if( isUi() ) Platform.runLater( () -> {
+				if( alert != null ) alert.setContentText( task.getMessage() );
+			} );
 
 			TaskResult result = executeTask( task );
 
@@ -205,12 +269,17 @@ public class Program implements Product {
 			if( result.getStatus() == TaskStatus.FAILURE ) break;
 		}
 		printWriter.close();
+		execute = false;
 
 		// Closing the elevated process output stream should cause it to exit
 		if( elevatedHandler != null ) elevatedHandler.stop();
 
-		if( alert != null ) Platform.runLater( () -> alert.setContentText( "Update complete" ) );
-		Thread.sleep( 500 );
+		if( isUi() ) {
+			Platform.runLater( () -> {
+				if( alert != null ) alert.setContentText( "Update complete" );
+			} );
+			Thread.sleep( 500 );
+		}
 
 		return results;
 	}

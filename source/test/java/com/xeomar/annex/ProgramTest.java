@@ -31,19 +31,17 @@ public class ProgramTest {
 		try {
 			new Thread( () -> {
 				try {
-					new Program().run( new String[]{ UpdateFlag.STDIN } );
+					new Program().start( new String[]{ UpdateFlag.STDIN } );
 				} catch( Exception exception ) {
 					exception.printStackTrace( System.err );
 				}
 			} ).start();
 
 			inputPipe.write( "pause 13\n".getBytes( CHARSET ) );
-			inputPipe.flush();
-			String result1 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
-			assertThat( result1, is( "SUCCESS paused 13ms" ) );
-
 			inputPipe.write( "pause 7\n".getBytes( CHARSET ) );
 			inputPipe.close();
+			String result1 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
+			assertThat( result1, is( "SUCCESS paused 13ms" ) );
 			String result2 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
 			assertThat( result2, is( "SUCCESS paused 7ms" ) );
 		} finally {
