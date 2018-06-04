@@ -1,6 +1,9 @@
 package com.xeomar.annex;
 
 import com.xeomar.product.ProductCard;
+import com.xeomar.util.LogFlag;
+import com.xeomar.util.LogUtil;
+import com.xeomar.util.Parameters;
 import org.junit.Test;
 
 import java.io.*;
@@ -31,7 +34,7 @@ public class ProgramTest {
 		try {
 			new Thread( () -> {
 				try {
-					new Program().start( new String[]{ UpdateFlag.STDIN } );
+					new Program().start( new String[]{ UpdateFlag.STDIN, LogFlag.LOG_LEVEL, "none" } );
 				} catch( Exception exception ) {
 					exception.printStackTrace( System.err );
 				}
@@ -61,7 +64,9 @@ public class ProgramTest {
 
 		new Thread( () -> {
 			try {
-				new Program().runTasksFromReader( reader, writer );
+				Program program = new Program();
+				LogUtil.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "none" ) );
+				program.runTasksFromReader( reader, writer );
 			} catch( Exception exception ) {
 				exception.printStackTrace( System.err );
 			}

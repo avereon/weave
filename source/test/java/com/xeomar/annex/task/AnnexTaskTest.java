@@ -18,7 +18,7 @@ abstract class AnnexTaskTest {
 	@Before
 	public void setup() {
 		this.program = new Program();
-		LogUtil.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "off" ) );
+		LogUtil.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "none" ) );
 	}
 
 	void assertTaskResult( TaskResult result, TaskStatus status ) {
