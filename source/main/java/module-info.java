@@ -3,7 +3,7 @@ module com.xeomar.annex {
 	requires java.logging;
 	requires javafx.controls;
 	requires com.xeomar.razor;
-	requires commons.io;
+	requires org.apache.commons.io;
 	requires org.slf4j;
 
 	exports com.xeomar.annex;
