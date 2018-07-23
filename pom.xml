@@ -53,11 +53,11 @@
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commonsio.version}</version>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>commons-io</groupId>-->
+			<!--<artifactId>commons-io</artifactId>-->
+			<!--<version>${commonsio.version}</version>-->
+		<!--</dependency>-->
 
 		<dependency>
 			<groupId>org.openjfx</groupId>
@@ -86,19 +86,50 @@
 	</dependencies>
 
 	<build>
-		<sourceDirectory>source/main/java</sourceDirectory>
-		<testSourceDirectory>source/test/java</testSourceDirectory>
-
-		<resources>
-
-			<resource>
-				<directory>source/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-
-		</resources>
 
 		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeScope>compile</includeScope>
+							<stripVersion>true</stripVersion>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>bash</executable>
+							<arguments>
+								<argument>${project.basedir}/source/tool/module-patch.sh</argument>
+								<!--<argument>${project.build.directory}/dependency/commons-io.jar</argument>-->
+								<!--<argument>${project.build.directory}/dependency/undofx.jar</argument>-->
+								<!--<argument>${project.build.directory}/dependency/jackson-annotations.jar</argument>-->
+								<!--<argument>${project.build.directory}/dependency/jackson-databind.jar</argument>-->
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 			<!-- JLink cannot build a distribution yet because not all dependencies
 			are modules yet.-->
