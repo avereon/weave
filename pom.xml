@@ -59,6 +59,8 @@
 			<!--<version>${commonsio.version}</version>-->
 		<!--</dependency>-->
 
+		<!-- Wait for Java 11 and OpenJFX to be more mature -->
+		<!--
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
@@ -70,6 +72,7 @@
 			<artifactId>javafx-graphics</artifactId>
 			<version>11-ea+19</version>
 		</dependency>
+		-->
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
