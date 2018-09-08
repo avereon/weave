@@ -15,7 +15,7 @@ public class PauseTask extends AnnexTask {
 
 	@Override
 	public String getMessage() {
-		return getParameters().get( 1 );
+		return getParameters().size() > 1 ? getParameters().get( 1 ) : null;
 	}
 
 	@Override

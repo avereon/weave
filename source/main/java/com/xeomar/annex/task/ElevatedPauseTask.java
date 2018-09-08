@@ -4,9 +4,9 @@ import com.xeomar.util.OperatingSystem;
 
 import java.util.List;
 
-public class ElevatedEchoTask extends EchoTask {
+public class ElevatedPauseTask extends PauseTask{
 
-	public ElevatedEchoTask( List<String> parameters ) {
+	public ElevatedPauseTask( List<String> parameters ) {
 		super( parameters );
 	}
 

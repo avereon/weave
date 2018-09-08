@@ -73,12 +73,12 @@ public class ProgramTest {
 		} ).start();
 
 		inputPipe.write( "pause 17\n" );
-		inputPipe.flush();
+		inputPipe.write( "pause 5" );
+		inputPipe.close();
+
 		String result1 = new BufferedReader( outputPipe ).readLine();
 		assertThat( result1, is( "SUCCESS paused 17ms" ) );
 
-		inputPipe.write( "pause 5" );
-		inputPipe.close();
 		String result2 = new BufferedReader( outputPipe ).readLine();
 		assertThat( result2, is( "SUCCESS paused 5ms" ) );
 	}

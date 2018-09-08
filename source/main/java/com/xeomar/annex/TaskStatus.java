@@ -4,6 +4,7 @@ public enum TaskStatus {
 
 	SUCCESS,
 	FAILURE,
-	TIMEOUT
+	TIMEOUT,
+	CANCELLED
 
 }

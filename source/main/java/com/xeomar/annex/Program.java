@@ -49,6 +49,8 @@ public class Program implements Product {
 
 	private Alert alert;
 
+	private ProgressPane progressPane;
+
 	public Program() {
 		this.execute = true;
 		this.waitLock = new Object();
@@ -138,7 +140,10 @@ public class Program implements Product {
 		@Override
 		public void run() {
 			try {
-				if( isUi() ) showProgressDialog();
+				if( isUi() ) {
+					showProgressDialog();
+					Thread.sleep( 500 );
+				}
 				execute();
 			} catch( Throwable throwable ) {
 				throwable.printStackTrace( System.err );
@@ -190,16 +195,25 @@ public class Program implements Product {
 		Platform.startup( () -> {} );
 
 		Platform.runLater( () -> {
-			alert = new Alert( Alert.AlertType.INFORMATION, "Starting update", ButtonType.CANCEL );
+			progressPane = new ProgressPane();
+			progressPane.setPrefWidth( 500 );
+			progressPane.setText( "Starting update" );
+
+			alert = new Alert( Alert.AlertType.INFORMATION, "", ButtonType.CANCEL );
 			alert.setTitle( parameters.get( UpdateFlag.TITLE ) );
 			alert.setHeaderText( "Performing update" );
+			alert.getDialogPane().setContent( progressPane );
 
 			// The following line is a workaround to dialogs showing with zero size on Linux
 			alert.setResizable( true );
 
-			Optional<ButtonType> result = alert.showAndWait();
+			// Set the onHidden handler
+			alert.setOnHidden( (event) -> {
+				Optional<ButtonType> result = Optional.ofNullable( alert.getResult());
+				if( result.isPresent() && result.get() == ButtonType.CANCEL ) terminate();
+			} );
 
-			if( result.isPresent() && result.get() == ButtonType.CANCEL ) terminate();
+			alert.show();
 		} );
 	}
 
@@ -249,22 +263,39 @@ public class Program implements Product {
 		BufferedReader buffer = new BufferedReader( reader );
 		PrintWriter printWriter = new PrintWriter( writer );
 
-		List<TaskResult> results = new ArrayList<>();
 		String line;
-		while( execute && !TextUtil.isEmpty( line = buffer.readLine() ) ) {
-			AnnexTask task = parseTask( line.trim() );
+		List<AnnexTask> tasks = new ArrayList<>();
+		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
+			tasks.add( parseTask( line.trim() ) );
+		}
 
-			if( isUi() ) Platform.runLater( () -> {
-				if( alert != null ) alert.setContentText( task.getMessage() );
-			} );
+		int index = 1;
+		int count = tasks.size();
+		TaskResult result;
+		List<TaskResult> results = new ArrayList<>();
+		for( AnnexTask task : tasks ) {
+			if( !execute ) break;
 
-			TaskResult result = executeTask( task );
+			if( isUi() ) {
+				Platform.runLater( () -> {
+					if( progressPane != null ) progressPane.setText( task.getMessage() );
+				} );
+			}
 
-			results.add( result );
+			results.add( result = executeTask( task ) );
+
+			double progress = (double)index / (double)count;
+			if( isUi() ) {
+				Platform.runLater( () -> {
+					if( progressPane != null ) progressPane.setProgress( progress );
+				} );
+			}
 
 			printWriter.print( result );
 			printWriter.print( "\n" );
 			printWriter.flush();
+
+			index++;
 
 			if( result.getStatus() == TaskStatus.FAILURE ) break;
 		}
@@ -276,9 +307,9 @@ public class Program implements Product {
 
 		if( isUi() ) {
 			Platform.runLater( () -> {
-				if( alert != null ) alert.setContentText( "Update complete" );
+				if( progressPane != null ) progressPane.setText( "Update complete" );
 			} );
-			Thread.sleep( 500 );
+			Thread.sleep( 1000 );
 		}
 
 		return results;
@@ -312,9 +343,13 @@ public class Program implements Product {
 				result = task.execute();
 			}
 		} catch( Exception exception ) {
-			log.error( "Error executing task", exception );
-			String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
-			result = new TaskResult( task, TaskStatus.FAILURE, message );
+			if( execute ) {
+				log.error( "Error executing task", exception );
+				String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
+				result = new TaskResult( task, TaskStatus.FAILURE, message );
+			} else {
+				result = new TaskResult( task, TaskStatus.CANCELLED );
+			}
 		}
 
 		log.info( "Result: " + result.getTask().getCommand() + " " + result );
@@ -351,6 +386,10 @@ public class Program implements Product {
 			}
 			case UpdateTask.PAUSE: {
 				task = new PauseTask( parameterList );
+				break;
+			}
+			case UpdateTask.ELEVATED_PAUSE: {
+				task = new ElevatedPauseTask( parameterList );
 				break;
 			}
 			case UpdateTask.UNPACK: {
