@@ -40,8 +40,11 @@
 		<project.timestamp>${maven.build.timestamp}</project.timestamp>
 		<product-name>${project.name}</product-name>
 		<product-identifier>annex</product-identifier>
+
+		<!-- Runtime dependencies -->
+		<javafx.version>11</javafx.version>
+		<controlsfx.version>8.40.14</controlsfx.version>
 		<commonsio.version>2.6</commonsio.version>
-		<javafx.version>11-ea-18</javafx.version>
 		<slf4j.version>1.8.0-beta2</slf4j.version>
 	</properties>
 
@@ -54,25 +57,34 @@
 		</dependency>
 
 		<!--<dependency>-->
-			<!--<groupId>commons-io</groupId>-->
-			<!--<artifactId>commons-io</artifactId>-->
-			<!--<version>${commonsio.version}</version>-->
+		<!--<groupId>commons-io</groupId>-->
+		<!--<artifactId>commons-io</artifactId>-->
+		<!--<version>${commonsio.version}</version>-->
 		<!--</dependency>-->
 
-		<!-- Wait for Java 11 and OpenJFX to be more mature -->
-		<!--
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
-			<version>11-ea+19</version>
+			<version>${javafx.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-graphics</artifactId>
-			<version>11-ea+19</version>
+			<artifactId>javafx-swing</artifactId>
+			<version>${javafx.version}</version>
 		</dependency>
-		-->
+
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-web</artifactId>
+			<version>${javafx.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.controlsfx</groupId>
+			<artifactId>controlsfx</artifactId>
+			<version>${controlsfx.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
