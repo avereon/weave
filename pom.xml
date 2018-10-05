@@ -36,6 +36,13 @@
 		</repository>
 	</repositories>
 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>xeo</id>
+			<url>https://code.xeomar.com/repo/xeo</url>
+		</pluginRepository>
+	</pluginRepositories>
+
 	<properties>
 		<project.timestamp>${maven.build.timestamp}</project.timestamp>
 		<product-name>${project.name}</product-name>
@@ -68,23 +75,23 @@
 			<version>${javafx.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-swing</artifactId>
-			<version>${javafx.version}</version>
-		</dependency>
+		<!--<dependency>-->
+		<!--<groupId>org.openjfx</groupId>-->
+		<!--<artifactId>javafx-swing</artifactId>-->
+		<!--<version>${javafx.version}</version>-->
+		<!--</dependency>-->
 
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-web</artifactId>
-			<version>${javafx.version}</version>
-		</dependency>
+		<!--<dependency>-->
+		<!--<groupId>org.openjfx</groupId>-->
+		<!--<artifactId>javafx-web</artifactId>-->
+		<!--<version>${javafx.version}</version>-->
+		<!--</dependency>-->
 
-		<dependency>
-			<groupId>org.controlsfx</groupId>
-			<artifactId>controlsfx</artifactId>
-			<version>${controlsfx.version}</version>
-		</dependency>
+		<!--<dependency>-->
+		<!--<groupId>org.controlsfx</groupId>-->
+		<!--<artifactId>controlsfx</artifactId>-->
+		<!--<version>${controlsfx.version}</version>-->
+		<!--</dependency>-->
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -134,34 +141,25 @@
 							<goal>patch</goal>
 						</goals>
 						<configuration>
-							<modules>
-								<module>jackson-core.jar</module>
-								<module>jackson-annotations.jar</module>
-							</modules>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.6.0</version>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>bash</executable>
-							<arguments>
-								<argument>${project.basedir}/source/tool/module-patch.sh</argument>
-								<!--<argument>${project.build.directory}/dependency/commons-io.jar</argument>-->
-								<!--<argument>${project.build.directory}/dependency/undofx.jar</argument>-->
-								<!--<argument>${project.build.directory}/dependency/jackson-annotations.jar</argument>-->
-								<!--<argument>${project.build.directory}/dependency/jackson-databind.jar</argument>-->
-							</arguments>
+							<modulePath>${project.build.directory}/dependency</modulePath>
+							<jars>
+								<jar>
+									<name>commons-io.jar</name>
+								</jar>
+								<jar>
+									<name>jackson-core.jar</name>
+								</jar>
+								<jar>
+									<name>jackson-annotations.jar</name>
+								</jar>
+								<jar>
+									<name>jackson-databind.jar</name>
+									<modules>
+										<module>com.fasterxml.jackson.core</module>
+										<module>com.fasterxml.jackson.annotation</module>
+									</modules>
+								</jar>
+							</jars>
 						</configuration>
 					</execution>
 				</executions>
@@ -214,6 +212,40 @@
 				</configuration>
 			</plugin>
 			-->
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.5.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${java.home}/bin/jlink</executable>
+							<arguments>
+								<argument>--module-path</argument>
+								<argument>${jlink.module.path}</argument>
+								<argument>--add-modules</argument>
+								<argument>com.xeomar.annex</argument>
+								<argument>--output</argument>
+								<argument>${basedir}/target/jlink</argument>
+								<argument>--launcher</argument>
+								<argument>annex=com.xeomar.annex/com.xeomar.annex.Program</argument>
+
+								<argument>--strip-debug</argument>
+								<argument>--no-header-files</argument>
+								<argument>--no-man-pages</argument>
+								<!-- Valid value: 0, 1, 2 -->
+								<argument>--compress</argument>
+								<argument>2</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 		</plugins>
 
