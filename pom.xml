@@ -49,6 +49,7 @@
 		<product-identifier>annex</product-identifier>
 
 		<!-- Runtime dependencies -->
+		<!--java.version defined in parent pom -->
 		<javafx.version>11</javafx.version>
 		<controlsfx.version>8.40.14</controlsfx.version>
 		<commonsio.version>2.6</commonsio.version>
