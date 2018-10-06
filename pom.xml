@@ -63,35 +63,11 @@
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 
-		<!--<dependency>-->
-		<!--<groupId>commons-io</groupId>-->
-		<!--<artifactId>commons-io</artifactId>-->
-		<!--<version>${commonsio.version}</version>-->
-		<!--</dependency>-->
-
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
 			<version>${javafx.version}</version>
 		</dependency>
-
-		<!--<dependency>-->
-		<!--<groupId>org.openjfx</groupId>-->
-		<!--<artifactId>javafx-swing</artifactId>-->
-		<!--<version>${javafx.version}</version>-->
-		<!--</dependency>-->
-
-		<!--<dependency>-->
-		<!--<groupId>org.openjfx</groupId>-->
-		<!--<artifactId>javafx-web</artifactId>-->
-		<!--<version>${javafx.version}</version>-->
-		<!--</dependency>-->
-
-		<!--<dependency>-->
-		<!--<groupId>org.controlsfx</groupId>-->
-		<!--<artifactId>controlsfx</artifactId>-->
-		<!--<version>${controlsfx.version}</version>-->
-		<!--</dependency>-->
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
