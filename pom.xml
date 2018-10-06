@@ -172,33 +172,6 @@
 			</plugin>
 			-->
 
-			<!-- Packing the application in a single jar is not the correct
-			approach in Java 9 and later using modules.-->
-			<!--
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<archive>
-						<manifest>
-							<mainClass>com.xeomar.annex.Program</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-			-->
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
