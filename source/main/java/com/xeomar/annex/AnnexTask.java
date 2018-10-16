@@ -1,6 +1,8 @@
 package com.xeomar.annex;
 
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public abstract class AnnexTask {
 
@@ -10,9 +12,14 @@ public abstract class AnnexTask {
 
 	private String originalLine;
 
+	private int currentStep = 0;
+
+	private Set<TaskListener> listeners;
+
 	public AnnexTask( String command, List<String> parameters ) {
 		this.command = command;
 		this.parameters = parameters;
+		this.listeners = new CopyOnWriteArraySet<>();
 	}
 
 	public String getCommand() {
@@ -33,12 +40,34 @@ public abstract class AnnexTask {
 
 	public void validate() {}
 
+	public abstract int getStepCount();
+
 	public boolean needsElevation() {
 		return false;
 	}
 
-	public String getMessage() {
-		return toString();
+	public void addTaskListener( TaskListener listener  ) {
+		this.listeners.add( listener );
+	}
+
+	public void removeTaskListener( TaskListener listener ) {
+		this.listeners.remove( listener );
+	}
+
+	protected void setMessage( String message ) {
+		for( TaskListener listener : listeners ) {
+			listener.updateMessage( message );
+		}
+	}
+
+	protected int incrementProgress() {
+		currentStep++;
+
+		for( TaskListener listener : listeners ) {
+			listener.updateProgress( currentStep );
+		}
+
+		return currentStep;
 	}
 
 	public abstract TaskResult execute() throws Exception;

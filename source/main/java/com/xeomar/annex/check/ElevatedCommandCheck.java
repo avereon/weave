@@ -41,8 +41,8 @@ public class ElevatedCommandCheck {
 
 			String result1 = new BufferedReader( new InputStreamReader( process.getInputStream(), TextUtil.CHARSET ) ).readLine();
 			System.out.println( result1 );
-		} catch( IOException e ) {
-			e.printStackTrace();
+		} catch( IOException exception ) {
+			exception.printStackTrace();
 		}
 
 	}

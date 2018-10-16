@@ -17,12 +17,12 @@ public class DeleteTask extends AnnexTask {
 
 	public DeleteTask( List<String> parameters ) {
 		super( UpdateTask.DELETE, parameters );
-		target = Paths.get( getParameters().get( 0 ) );
+		this.target = Paths.get( getParameters().get( 0 ) );
 	}
 
 	@Override
-	public String getMessage() {
-		return "Delete " + target;
+	public int getStepCount() {
+		return 1;
 	}
 
 	@Override
@@ -32,7 +32,9 @@ public class DeleteTask extends AnnexTask {
 
 	@Override
 	public TaskResult execute() throws Exception {
+		setMessage( "Delete " + target );
 		FileUtil.delete( target );
+		incrementProgress();
 		return new TaskResult( this, TaskStatus.SUCCESS, target.toString() );
 	}
 

@@ -26,21 +26,25 @@ public class PermissionsTask extends AnnexTask {
 	}
 
 	@Override
-	public String getMessage() {
-		return "Setting permissions";
+	public void validate() {
+		if( getParameters().size() < 1 ) throw new IllegalArgumentException( "Missing permission mask" );
+	}
+
+	@Override
+	public int getStepCount() {
+		return getParameters().size() - 1;
 	}
 
 	@Override
 	public TaskResult execute() throws Exception {
-		// The first parameter should be a permissions mask in octal or rwx format
-		if( getParameters().size() < 1 ) return new TaskResult( this, TaskStatus.FAILURE, "Missing permission mask" );
-
+		setMessage( "Setting permissions" );
 		Set<PosixFilePermission> permissions = getPosixPermissions( getParameters().get( 0 ) );
 
 		int size = getParameters().size();
 		for( int index = 1; index < size; index++ ) {
 			Path file = Paths.get( getParameters().get( index ) );
 			Files.getFileAttributeView( file, PosixFileAttributeView.class ).setPermissions( permissions );
+			incrementProgress();
 		}
 
 		return new TaskResult( this, TaskStatus.SUCCESS );
@@ -60,7 +64,7 @@ public class PermissionsTask extends AnnexTask {
 		}
 
 		// If there are nine letters
-		log.debug( "Permissions to parse: " + permissions );
+		log.debug( "Parse permissions: " + permissions );
 		return PosixFilePermissions.fromString( permissions );
 	}
 

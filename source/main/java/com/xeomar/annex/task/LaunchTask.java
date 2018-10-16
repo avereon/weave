@@ -10,22 +10,29 @@ import java.util.List;
 
 public class LaunchTask extends AnnexTask {
 
+	private String message;
+
 	public LaunchTask( List<String> parameters ) {
 		super( UpdateTask.LAUNCH, parameters );
+		this.message = "Launch " + getParameters().get( 0 );
 	}
 
 	@Override
-	public String getMessage() {
-		return "Launch " + getParameters().get( 0 );
+	public int getStepCount() {
+		return 1;
 	}
 
 	@Override
 	public TaskResult execute() throws Exception {
+		setMessage( message );
+
 		ProcessBuilder builder = new ProcessBuilder().inheritIO();
 		builder.command().addAll( getParameters() );
 		builder.start();
 
-		// TODO Without waiting for the process to finish, this task is asynchronous
+		// NOTE This task does not wait for the process to finish, this task is asynchronous
+
+		incrementProgress();
 
 		return new TaskResult( this, TaskStatus.SUCCESS, TextUtil.toString( builder.command(), " " ) );
 	}

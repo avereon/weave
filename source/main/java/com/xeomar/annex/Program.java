@@ -29,6 +29,8 @@ public class Program implements Product {
 
 	private boolean execute;
 
+	private boolean started;
+
 	private Thread executeThread;
 
 	private final Object waitLock;
@@ -53,6 +55,7 @@ public class Program implements Product {
 
 	public Program() {
 		this.execute = true;
+		this.started = false;
 		this.waitLock = new Object();
 		try {
 			this.card = new ProductCard().init( getClass() );
@@ -135,6 +138,12 @@ public class Program implements Product {
 		executeThread.start();
 	}
 
+	public synchronized void waitForStart() throws InterruptedException {
+		while( !started ) {
+			wait( 1000 );
+		}
+	}
+
 	private class Runner implements Runnable {
 
 		@Override
@@ -143,6 +152,10 @@ public class Program implements Product {
 				if( isUi() ) {
 					showProgressDialog();
 					Thread.sleep( 500 );
+				}
+				synchronized( this ) {
+					started = true;
+					this.notifyAll();
 				}
 				execute();
 			} catch( Throwable throwable ) {
@@ -175,9 +188,10 @@ public class Program implements Product {
 				break;
 			}
 			case STRING: {
+				// runTasksFromString() is called outside this method
 				synchronized( waitLock ) {
 					while( execute && !Thread.currentThread().isInterrupted() ) {
-						waitLock.wait( 100 );
+						waitLock.wait( 1000 );
 					}
 				}
 				break;
@@ -196,7 +210,7 @@ public class Program implements Product {
 
 		Platform.runLater( () -> {
 			progressPane = new ProgressPane();
-			progressPane.setPrefWidth( 500 );
+			progressPane.setPrefWidth( 400 );
 			progressPane.setText( "Starting update" );
 
 			alert = new Alert( Alert.AlertType.INFORMATION, "", ButtonType.CANCEL );
@@ -208,8 +222,8 @@ public class Program implements Product {
 			alert.setResizable( true );
 
 			// Set the onHidden handler
-			alert.setOnHidden( (event) -> {
-				Optional<ButtonType> result = Optional.ofNullable( alert.getResult());
+			alert.setOnHidden( ( event ) -> {
+				Optional<ButtonType> result = Optional.ofNullable( alert.getResult() );
 				if( result.isPresent() && result.get() == ButtonType.CANCEL ) terminate();
 			} );
 
@@ -264,44 +278,35 @@ public class Program implements Product {
 		PrintWriter printWriter = new PrintWriter( writer );
 
 		String line;
+		int totalSteps = 0;
 		List<AnnexTask> tasks = new ArrayList<>();
 		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
-			tasks.add( parseTask( line.trim() ) );
+			AnnexTask task = parseTask( line.trim() );
+			totalSteps += task.getStepCount();
+			tasks.add( task );
 			log.debug( line.trim() );
 		}
 
-		int index = 1;
-		int count = tasks.size();
+		TaskHandler handler = new TaskHandler( totalSteps );
+
+		int taskCompletedCount = 0;
 		TaskResult result;
 		List<TaskResult> results = new ArrayList<>();
 		for( AnnexTask task : tasks ) {
 			if( !execute ) break;
 
-			if( isUi() ) {
-				Platform.runLater( () -> {
-					if( progressPane != null ) progressPane.setText( task.getMessage() );
-				} );
-			}
-
+			if( isUi() ) task.addTaskListener( handler );
 			results.add( result = executeTask( task ) );
-
-			double progress = (double)index / (double)count;
-			if( isUi() ) {
-				Platform.runLater( () -> {
-					if( progressPane != null ) progressPane.setProgress( progress );
-				} );
-			}
+			if( isUi() ) task.removeTaskListener( handler );
 
 			printWriter.print( result );
 			printWriter.print( "\n" );
 			printWriter.flush();
 
-			index++;
-
 			if( result.getStatus() == TaskStatus.FAILURE ) break;
+			taskCompletedCount++;
 		}
 		printWriter.close();
-		execute = false;
 
 		// Closing the elevated process output stream should cause it to exit
 		if( elevatedHandler != null ) elevatedHandler.stop();
@@ -311,6 +316,12 @@ public class Program implements Product {
 				if( progressPane != null ) progressPane.setText( "Update complete" );
 			} );
 			Thread.sleep( 1000 );
+		}
+
+		synchronized( waitLock ) {
+			log.debug( "All tasks completed: " + taskCompletedCount );
+			execute = false;
+			waitLock.notifyAll();
 		}
 
 		return results;
@@ -409,6 +420,34 @@ public class Program implements Product {
 		task.setOriginalLine( line );
 
 		return task;
+	}
+
+	private class TaskHandler implements TaskListener {
+
+		private int step;
+
+		private int totalSteps;
+
+		public TaskHandler( int totalSteps ) {
+			this.totalSteps = totalSteps;
+		}
+
+		@Override
+		public void updateMessage( String message ) {
+			Platform.runLater( () -> {
+				if( progressPane != null ) progressPane.setText( message );
+			} );
+		}
+
+		@Override
+		public void updateProgress( int step ) {
+			this.step++;
+			double progress = (double)this.step / (double)totalSteps;
+			Platform.runLater( () -> {
+				if( progressPane != null ) progressPane.setProgress( progress );
+			} );
+		}
+
 	}
 
 }

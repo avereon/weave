@@ -10,17 +10,22 @@ import java.util.List;
 
 public class EchoTask extends AnnexTask {
 
+	private String message;
+
 	public EchoTask( List<String> parameters ) {
 		super( UpdateTask.ECHO, parameters );
+		this.message = getParameters().get( 0 );
 	}
 
 	@Override
-	public String getMessage() {
-		return getParameters().get( 0 );
+	public int getStepCount() {
+		return 1;
 	}
 
 	@Override
 	public TaskResult execute() throws Exception {
+		setMessage( message );
+		incrementProgress();
 		return new TaskResult( this, TaskStatus.SUCCESS, TextUtil.toString( getParameters(), " " ) );
 	}
 

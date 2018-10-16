@@ -35,6 +35,8 @@ public class UnpackTask extends AnnexTask {
 
 	private Path target;
 
+	private ZipFile zip;
+
 	public UnpackTask( List<String> parameters ) {
 		super( UpdateTask.UNPACK, parameters );
 		source = Paths.get( getParameters().get( 0 ) );
@@ -42,14 +44,19 @@ public class UnpackTask extends AnnexTask {
 	}
 
 	@Override
-	public String getMessage() {
-		return "Update " + target;
-	}
-
-	@Override
 	public void validate() {
 		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source not found: " + source );
 		if( Files.exists( target ) && !Files.isDirectory( target ) ) throw new IllegalArgumentException( "Target already exists and is not a folder: " + target );
+		try {
+			zip = new ZipFile( source.toFile() );
+		} catch( IOException exception ) {
+			throw new RuntimeException( exception );
+		}
+	}
+
+	@Override
+	public int getStepCount() {
+		return zip.size() + 1;
 	}
 
 	@Override
@@ -69,12 +76,14 @@ public class UnpackTask extends AnnexTask {
 			throw new IOException( "Source not a valid zip file: " + source );
 		} catch( Throwable throwable ) {
 			log.warn( "Unpack failed: " + target, throwable.getMessage() );
-			revert( target, target );
+			revert( target );
 			throw throwable;
 		}
 
 		log.debug( "Committing: {}", target );
-		commit( target, target );
+		setMessage( "Committing " + target );
+		commit( target );
+		incrementProgress();
 
 		return new TaskResult( this, TaskStatus.SUCCESS, "Unpacked: " + source + " to " + target );
 	}
@@ -82,12 +91,15 @@ public class UnpackTask extends AnnexTask {
 	private void stage( Path source, Path target ) throws IOException {
 		log.trace( "Staging: {} to {}...", source.getFileName(), target );
 
-		try( ZipFile zip = new ZipFile( source.toFile() ) ) {
+		final ZipFile zip = this.zip;
+		try( zip ) {
 			Enumeration<? extends ZipEntry> entries = zip.entries();
 			while( entries.hasMoreElements() ) {
 				ZipEntry entry = entries.nextElement();
+				setMessage( "Unpacking " + entry );
 				boolean staged = stage( zip.getInputStream( entry ), target, entry.getName() );
 				if( !staged ) throw new RuntimeException( "Could not stage: " + target.resolve( entry.getName() ) );
+				incrementProgress();
 			}
 		}
 
@@ -114,6 +126,10 @@ public class UnpackTask extends AnnexTask {
 		return true;
 	}
 
+	private void revert( Path target ) throws IOException {
+		revert( target, target );
+	}
+
 	private void revert( Path root, Path target ) throws IOException {
 		// Revert staged changes.
 		if( Files.isDirectory( target ) ) {
@@ -127,6 +143,10 @@ public class UnpackTask extends AnnexTask {
 				Files.delete( target );
 			}
 		}
+	}
+
+	private void commit( Path target ) throws IOException {
+		commit( target, target );
 	}
 
 	private void commit( Path root, Path target ) throws IOException {
