@@ -267,6 +267,7 @@ public class Program implements Product {
 		List<AnnexTask> tasks = new ArrayList<>();
 		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
 			tasks.add( parseTask( line.trim() ) );
+			log.debug( line.trim() );
 		}
 
 		int index = 1;

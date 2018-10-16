@@ -4,7 +4,10 @@ import com.xeomar.annex.AnnexTask;
 import com.xeomar.annex.TaskResult;
 import com.xeomar.annex.TaskStatus;
 import com.xeomar.annex.UpdateTask;
+import com.xeomar.util.LogUtil;
+import org.slf4j.Logger;
 
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,8 +19,15 @@ import java.util.Set;
 
 public class PermissionsTask extends AnnexTask {
 
+	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
+
 	public PermissionsTask( List<String> parameters ) {
 		super( UpdateTask.PERMISSIONS, parameters );
+	}
+
+	@Override
+	public String getMessage() {
+		return "Setting permissions";
 	}
 
 	@Override
@@ -50,6 +60,7 @@ public class PermissionsTask extends AnnexTask {
 		}
 
 		// If there are nine letters
+		log.debug( "Permissions to parse: " + permissions );
 		return PosixFilePermissions.fromString( permissions );
 	}
 
