@@ -37,6 +37,8 @@ public interface UpdateTask {
 
 	String ELEVATED_PAUSE = "elevated-pause";
 
+	String PERMISSIONS = "permissions";
+
 	/**
 	 * The rename command indicates that a path be given a different name.
 	 */

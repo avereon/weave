@@ -122,7 +122,7 @@ public class UnpackTask extends AnnexTask {
 			}
 		} else {
 			if( target.getFileName().toString().endsWith( DEL_SUFFIX ) ) {
-				Files.move( target, FileUtil.removeExtension( target ), StandardCopyOption.ATOMIC_MOVE );
+				Files.move( target, FileUtil.removeExtension( target ), StandardCopyOption.REPLACE_EXISTING );
 			} else if( target.getFileName().toString().endsWith( ADD_SUFFIX ) ) {
 				Files.delete( target );
 			}

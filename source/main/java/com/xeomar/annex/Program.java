@@ -384,6 +384,10 @@ public class Program implements Product {
 				task = new MoveTask( parameterList );
 				break;
 			}
+			case UpdateTask.PERMISSIONS: {
+				task = new PermissionsTask( parameterList );
+				break;
+			}
 			case UpdateTask.PAUSE: {
 				task = new PauseTask( parameterList );
 				break;
