@@ -47,16 +47,11 @@ public class UnpackTask extends AnnexTask {
 	public void validate() {
 		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source not found: " + source );
 		if( Files.exists( target ) && !Files.isDirectory( target ) ) throw new IllegalArgumentException( "Target already exists and is not a folder: " + target );
-		try {
-			zip = new ZipFile( source.toFile() );
-		} catch( IOException exception ) {
-			throw new RuntimeException( exception );
-		}
 	}
 
 	@Override
-	public int getStepCount() {
-		return zip.size() + 1;
+	public int getStepCount() throws Exception {
+		return getZipFile().size() + 1;
 	}
 
 	@Override
@@ -88,10 +83,15 @@ public class UnpackTask extends AnnexTask {
 		return new TaskResult( this, TaskStatus.SUCCESS, "Unpacked: " + source + " to " + target );
 	}
 
+	private ZipFile getZipFile() throws IOException {
+		if( zip == null ) zip = new ZipFile( source.toFile() );
+		return zip;
+	}
+
 	private void stage( Path source, Path target ) throws IOException {
 		log.trace( "Staging: {} to {}...", source.getFileName(), target );
 
-		final ZipFile zip = this.zip;
+		final ZipFile zip = getZipFile();
 		try( zip ) {
 			Enumeration<? extends ZipEntry> entries = zip.entries();
 			while( entries.hasMoreElements() ) {

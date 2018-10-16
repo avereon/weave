@@ -278,20 +278,32 @@ public class Program implements Product {
 		PrintWriter printWriter = new PrintWriter( writer );
 
 		String line;
-		int totalSteps = 0;
 		List<AnnexTask> tasks = new ArrayList<>();
 		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
 			AnnexTask task = parseTask( line.trim() );
-			totalSteps += task.getStepCount();
 			tasks.add( task );
 			log.debug( line.trim() );
 		}
 
-		TaskHandler handler = new TaskHandler( totalSteps );
-
-		int taskCompletedCount = 0;
-		TaskResult result;
 		List<TaskResult> results = new ArrayList<>();
+
+		// Validate the tasks and determine the step count
+		int totalSteps = 0;
+		for( AnnexTask task : tasks ) {
+			try {
+				task.validate();
+				totalSteps += task.getStepCount();
+			} catch( Exception exception ) {
+				results.add( getTaskResult( task, exception ) );
+			}
+		}
+		if( results.size() > 0 ) return results;
+
+
+		// Execute the tasks
+		TaskResult result;
+		int taskCompletedCount = 0;
+		TaskHandler handler = new TaskHandler( totalSteps );
 		for( AnnexTask task : tasks ) {
 			if( !execute ) break;
 
@@ -319,7 +331,7 @@ public class Program implements Product {
 		}
 
 		synchronized( waitLock ) {
-			log.debug( "All tasks completed: " + taskCompletedCount );
+			log.debug( "Tasks completed: " + taskCompletedCount );
 			execute = false;
 			waitLock.notifyAll();
 		}
@@ -343,11 +355,7 @@ public class Program implements Product {
 		log.debug( "Task: " + task.getOriginalLine() );
 
 		try {
-			// Validate the task parameters before asking if it needs elevation
-			task.validate();
-
 			log.trace( "Task needs elevation?: " + task.needsElevation() );
-
 			if( task.needsElevation() && !isElevated() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
 				result = elevatedHandler.execute( task );
@@ -355,17 +363,23 @@ public class Program implements Product {
 				result = task.execute();
 			}
 		} catch( Exception exception ) {
-			if( execute ) {
-				log.error( "Error executing task", exception );
-				String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
-				result = new TaskResult( task, TaskStatus.FAILURE, message );
-			} else {
-				result = new TaskResult( task, TaskStatus.CANCELLED );
-			}
+			result = getTaskResult( task, exception );
 		}
 
 		log.info( "Result: " + result.getTask().getCommand() + " " + result );
 
+		return result;
+	}
+
+	private TaskResult getTaskResult( AnnexTask task, Exception exception ) {
+		TaskResult result;
+		if( execute ) {
+			log.error( "Error executing task", exception );
+			String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
+			result = new TaskResult( task, TaskStatus.FAILURE, message );
+		} else {
+			result = new TaskResult( task, TaskStatus.CANCELLED );
+		}
 		return result;
 	}
 

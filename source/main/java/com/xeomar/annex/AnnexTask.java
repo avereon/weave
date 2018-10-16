@@ -40,7 +40,7 @@ public abstract class AnnexTask {
 
 	public void validate() {}
 
-	public abstract int getStepCount();
+	public abstract int getStepCount() throws Exception;
 
 	public boolean needsElevation() {
 		return false;
