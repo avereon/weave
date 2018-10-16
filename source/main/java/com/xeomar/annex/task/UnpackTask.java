@@ -14,10 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -142,7 +139,7 @@ public class UnpackTask extends AnnexTask {
 			if( target.getFileName().toString().endsWith( ADD_SUFFIX ) ) {
 				String sourceHash = HashUtil.hash( target );
 				Path file = FileUtil.removeExtension( target );
-				Files.move( target, file );
+				Files.move( target, file, StandardCopyOption.REPLACE_EXISTING );
 				String targetHash = HashUtil.hash( file );
 				if( !targetHash.equals( sourceHash ) ) throw new RuntimeException( "Hash code mismatch committing file: " + file );
 				log.trace( "Commit: {}", root.relativize( file ) );
