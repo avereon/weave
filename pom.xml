@@ -60,7 +60,7 @@
 
 		<dependency>
 			<groupId>com.xeomar</groupId>
-			<artifactId>razor</artifactId>
+			<artifactId>zenna</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 
