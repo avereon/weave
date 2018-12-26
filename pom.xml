@@ -11,12 +11,12 @@
 	</parent>
 
 	<groupId>com.xeomar</groupId>
-	<artifactId>annex</artifactId>
+	<artifactId>xevra</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Annex</name>
-	<description>Program update utility.</description>
+	<name>Xevra</name>
+	<description>Update utility</description>
 	<inceptionYear>2018</inceptionYear>
 
 	<developers>
