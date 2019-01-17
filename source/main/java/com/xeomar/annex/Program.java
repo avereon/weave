@@ -4,10 +4,7 @@ import com.xeomar.annex.task.*;
 import com.xeomar.product.Product;
 import com.xeomar.product.ProductBundle;
 import com.xeomar.product.ProductCard;
-import com.xeomar.util.LogUtil;
-import com.xeomar.util.OperatingSystem;
-import com.xeomar.util.Parameters;
-import com.xeomar.util.TextUtil;
+import com.xeomar.util.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -374,7 +371,7 @@ public class Program implements Product {
 	private TaskResult getTaskResult( AnnexTask task, Exception exception ) {
 		TaskResult result;
 		if( execute ) {
-			log.error( "Error executing task", exception );
+			if( !TestUtil.isTest() ) log.error( "Error executing task", exception );
 			String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
 			result = new TaskResult( task, TaskStatus.FAILURE, message );
 		} else {
