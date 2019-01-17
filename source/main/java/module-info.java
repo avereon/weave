@@ -1,13 +1,13 @@
-module com.xeomar.annex {
+module com.xeomar.xevra {
 
 	requires java.logging;
 	requires javafx.controls;
-	requires com.xeomar.razor;
+	requires com.xeomar.zenna;
 	requires org.apache.commons.io;
 	requires org.slf4j;
 
-	exports com.xeomar.annex;
+	exports com.xeomar.xevra;
 
-	provides com.xeomar.product.Product with com.xeomar.annex.Program;
+	provides com.xeomar.product.Product with com.xeomar.xevra.Program;
 
 }

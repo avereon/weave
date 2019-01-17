@@ -13,7 +13,7 @@
   "licenseSummary" : "${project.name} comes with ABSOLUTELY NO WARRANTY. This is open software, and you are welcome to redistribute it under certain conditions.",
   "cardUri" : "http://xeomar.com/download/${project.artifactId}/product/card/{0}",
   "packUri" : "http://xeomar.com/download/${project.artifactId}/product/pack/{0}",
-  "mainClass" : "com.xeomar.annex.Program",
+  "mainClass" : "com.xeomar.xevra.Program",
   "javaVersion" : "9",
   "maintainers" : [ {
     "name" : "Mark Soderquist",
