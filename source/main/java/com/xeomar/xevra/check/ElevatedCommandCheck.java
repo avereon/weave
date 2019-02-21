@@ -22,11 +22,11 @@ import java.io.InputStreamReader;
 public class ElevatedCommandCheck {
 
 	public static void main( String[] commands ) {
-		String path = System.getProperty( "jdk.module.path" );
+		String modulePath = System.getProperty( "jdk.module.path" );
 		String mainModule = Program.class.getModule().getName();
 		String mainClass = Program.class.getName();
 
-		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule( path, mainModule, mainClass ) );
+		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule( null, modulePath, mainModule, mainClass ) );
 		processBuilder.redirectError( ProcessBuilder.Redirect.INHERIT );
 		processBuilder.command().add( UpdateFlag.STDIN );
 		processBuilder.command().add( LogFlag.LOG_FILE );
@@ -35,9 +35,11 @@ public class ElevatedCommandCheck {
 		processBuilder.command().add( "info" );
 
 		try {
+			System.err.println( "Starting elevated process..." );
 			Process process = processBuilder.start();
 			process.getOutputStream().write( (UpdateTask.ELEVATED_ECHO + " hello\n").getBytes( TextUtil.CHARSET ) );
 			process.getOutputStream().flush();
+			System.err.println( "Elevated process started." );
 
 			String result1 = new BufferedReader( new InputStreamReader( process.getInputStream(), TextUtil.CHARSET ) ).readLine();
 			System.out.println( result1 );
