@@ -12,6 +12,8 @@ public abstract class AbstractUpdateTask {
 
 	private String originalLine;
 
+	private boolean elevated;
+
 	private int currentStep = 0;
 
 	private Set<TaskListener> listeners;
@@ -68,6 +70,14 @@ public abstract class AbstractUpdateTask {
 		}
 
 		return currentStep;
+	}
+
+	boolean isElevated() {
+		return elevated;
+	}
+
+	void setElevated() {
+		elevated = true;
 	}
 
 	public abstract TaskResult execute() throws Exception;

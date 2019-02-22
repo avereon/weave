@@ -1,14 +1,15 @@
 package com.xeomar.xevra.check;
 
-import com.xeomar.xevra.Program;
-import com.xeomar.xevra.UpdateFlag;
-import com.xeomar.xevra.UpdateTask;
 import com.xeomar.util.LogFlag;
 import com.xeomar.util.ProcessCommands;
 import com.xeomar.util.TextUtil;
+import com.xeomar.xevra.Program;
+import com.xeomar.xevra.UpdateFlag;
+import com.xeomar.xevra.UpdateTask;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
@@ -22,6 +23,10 @@ import java.io.InputStreamReader;
 public class ElevatedCommandCheck {
 
 	public static void main( String[] commands ) {
+		new ElevatedCommandCheck().run();
+	}
+
+	public void run() {
 		String modulePath = System.getProperty( "jdk.module.path" );
 		String mainModule = Program.class.getModule().getName();
 		String mainClass = Program.class.getName();
@@ -35,18 +40,26 @@ public class ElevatedCommandCheck {
 		processBuilder.command().add( UpdateFlag.STDIN );
 
 		try {
-			System.err.println( "Starting elevated process..." );
 			Process process = processBuilder.start();
-			process.getOutputStream().write( (UpdateTask.ELEVATED_ECHO + " hello\n").getBytes( TextUtil.CHARSET ) );
+			process.getOutputStream().write( (UpdateTask.ELEVATED_ECHO + " hello1\n").getBytes( TextUtil.CHARSET ) );
+			process.getOutputStream().write( (UpdateTask.PAUSE + " 500\n").getBytes( TextUtil.CHARSET ) );
+			process.getOutputStream().write( (UpdateTask.ELEVATED_ECHO + " hello2\n").getBytes( TextUtil.CHARSET ) );
 			process.getOutputStream().close();
-			System.err.println( "Elevated process started." );
 
-			String result1 = new BufferedReader( new InputStreamReader( process.getInputStream(), TextUtil.CHARSET ) ).readLine();
-			System.out.println( result1 );
+			check( "SUCCESS echo hello1", readLine( process.getInputStream() ) );
+			check( "SUCCESS pause paused 500ms", readLine( process.getInputStream() ) );
+			check( "SUCCESS echo hello2", readLine( process.getInputStream() ) );
 		} catch( IOException exception ) {
 			exception.printStackTrace();
 		}
+	}
 
+	private String readLine( InputStream input ) throws IOException {
+		return new BufferedReader( new InputStreamReader( input, TextUtil.CHARSET ) ).readLine();
+	}
+
+	private void check( String expected, String result ) {
+		if( !expected.equals( result ) ) throw new RuntimeException( "Unexpected result\nexpected: " + expected + "\n     was: " + result );
 	}
 
 }

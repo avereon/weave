@@ -17,21 +17,21 @@ import java.util.concurrent.TimeoutException;
 
 class ElevatedHandler {
 
+	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
+
 	static final String CALLBACK_SECRET = "--callback-secret";
 
 	static final String CALLBACK_PORT = "--callback-port";
 
-	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
-
 	private Program program;
+
+	private String secret;
 
 	private ServerSocket server;
 
 	private Socket socket;
 
 	private Throwable throwable;
-
-	private String secret;
 
 	ElevatedHandler( Program program ) {
 		this.program = program;
@@ -50,16 +50,9 @@ class ElevatedHandler {
 	}
 
 	public synchronized TaskResult execute( AbstractUpdateTask task ) throws IOException, InterruptedException, TimeoutException {
-		int attemptLimit = 10;
-		int attemptCount = 0;
-		while( socket == null && attemptCount < attemptLimit ) {
-			log.trace( "Attempt: " + attemptCount );
-			attemptCount++;
-			wait( 1000 );
-		}
+		waitForSocket();
 
-		if( attemptCount >= attemptLimit ) throw new TimeoutException( "Timeout waiting for elevated updater to start" );
-		if( throwable != null ) throw new IOException( throwable );
+		task.setElevated();
 
 		log.debug( "Sending task commands to elevated process..." );
 		socket.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
@@ -73,6 +66,20 @@ class ElevatedHandler {
 		log.debug( "  result: " + result );
 
 		return result;
+	}
+
+	private void waitForSocket() throws IOException, InterruptedException, TimeoutException {
+		// Wait for the elevated process to get started
+		int attemptLimit = 30;
+		int attemptCount = 0;
+		while( socket == null && attemptCount < attemptLimit && throwable == null ) {
+			log.trace( "Attempt: " + attemptCount );
+			attemptCount++;
+			wait( 1000 );
+		}
+
+		if( attemptCount >= attemptLimit ) throw new TimeoutException( "Timeout waiting for elevated updater to start" );
+		if( throwable != null ) throw new IOException( throwable );
 	}
 
 	private void startServerSocket() throws IOException {
@@ -105,7 +112,8 @@ class ElevatedHandler {
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
 		log.debug( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
-		processBuilder.start();
+		Process process = processBuilder.start();
+		new ProcessWatcherThread( process ).start();
 	}
 
 	private synchronized void setSocket( Socket socket ) {
@@ -137,6 +145,35 @@ class ElevatedHandler {
 			} catch( Throwable throwable ) {
 				ElevatedHandler.this.throwable = throwable;
 			}
+		}
+
+	}
+
+	private class ProcessWatcherThread extends Thread {
+
+		private Process process;
+
+		private int exitValue;
+
+		private Exception exception;
+
+		public ProcessWatcherThread( Process process ) {
+			this.process = process;
+			setDaemon( true );
+		}
+
+		public void run() {
+			try {
+				process.waitFor();
+				exitValue = process.exitValue();
+				if( exitValue != 0 ) throw new IllegalStateException( "Elevated process failed to start" );
+			} catch( Exception exception ) {
+				throwable = exception;
+			}
+		}
+
+		public int getExitValue() {
+			return exitValue;
 		}
 
 	}

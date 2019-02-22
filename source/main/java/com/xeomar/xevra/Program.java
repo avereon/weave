@@ -106,8 +106,10 @@ public class Program implements Product {
 		// Print the program header
 		printHeader( card );
 
-		log.info( card.getName() + " started " + (isElevated() ? "(elevated)" : "") );
-		log.info( "Parameters: " + parameters );
+		log.info( elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "") );
+		log.info( elevatedKey() + "Parameters: " + parameters );
+		log.debug( elevatedKey() + "Command line: " + ProcessCommands.getCommandLineAsString() );
+		log.debug( elevatedKey() + "Log: " + LogUtil.getLogFile() );
 
 		boolean file = parameters.isSet( UpdateFlag.FILE );
 		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
@@ -135,7 +137,7 @@ public class Program implements Product {
 		executeThread.start();
 	}
 
-	public synchronized void waitForStart() throws InterruptedException {
+	synchronized void waitForStart() throws InterruptedException {
 		while( !started ) {
 			wait( 1000 );
 		}
@@ -157,10 +159,10 @@ public class Program implements Product {
 				execute();
 			} catch( Throwable throwable ) {
 				throwable.printStackTrace( System.err );
-				log.error( "Execution error", throwable );
+				log.error( elevatedKey() + "Execution error", throwable );
 			} finally {
 				if( isUi() ) hideProgressDialog();
-				log.info( card.getName() + " finished" );
+				log.info( elevatedKey() + card.getName() + " finished" );
 			}
 
 		}
@@ -271,20 +273,27 @@ public class Program implements Product {
 	}
 
 	private List<TaskResult> runTasks( Reader reader, Writer writer ) throws IOException, InterruptedException {
-		BufferedReader buffer = new BufferedReader( reader );
-		PrintWriter printWriter = new PrintWriter( writer );
+		return isElevated() ? runElevatedTasks( reader, writer ) : runNormalTasks( reader, writer );
+	}
 
+	private List<TaskResult> runElevatedTasks( Reader reader, Writer writer ) throws IOException {
 		String line;
+		List<TaskResult> results = new ArrayList<>();
+		BufferedReader buffer = new BufferedReader( reader );
+		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
+			log.debug( elevatedKey() + "-> " + line.trim() );
+			results.add( executeTask( parseTask( line.trim() ), new PrintWriter( writer ) ) );
+		}
+		return results;
+	}
+
+	private List<TaskResult> runNormalTasks( Reader reader, Writer writer ) throws IOException, InterruptedException {
+		String line;
+		BufferedReader buffer = new BufferedReader( reader );
 		List<AbstractUpdateTask> tasks = new ArrayList<>();
 		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
-			AbstractUpdateTask task = parseTask( line.trim() );
-			tasks.add( task );
-			//log.debug( line.trim() );
-		}
-
-		// List the commands that were read in
-		for( AbstractUpdateTask task : tasks ) {
-			log.warn( "Parsed line: " + task.getOriginalLine() );
+			log.debug( elevatedKey() + "-> " + line.trim() );
+			tasks.add( parseTask( line.trim() ) );
 		}
 
 		List<TaskResult> results = new ArrayList<>();
@@ -301,21 +310,17 @@ public class Program implements Product {
 		}
 		if( results.size() > 0 ) return results;
 
-
 		// Execute the tasks
 		TaskResult result;
 		int taskCompletedCount = 0;
 		TaskHandler handler = new TaskHandler( totalSteps );
+		PrintWriter printWriter = new PrintWriter( writer );
 		for( AbstractUpdateTask task : tasks ) {
 			if( !execute ) break;
 
 			if( isUi() ) task.addTaskListener( handler );
-			results.add( result = executeTask( task ) );
+			results.add( result = executeTask( task, printWriter ) );
 			if( isUi() ) task.removeTaskListener( handler );
-
-			printWriter.print( result );
-			printWriter.print( "\n" );
-			printWriter.flush();
 
 			if( result.getStatus() == TaskStatus.FAILURE ) break;
 			taskCompletedCount++;
@@ -333,7 +338,7 @@ public class Program implements Product {
 		}
 
 		synchronized( waitLock ) {
-			log.debug( "Tasks completed: " + taskCompletedCount );
+			log.debug( elevatedKey() + "Tasks completed: " + taskCompletedCount );
 			execute = false;
 			waitLock.notifyAll();
 		}
@@ -341,23 +346,17 @@ public class Program implements Product {
 		return results;
 	}
 
-	private boolean isElevated() {
-		return OperatingSystem.isProcessElevated();
+	private String elevatedKey() {
+		return isElevated() ? "*" : "";
 	}
 
-	private void printHeader( ProductCard card ) {
-		// These use System.err because System.out is used for communication
-		System.err.println( card.getName() + " " + card.getVersion() );
-		System.err.println( "Java " + System.getProperty( "java.runtime.version" ) );
-	}
-
-	private TaskResult executeTask( AbstractUpdateTask task ) {
+	private TaskResult executeTask( AbstractUpdateTask task, PrintWriter printWriter ) {
 		TaskResult result;
 
-		log.debug( "Task: " + task.getOriginalLine() );
+		log.debug( elevatedKey() + "Task: " + task.getOriginalLine() );
 
 		try {
-			log.trace( "Task needs elevation?: " + task.needsElevation() );
+			log.trace( elevatedKey() + "Task needs elevation?: " + task.needsElevation() );
 			if( task.needsElevation() && !isElevated() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
 				result = elevatedHandler.execute( task );
@@ -368,7 +367,10 @@ public class Program implements Product {
 			result = getTaskResult( task, exception );
 		}
 
-		log.info( "Result: " + result.getTask().getCommand() + " " + result );
+		printWriter.println( result.format() );
+		printWriter.flush();
+
+		log.info( elevatedKey() + "Result: " + result );
 
 		return result;
 	}
@@ -376,7 +378,7 @@ public class Program implements Product {
 	private TaskResult getTaskResult( AbstractUpdateTask task, Exception exception ) {
 		TaskResult result;
 		if( execute ) {
-			if( !TestUtil.isTest() ) log.error( "Error executing task", exception );
+			if( !TestUtil.isTest() ) log.error( elevatedKey() + "Error executing task", exception );
 			String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
 			result = new TaskResult( task, TaskStatus.FAILURE, message );
 		} else {
@@ -438,13 +440,23 @@ public class Program implements Product {
 		return task;
 	}
 
+	private void printHeader( ProductCard card ) {
+		// These use System.err because System.out is used for communication
+		System.err.println( card.getName() + " " + card.getVersion() );
+		System.err.println( "Java " + System.getProperty( "java.runtime.version" ) );
+	}
+
+	private boolean isElevated() {
+		return OperatingSystem.isProcessElevated();
+	}
+
 	private class TaskHandler implements TaskListener {
 
 		private int step;
 
 		private int totalSteps;
 
-		public TaskHandler( int totalSteps ) {
+		TaskHandler( int totalSteps ) {
 			this.totalSteps = totalSteps;
 		}
 
