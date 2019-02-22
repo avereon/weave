@@ -49,7 +49,7 @@ class ElevatedHandler {
 		return this;
 	}
 
-	public synchronized TaskResult execute( AnnexTask task ) throws IOException, InterruptedException, TimeoutException {
+	public synchronized TaskResult execute( AbstractUpdateTask task ) throws IOException, InterruptedException, TimeoutException {
 		int attemptLimit = 10;
 		int attemptCount = 0;
 		while( socket == null && attemptCount < attemptLimit ) {
@@ -58,7 +58,7 @@ class ElevatedHandler {
 			wait( 1000 );
 		}
 
-		if( attemptCount == attemptLimit ) throw new TimeoutException( "Timeout waiting for elevated updater to start" );
+		if( attemptCount >= attemptLimit ) throw new TimeoutException( "Timeout waiting for elevated updater to start" );
 		if( throwable != null ) throw new IOException( throwable );
 
 		log.debug( "Sending task commands to elevated process..." );

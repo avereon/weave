@@ -1,10 +1,10 @@
 package com.xeomar.xevra;
 
-import com.xeomar.xevra.task.*;
 import com.xeomar.product.Product;
 import com.xeomar.product.ProductBundle;
 import com.xeomar.product.ProductCard;
 import com.xeomar.util.*;
+import com.xeomar.xevra.task.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -275,18 +275,23 @@ public class Program implements Product {
 		PrintWriter printWriter = new PrintWriter( writer );
 
 		String line;
-		List<AnnexTask> tasks = new ArrayList<>();
+		List<AbstractUpdateTask> tasks = new ArrayList<>();
 		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
-			AnnexTask task = parseTask( line.trim() );
+			AbstractUpdateTask task = parseTask( line.trim() );
 			tasks.add( task );
-			log.debug( line.trim() );
+			//log.debug( line.trim() );
+		}
+
+		// List the commands that were read in
+		for( AbstractUpdateTask task : tasks ) {
+			log.warn( "Parsed line: " + task.getOriginalLine() );
 		}
 
 		List<TaskResult> results = new ArrayList<>();
 
 		// Validate the tasks and determine the step count
 		int totalSteps = 0;
-		for( AnnexTask task : tasks ) {
+		for( AbstractUpdateTask task : tasks ) {
 			try {
 				task.validate();
 				totalSteps += task.getStepCount();
@@ -301,7 +306,7 @@ public class Program implements Product {
 		TaskResult result;
 		int taskCompletedCount = 0;
 		TaskHandler handler = new TaskHandler( totalSteps );
-		for( AnnexTask task : tasks ) {
+		for( AbstractUpdateTask task : tasks ) {
 			if( !execute ) break;
 
 			if( isUi() ) task.addTaskListener( handler );
@@ -346,7 +351,7 @@ public class Program implements Product {
 		System.err.println( "Java " + System.getProperty( "java.runtime.version" ) );
 	}
 
-	private TaskResult executeTask( AnnexTask task ) {
+	private TaskResult executeTask( AbstractUpdateTask task ) {
 		TaskResult result;
 
 		log.debug( "Task: " + task.getOriginalLine() );
@@ -368,7 +373,7 @@ public class Program implements Product {
 		return result;
 	}
 
-	private TaskResult getTaskResult( AnnexTask task, Exception exception ) {
+	private TaskResult getTaskResult( AbstractUpdateTask task, Exception exception ) {
 		TaskResult result;
 		if( execute ) {
 			if( !TestUtil.isTest() ) log.error( "Error executing task", exception );
@@ -380,12 +385,12 @@ public class Program implements Product {
 		return result;
 	}
 
-	private AnnexTask parseTask( String line ) {
+	private AbstractUpdateTask parseTask( String line ) {
 		List<String> commands = TextUtil.split( line );
 		String command = commands.get( 0 );
 		List<String> parameterList = commands.subList( 1, commands.size() );
 
-		AnnexTask task;
+		AbstractUpdateTask task;
 		switch( command ) {
 			case UpdateTask.DELETE: {
 				task = new DeleteTask( parameterList );

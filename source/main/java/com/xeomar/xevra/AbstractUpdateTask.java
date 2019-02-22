@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-public abstract class AnnexTask {
+public abstract class AbstractUpdateTask {
 
 	private String command;
 
@@ -16,7 +16,7 @@ public abstract class AnnexTask {
 
 	private Set<TaskListener> listeners;
 
-	public AnnexTask( String command, List<String> parameters ) {
+	public AbstractUpdateTask( String command, List<String> parameters ) {
 		this.command = command;
 		this.parameters = parameters;
 		this.listeners = new CopyOnWriteArraySet<>();

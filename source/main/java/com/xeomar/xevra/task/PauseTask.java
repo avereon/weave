@@ -1,13 +1,13 @@
 package com.xeomar.xevra.task;
 
-import com.xeomar.xevra.AnnexTask;
+import com.xeomar.xevra.AbstractUpdateTask;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
 
 import java.util.List;
 
-public class PauseTask extends AnnexTask {
+public class PauseTask extends AbstractUpdateTask {
 
 	private String message;
 

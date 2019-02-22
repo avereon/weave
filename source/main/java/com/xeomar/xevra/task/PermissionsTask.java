@@ -1,6 +1,6 @@
 package com.xeomar.xevra.task;
 
-import com.xeomar.xevra.AnnexTask;
+import com.xeomar.xevra.AbstractUpdateTask;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
@@ -17,7 +17,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Set;
 
-public class PermissionsTask extends AnnexTask {
+public class PermissionsTask extends AbstractUpdateTask {
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 

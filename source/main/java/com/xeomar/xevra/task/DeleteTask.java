@@ -1,6 +1,6 @@
 package com.xeomar.xevra.task;
 
-import com.xeomar.xevra.AnnexTask;
+import com.xeomar.xevra.AbstractUpdateTask;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class DeleteTask extends AnnexTask {
+public class DeleteTask extends AbstractUpdateTask {
 
 	private Path target;
 

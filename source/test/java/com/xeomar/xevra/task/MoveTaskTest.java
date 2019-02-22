@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class MoveTaskTest extends AnnexTaskTest {
+public class MoveTaskTest extends AbstractUpdateTaskTest {
 
 	@Test
 	public void testConstructor() {

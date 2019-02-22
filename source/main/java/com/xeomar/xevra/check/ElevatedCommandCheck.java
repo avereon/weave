@@ -28,17 +28,17 @@ public class ElevatedCommandCheck {
 
 		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule( null, modulePath, mainModule, mainClass ) );
 		processBuilder.redirectError( ProcessBuilder.Redirect.INHERIT );
-		processBuilder.command().add( UpdateFlag.STDIN );
 		processBuilder.command().add( LogFlag.LOG_FILE );
 		processBuilder.command().add( "privilege-check.log" );
 		processBuilder.command().add( LogFlag.LOG_LEVEL );
-		processBuilder.command().add( "info" );
+		processBuilder.command().add( "debug" );
+		processBuilder.command().add( UpdateFlag.STDIN );
 
 		try {
 			System.err.println( "Starting elevated process..." );
 			Process process = processBuilder.start();
 			process.getOutputStream().write( (UpdateTask.ELEVATED_ECHO + " hello\n").getBytes( TextUtil.CHARSET ) );
-			process.getOutputStream().flush();
+			process.getOutputStream().close();
 			System.err.println( "Elevated process started." );
 
 			String result1 = new BufferedReader( new InputStreamReader( process.getInputStream(), TextUtil.CHARSET ) ).readLine();

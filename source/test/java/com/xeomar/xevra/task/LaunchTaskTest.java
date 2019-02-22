@@ -10,7 +10,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
-public class LaunchTaskTest extends AnnexTaskTest {
+public class LaunchTaskTest extends AbstractUpdateTaskTest {
 
 	@Test
 	public void testExecute() throws Exception {

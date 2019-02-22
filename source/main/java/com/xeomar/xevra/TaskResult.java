@@ -2,23 +2,23 @@ package com.xeomar.xevra;
 
 public class TaskResult {
 
-	private AnnexTask task;
+	private AbstractUpdateTask task;
 
 	private TaskStatus status;
 
 	private String message;
 
-	public TaskResult( AnnexTask task, TaskStatus status ) {
+	public TaskResult( AbstractUpdateTask task, TaskStatus status ) {
 		this( task, status, null );
 	}
 
-	public TaskResult( AnnexTask task, TaskStatus status, String message ) {
+	public TaskResult( AbstractUpdateTask task, TaskStatus status, String message ) {
 		this.task = task;
 		this.status = status;
 		this.message = message;
 	}
 
-	public AnnexTask getTask() {
+	public AbstractUpdateTask getTask() {
 		return task;
 	}
 
@@ -30,7 +30,7 @@ public class TaskResult {
 		return message;
 	}
 
-	public static TaskResult parse( AnnexTask task, String string ) {
+	public static TaskResult parse( AbstractUpdateTask task, String string ) {
 		int index = string.indexOf( ' ' );
 		if( index < 0 ) {
 			return new TaskResult( task, TaskStatus.valueOf( string ) );
