@@ -33,11 +33,11 @@ public class ElevatedCommandCheck {
 
 		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule( null, modulePath, mainModule, mainClass ) );
 		processBuilder.redirectError( ProcessBuilder.Redirect.INHERIT );
+		processBuilder.command().add( UpdateFlag.STDIN );
 		processBuilder.command().add( LogFlag.LOG_FILE );
 		processBuilder.command().add( "privilege-check.log" );
 		processBuilder.command().add( LogFlag.LOG_LEVEL );
-		processBuilder.command().add( "debug" );
-		processBuilder.command().add( UpdateFlag.STDIN );
+		processBuilder.command().add( "trace" );
 
 		try {
 			Process process = processBuilder.start();

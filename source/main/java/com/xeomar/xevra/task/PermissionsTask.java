@@ -43,7 +43,12 @@ public class PermissionsTask extends AbstractUpdateTask {
 		int size = getParameters().size();
 		for( int index = 1; index < size; index++ ) {
 			Path file = Paths.get( getParameters().get( index ) );
-			Files.getFileAttributeView( file, PosixFileAttributeView.class ).setPermissions( permissions );
+			if( Files.exists( file ) ) {
+				log.debug( "Setting permission on: " + file );
+				Files.getFileAttributeView( file, PosixFileAttributeView.class ).setPermissions( permissions );
+			} else {
+				log.warn( "File not found: " + file );
+			}
 			incrementProgress();
 		}
 

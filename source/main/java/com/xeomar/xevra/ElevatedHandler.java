@@ -70,12 +70,12 @@ class ElevatedHandler {
 
 	private void waitForSocket() throws IOException, InterruptedException, TimeoutException {
 		// Wait for the elevated process to get started
-		int attemptLimit = 30;
 		int attemptCount = 0;
+		int attemptLimit = 20;
 		while( socket == null && attemptCount < attemptLimit && throwable == null ) {
-			log.trace( "Attempt: " + attemptCount );
 			attemptCount++;
 			wait( 1000 );
+			log.trace( "Waiting for elevated process: " + attemptCount + " of " + attemptLimit + " seconds" );
 		}
 
 		if( attemptCount >= attemptLimit ) throw new TimeoutException( "Timeout waiting for elevated updater to start" );
