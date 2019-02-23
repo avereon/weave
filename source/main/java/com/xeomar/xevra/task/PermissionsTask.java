@@ -11,11 +11,14 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
-import java.util.Set;
 
+/**
+ * The permissions task allows permissions to be set on one or more files. The
+ * same permissions are set on all files specified.
+ * <p>
+ * Parameter 0: The permissions bitmask. Example: 700
+ */
 public class PermissionsTask extends AbstractUpdateTask {
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
@@ -48,7 +51,20 @@ public class PermissionsTask extends AbstractUpdateTask {
 	@Override
 	public TaskResult execute() throws Exception {
 		setMessage( "Setting permissions" );
-		Set<PosixFilePermission> permissions = getPosixPermissions( getParameters().get( 0 ) );
+
+		String permissions = getParameters().get( 0 );
+		if( permissions.length() == 4 ) permissions = permissions.substring( 1 );
+
+		int user = permissions.charAt( 0 ) - '0';
+		int group = permissions.charAt( 1 ) - '0';
+		int world = permissions.charAt( 2 ) - '0';
+
+		boolean userRead = isRead( user );
+		boolean worldRead = userRead && isRead( world );
+		boolean userWrite = isWrite( group );
+		boolean worldWrite = userWrite && isWrite( world );
+		boolean userExec = isExec( user );
+		boolean worldExec = userExec && isExec( world );
 
 		int size = getParameters().size();
 		for( int index = 1; index < size; index++ ) {
@@ -56,7 +72,9 @@ public class PermissionsTask extends AbstractUpdateTask {
 			log.debug( "Setting permission on: " + file );
 
 			if( Files.exists( file ) ) {
-				Files.setPosixFilePermissions( file, permissions );
+				file.toFile().setReadable( userRead, worldRead );
+				file.toFile().setWritable( userWrite, worldWrite );
+				file.toFile().setExecutable( userExec, worldExec );
 			} else {
 				log.warn( "File not found: " + file );
 			}
@@ -66,51 +84,79 @@ public class PermissionsTask extends AbstractUpdateTask {
 		return new TaskResult( this, TaskStatus.SUCCESS );
 	}
 
-	private Set<PosixFilePermission> getPosixPermissions( String permissions ) {
-		// If there are four numbers
-		if( permissions.length() == 4 ) permissions = permissions.substring( 1 );
+	//	private Set<PosixFilePermission> getPosixPermissions( String permissions ) {
+	//		// If there are four numbers
+	//		if( permissions.length() == 4 ) permissions = permissions.substring( 1 );
+	//
+	//		// If there are three numbers
+	//		if( permissions.length() == 3 ) {
+	//			StringBuilder builder = new StringBuilder();
+	//			for( char c : permissions.toCharArray() ) {
+	//				builder.append( toString( ((int)c) - 48 ) );
+	//			}
+	//			permissions = builder.toString();
+	//		}
+	//
+	//		// If there are nine letters
+	//		log.debug( "Parse permissions: " + permissions );
+	//		return PosixFilePermissions.fromString( permissions );
+	//	}
 
-		// If there are three numbers
-		if( permissions.length() == 3 ) {
-			StringBuilder builder = new StringBuilder();
-			for( char c : permissions.toCharArray() ) {
-				builder.append( toString( ((int)c) - 48 ) );
-			}
-			permissions = builder.toString();
-		}
+	//	private String convertFromMask( String permissions ) {
+	//		// If there are four numbers
+	//		if( permissions.length() == 4 ) permissions = permissions.substring( 1 );
+	//
+	//		// If there are three numbers
+	//		if( permissions.length() == 3 ) {
+	//			StringBuilder builder = new StringBuilder();
+	//			for( char c : permissions.toCharArray() ) {
+	//				builder.append( toString( ((int)c) - 48 ) );
+	//			}
+	//			permissions = builder.toString();
+	//		}
+	//
+	//		return permissions;
+	//	}
 
-		// If there are nine letters
-		log.debug( "Parse permissions: " + permissions );
-		return PosixFilePermissions.fromString( permissions );
+	private boolean isRead( int value ) {
+		return (value & 4) != 0;
 	}
 
-	private String toString( int value ) {
-		switch( value ) {
-			case 7: {
-				return "rwx";
-			}
-			case 6: {
-				return "rw-";
-			}
-			case 5: {
-				return "r-x";
-			}
-			case 4: {
-				return "r--";
-			}
-			case 3: {
-				return "-wx";
-			}
-			case 2: {
-				return "-w-";
-			}
-			case 1: {
-				return "--x";
-			}
-			default: {
-				return "---";
-			}
-		}
+	private boolean isWrite( int value ) {
+		return (value & 2) != 0;
 	}
+
+	private boolean isExec( int value ) {
+		return (value & 1) != 0;
+	}
+
+	//	private String toString( int value ) {
+	//		switch( value ) {
+	//			case 7: {
+	//				return "rwx";
+	//			}
+	//			case 6: {
+	//				return "rw-";
+	//			}
+	//			case 5: {
+	//				return "r-x";
+	//			}
+	//			case 4: {
+	//				return "r--";
+	//			}
+	//			case 3: {
+	//				return "-wx";
+	//			}
+	//			case 2: {
+	//				return "-w-";
+	//			}
+	//			case 1: {
+	//				return "--x";
+	//			}
+	//			default: {
+	//				return "---";
+	//			}
+	//		}
+	//	}
 
 }
