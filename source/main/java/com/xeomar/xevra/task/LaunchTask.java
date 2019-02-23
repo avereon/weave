@@ -1,10 +1,10 @@
 package com.xeomar.xevra.task;
 
+import com.xeomar.util.TextUtil;
 import com.xeomar.xevra.AbstractUpdateTask;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
-import com.xeomar.util.TextUtil;
 
 import java.util.List;
 
@@ -26,8 +26,8 @@ public class LaunchTask extends AbstractUpdateTask {
 	public TaskResult execute() throws Exception {
 		setMessage( message );
 
-		ProcessBuilder builder = new ProcessBuilder().inheritIO();
-		builder.command().addAll( getParameters() );
+		ProcessBuilder builder = new ProcessBuilder( getParameters() );
+		builder.redirectOutput( ProcessBuilder.Redirect.DISCARD ).redirectError( ProcessBuilder.Redirect.DISCARD );
 		builder.start();
 
 		// NOTE This task does not wait for the process to finish, this task is asynchronous
