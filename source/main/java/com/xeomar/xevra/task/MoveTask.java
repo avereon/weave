@@ -24,14 +24,14 @@ public class MoveTask extends AbstractUpdateTask {
 	}
 
 	@Override
-	public void validate() {
-		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source does not exist: " + source );
-		if( Files.exists( target ) ) throw new IllegalArgumentException( "Target already exists: " + target );
+	public int getStepCount() {
+		return 1;
 	}
 
 	@Override
-	public int getStepCount() {
-		return 1;
+	public void validate() {
+		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source does not exist: " + source );
+		if( Files.exists( target ) ) throw new IllegalArgumentException( "Target already exists: " + target );
 	}
 
 	@Override

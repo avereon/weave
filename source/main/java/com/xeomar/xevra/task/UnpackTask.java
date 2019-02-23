@@ -44,19 +44,22 @@ public class UnpackTask extends AbstractUpdateTask {
 	}
 
 	@Override
+	public int getStepCount() throws Exception {
+		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source not found: " + source );
+		return getZipFile().size() + 1;
+	}
+
+	@Override
 	public void validate() {
 		if( !Files.exists( source ) ) throw new IllegalArgumentException( "Source not found: " + source );
 		if( Files.exists( target ) && !Files.isDirectory( target ) ) throw new IllegalArgumentException( "Target already exists and is not a folder: " + target );
 	}
 
 	@Override
-	public int getStepCount() throws Exception {
-		return getZipFile().size() + 1;
-	}
-
-	@Override
 	public boolean needsElevation() {
-		return Files.exists( target ) && !Files.isWritable( target );
+		if( !Files.exists( target ) ) return !Files.isWritable( target.getParent() );
+		if( Files.exists( target ) ) return !Files.isWritable( target );
+		return false;
 	}
 
 	@Override

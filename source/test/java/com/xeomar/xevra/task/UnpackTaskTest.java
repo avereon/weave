@@ -1,10 +1,9 @@
 package com.xeomar.xevra.task;
 
+import com.xeomar.util.*;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
-import com.xeomar.util.FileUtil;
-import com.xeomar.util.IdGenerator;
 import org.junit.Test;
 
 import java.nio.file.Files;
@@ -102,6 +101,7 @@ public class UnpackTaskTest extends AbstractUpdateTaskTest {
 
 	@Test
 	public void testInvalidSource() throws Exception {
+		LogUtil.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "info" ) );
 		String source = "invalidsource";
 		String target = "invalidtarget";
 		List<TaskResult> results =  program.runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );

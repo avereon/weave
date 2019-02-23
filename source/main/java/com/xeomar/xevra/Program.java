@@ -281,7 +281,7 @@ public class Program implements Product {
 		List<TaskResult> results = new ArrayList<>();
 		BufferedReader buffer = new BufferedReader( reader );
 		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
-			log.debug( elevatedKey() + "-> " + line.trim() );
+			log.trace( elevatedKey() + "parsed: " + line.trim() );
 			results.add( executeTask( parseTask( line.trim() ), new PrintWriter( writer ) ) );
 		}
 		return results;
@@ -292,7 +292,7 @@ public class Program implements Product {
 		BufferedReader buffer = new BufferedReader( reader );
 		List<AbstractUpdateTask> tasks = new ArrayList<>();
 		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
-			log.debug( elevatedKey() + "-> " + line.trim() );
+			log.trace( elevatedKey() + "parsed: " + line.trim() );
 			tasks.add( parseTask( line.trim() ) );
 		}
 
@@ -302,7 +302,6 @@ public class Program implements Product {
 		int totalSteps = 0;
 		for( AbstractUpdateTask task : tasks ) {
 			try {
-				task.validate();
 				totalSteps += task.getStepCount();
 			} catch( Exception exception ) {
 				results.add( getTaskResult( task, exception ) );
@@ -356,6 +355,8 @@ public class Program implements Product {
 		log.debug( elevatedKey() + "Task: " + task.getOriginalLine() );
 
 		try {
+			task.validate();
+
 			log.trace( elevatedKey() + "Task needs elevation?: " + task.needsElevation() );
 			if( task.needsElevation() && !isElevated() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
@@ -365,6 +366,7 @@ public class Program implements Product {
 			}
 		} catch( Exception exception ) {
 			result = getTaskResult( task, exception );
+			log.warn( "", exception );
 		}
 
 		printWriter.println( result.format() );

@@ -40,9 +40,9 @@ public abstract class AbstractUpdateTask {
 		this.originalLine = originalLine;
 	}
 
-	public void validate() {}
-
 	public abstract int getStepCount() throws Exception;
+
+	public void validate() {}
 
 	public boolean needsElevation() {
 		return false;

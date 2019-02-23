@@ -28,14 +28,8 @@ public class PermissionsTask extends AbstractUpdateTask {
 	}
 
 	@Override
-	public boolean needsElevation() {
-		// Check all the files to see if they are writable without elevation
-		int size = getParameters().size();
-		for( int index = 1; index < size; index++ ) {
-			Path file = Paths.get( getParameters().get( index ) );
-			if( Files.exists( file ) && !Files.isWritable( file ) ) return true;
-		}
-		return false;
+	public int getStepCount() {
+		return getParameters().size() - 1;
 	}
 
 	@Override
@@ -44,8 +38,14 @@ public class PermissionsTask extends AbstractUpdateTask {
 	}
 
 	@Override
-	public int getStepCount() {
-		return getParameters().size() - 1;
+	public boolean needsElevation() {
+		// Check all the files to see if they are writable without elevation
+		int size = getParameters().size();
+		for( int index = 1; index < size; index++ ) {
+			Path file = Paths.get( getParameters().get( index ) );
+			if( Files.exists( file ) && !Files.isWritable( file ) ) return true;
+		}
+		return false;
 	}
 
 	@Override

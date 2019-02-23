@@ -1,9 +1,12 @@
 package com.xeomar.xevra.task;
 
+import com.xeomar.util.FileUtil;
+import com.xeomar.util.LogFlag;
+import com.xeomar.util.LogUtil;
+import com.xeomar.util.Parameters;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
-import com.xeomar.util.FileUtil;
 import org.junit.Test;
 
 import java.nio.file.Files;
