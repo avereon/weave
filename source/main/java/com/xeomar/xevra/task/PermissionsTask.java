@@ -1,17 +1,16 @@
 package com.xeomar.xevra.task;
 
+import com.xeomar.util.LogUtil;
 import com.xeomar.xevra.AbstractUpdateTask;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
-import com.xeomar.util.LogUtil;
 import org.slf4j.Logger;
 
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
@@ -23,6 +22,17 @@ public class PermissionsTask extends AbstractUpdateTask {
 
 	public PermissionsTask( List<String> parameters ) {
 		super( UpdateTask.PERMISSIONS, parameters );
+	}
+
+	@Override
+	public boolean needsElevation() {
+		// Check all the files to see if they are writable without elevation
+		int size = getParameters().size();
+		for( int index = 1; index < size; index++ ) {
+			Path file = Paths.get( getParameters().get( index ) );
+			if( Files.exists( file ) && !Files.isWritable( file ) ) return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -43,9 +53,10 @@ public class PermissionsTask extends AbstractUpdateTask {
 		int size = getParameters().size();
 		for( int index = 1; index < size; index++ ) {
 			Path file = Paths.get( getParameters().get( index ) );
+			log.debug( "Setting permission on: " + file );
+
 			if( Files.exists( file ) ) {
-				log.debug( "Setting permission on: " + file );
-				Files.getFileAttributeView( file, PosixFileAttributeView.class ).setPermissions( permissions );
+				Files.setPosixFilePermissions( file, permissions );
 			} else {
 				log.warn( "File not found: " + file );
 			}
