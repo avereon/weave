@@ -61,7 +61,7 @@ public class PermissionsTask extends AbstractUpdateTask {
 
 		boolean userRead = isRead( user );
 		boolean worldRead = userRead && isRead( world );
-		boolean userWrite = isWrite( group );
+		boolean userWrite = isWrite( user );
 		boolean worldWrite = userWrite && isWrite( world );
 		boolean userExec = isExec( user );
 		boolean worldExec = userExec && isExec( world );
