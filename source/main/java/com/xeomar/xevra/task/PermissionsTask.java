@@ -69,9 +69,10 @@ public class PermissionsTask extends AbstractUpdateTask {
 		int size = getParameters().size();
 		for( int index = 1; index < size; index++ ) {
 			Path file = Paths.get( getParameters().get( index ) );
-			log.debug( "Setting permission on: " + file );
 
-			if( !Files.exists( file ) ) return new TaskResult( this, TaskStatus.FAILURE, "File not found: " + file );
+			// Skip missing files
+			if( !Files.exists( file ) ) continue;
+			log.debug( "Setting permission on: " + file );
 
 			boolean read = file.toFile().setReadable( userRead, worldRead );
 			boolean write = file.toFile().setWritable( userWrite, worldWrite );
