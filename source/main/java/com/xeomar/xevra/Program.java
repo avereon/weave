@@ -104,7 +104,7 @@ public class Program implements Product {
 		LogUtil.configureLogging( this, parameters );
 
 		// Print the program header
-		printHeader( card );
+		if( !isElevated() ) printHeader( card );
 
 		log.info( elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "") );
 		log.info( elevatedKey() + "Parameters: " + parameters );

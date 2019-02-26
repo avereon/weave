@@ -11,19 +11,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
-/**
- * This class is used to test elevated command execution.
- * <p>
- * It is not a unit test because it causes an elevated privileges dialog to be
- * displayed, requiring user input. It is also not in the test folder because
- * IntelliJ keys off the folder whether to run this as a module or a class. It
- * needs to be run from the java folder, not the test folder.
- */
 public class ElevatedCommandCheck {
 
 	public static void main( String[] commands ) {
 		new ElevatedCommandCheck().run();
+	}
+
+	public List<String> getAdditionalCommands() {
+		return List.of();
 	}
 
 	public void run() {
@@ -33,13 +30,12 @@ public class ElevatedCommandCheck {
 
 		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule( null, modulePath, mainModule, mainClass ) );
 		processBuilder.redirectError( ProcessBuilder.Redirect.INHERIT );
-		processBuilder.command().add( UpdateFlag.TITLE );
-		processBuilder.command().add( "ElevatedCommandCheck" );
 		processBuilder.command().add( UpdateFlag.STDIN );
 		processBuilder.command().add( LogFlag.LOG_FILE );
 		processBuilder.command().add( "privilege-check.log" );
 		processBuilder.command().add( LogFlag.LOG_LEVEL );
-		processBuilder.command().add( "trace" );
+		processBuilder.command().add( "info" );
+		processBuilder.command().addAll( getAdditionalCommands() );
 
 		try {
 			Process process = processBuilder.start();
