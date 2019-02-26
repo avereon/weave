@@ -40,13 +40,13 @@ public class ProgramTest {
 				}
 			} ).start();
 
-			inputPipe.write( "pause 13\n".getBytes( CHARSET ) );
-			inputPipe.write( "pause 7\n".getBytes( CHARSET ) );
+			inputPipe.write( "pause 130\n".getBytes( CHARSET ) );
+			inputPipe.write( "pause 170\n".getBytes( CHARSET ) );
 			inputPipe.close();
 			String result1 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
-			assertThat( result1, is( "SUCCESS pause paused 13ms" ) );
+			assertThat( result1, is( "SUCCESS pause paused 130ms" ) );
 			String result2 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
-			assertThat( result2, is( "SUCCESS pause paused 7ms" ) );
+			assertThat( result2, is( "SUCCESS pause paused 170ms" ) );
 		} finally {
 			// Restore the original streams
 			System.setOut( originalOutput );
@@ -72,15 +72,15 @@ public class ProgramTest {
 			}
 		} ).start();
 
-		inputPipe.write( "pause 17\n" );
-		inputPipe.write( "pause 5" );
+		inputPipe.write( "pause 170\n" );
+		inputPipe.write( "pause 190" );
 		inputPipe.close();
 
 		String result1 = new BufferedReader( outputPipe ).readLine();
-		assertThat( result1, is( "SUCCESS pause paused 17ms" ) );
+		assertThat( result1, is( "SUCCESS pause paused 170ms" ) );
 
 		String result2 = new BufferedReader( outputPipe ).readLine();
-		assertThat( result2, is( "SUCCESS pause paused 5ms" ) );
+		assertThat( result2, is( "SUCCESS pause paused 190ms" ) );
 	}
 
 }

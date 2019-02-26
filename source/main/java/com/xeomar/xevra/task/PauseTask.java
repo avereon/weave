@@ -30,7 +30,7 @@ public class PauseTask extends AbstractUpdateTask {
 
 	@Override
 	public int getStepCount() {
-		this.time = Long.parseLong( getParameters().get( 0 ) );
+		this.time = Math.max( 100, Long.parseLong( getParameters().get( 0 ) ) );
 		this.steps = (int)(time / increment);
 		return steps;
 	}
