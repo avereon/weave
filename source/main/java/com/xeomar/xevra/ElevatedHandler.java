@@ -23,6 +23,10 @@ class ElevatedHandler {
 
 	static final String CALLBACK_PORT = "--callback-port";
 
+	static final String MESSAGE = "MESSAGE";
+
+	static final String PROGRESS = "PROGRESS";
+
 	private Program program;
 
 	private String secret;
@@ -61,8 +65,18 @@ class ElevatedHandler {
 		log.debug( "  commands: " + task.getOriginalLine() );
 
 		log.debug( "Reading task result from elevated process..." );
-		String taskOutput = readLine( socket.getInputStream() );
-		TaskResult result = TaskResult.parse( task, taskOutput );
+		TaskResult result = null;
+		String line;
+		while( (line = readLine( socket.getInputStream() )) != null ) {
+			if( line.startsWith( PROGRESS ) ) {
+				task.incrementProgress();
+			} else if( line.startsWith( MESSAGE ) ) {
+				task.setMessage( line.substring( MESSAGE.length() + 1 ) );
+			} else {
+				result = TaskResult.parse( task, line );
+				break;
+			}
+		}
 		log.debug( "  result: " + result );
 
 		return result;

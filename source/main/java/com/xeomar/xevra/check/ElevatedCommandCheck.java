@@ -33,6 +33,8 @@ public class ElevatedCommandCheck {
 
 		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule( null, modulePath, mainModule, mainClass ) );
 		processBuilder.redirectError( ProcessBuilder.Redirect.INHERIT );
+		processBuilder.command().add( UpdateFlag.TITLE );
+		processBuilder.command().add( "ElevatedCommandCheck" );
 		processBuilder.command().add( UpdateFlag.STDIN );
 		processBuilder.command().add( LogFlag.LOG_FILE );
 		processBuilder.command().add( "privilege-check.log" );
@@ -41,14 +43,18 @@ public class ElevatedCommandCheck {
 
 		try {
 			Process process = processBuilder.start();
+			process.getOutputStream().write( (UpdateTask.PAUSE + " 500 \"Preparing update\"\n").getBytes( TextUtil.CHARSET ) );
 			process.getOutputStream().write( (UpdateTask.ELEVATED_ECHO + " hello1\n").getBytes( TextUtil.CHARSET ) );
-			process.getOutputStream().write( (UpdateTask.PAUSE + " 500\n").getBytes( TextUtil.CHARSET ) );
+			process.getOutputStream().write( (UpdateTask.ELEVATED_PAUSE + " 2000 \"Simulating update\"\n").getBytes( TextUtil.CHARSET ) );
 			process.getOutputStream().write( (UpdateTask.ELEVATED_ECHO + " hello2\n").getBytes( TextUtil.CHARSET ) );
+			process.getOutputStream().write( (UpdateTask.PAUSE + " 500 \"Finishing update\"\n").getBytes( TextUtil.CHARSET ) );
 			process.getOutputStream().close();
 
-			check( "SUCCESS echo hello1", readLine( process.getInputStream() ) );
 			check( "SUCCESS pause paused 500ms", readLine( process.getInputStream() ) );
+			check( "SUCCESS echo hello1", readLine( process.getInputStream() ) );
+			check( "SUCCESS pause paused 2000ms", readLine( process.getInputStream() ) );
 			check( "SUCCESS echo hello2", readLine( process.getInputStream() ) );
+			check( "SUCCESS pause paused 500ms", readLine( process.getInputStream() ) );
 		} catch( IOException exception ) {
 			exception.printStackTrace();
 		}

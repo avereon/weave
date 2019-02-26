@@ -231,9 +231,7 @@ public class Program implements Product {
 	}
 
 	private void hideProgressDialog() {
-		Platform.runLater( () -> {
-			if( alert != null ) alert.close();
-		} );
+		if( alert != null ) Platform.runLater( () -> alert.close() );
 	}
 
 	public List<TaskResult> runTasksFromString( String commands ) throws IOException, InterruptedException {
@@ -273,21 +271,31 @@ public class Program implements Product {
 	}
 
 	private List<TaskResult> runTasks( Reader reader, Writer writer ) throws IOException, InterruptedException {
-		return isElevated() ? runElevatedTasks( reader, writer ) : runNormalTasks( reader, writer );
+		return isElevated() ? runTasksElevated( reader, writer ) : runTasksNormally( reader, writer );
 	}
 
-	private List<TaskResult> runElevatedTasks( Reader reader, Writer writer ) throws IOException {
+	private List<TaskResult> runTasksElevated( Reader reader, Writer writer ) throws IOException {
 		String line;
 		List<TaskResult> results = new ArrayList<>();
 		BufferedReader buffer = new BufferedReader( reader );
 		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
-			log.trace( elevatedKey() + "parsed: " + line.trim() );
-			results.add( executeTask( parseTask( line.trim() ), new PrintWriter( writer ) ) );
+			log.trace( elevatedKey() + "Parsed: " + line.trim() );
+			AbstractUpdateTask task = parseTask( line.trim() );
+			try {
+				int totalSteps = task.getStepCount();
+				PrintWriter printWriter = new PrintWriter( writer );
+				TaskHandler handler = new TaskHandler( totalSteps, printWriter );
+				task.addTaskListener( handler );
+				results.add( executeTask( task, printWriter ) );
+				task.removeTaskListener( handler );
+			} catch( Exception exception ) {
+				results.add( getTaskResult( task, exception ) );
+			}
 		}
 		return results;
 	}
 
-	private List<TaskResult> runNormalTasks( Reader reader, Writer writer ) throws IOException, InterruptedException {
+	private List<TaskResult> runTasksNormally( Reader reader, Writer writer ) throws IOException, InterruptedException {
 		String line;
 		BufferedReader buffer = new BufferedReader( reader );
 		List<AbstractUpdateTask> tasks = new ArrayList<>();
@@ -312,8 +320,8 @@ public class Program implements Product {
 		// Execute the tasks
 		TaskResult result;
 		int taskCompletedCount = 0;
-		TaskHandler handler = new TaskHandler( totalSteps );
 		PrintWriter printWriter = new PrintWriter( writer );
+		TaskHandler handler = new TaskHandler( totalSteps, printWriter );
 		for( AbstractUpdateTask task : tasks ) {
 			if( !execute ) break;
 
@@ -330,9 +338,8 @@ public class Program implements Product {
 		if( elevatedHandler != null ) elevatedHandler.stop();
 
 		if( isUi() ) {
-			Platform.runLater( () -> {
-				if( progressPane != null ) progressPane.setText( "Update complete" );
-			} );
+			if( progressPane != null ) Platform.runLater( () -> progressPane.setText( "Update complete" ) );
+			if( progressPane != null ) Platform.runLater( () -> progressPane.setProgress( 1.0 ) );
 			Thread.sleep( 1000 );
 		}
 
@@ -458,24 +465,31 @@ public class Program implements Product {
 
 		private int totalSteps;
 
-		TaskHandler( int totalSteps ) {
+		private PrintWriter printWriter;
+
+		TaskHandler( int totalSteps, PrintWriter printWriter ) {
 			this.totalSteps = totalSteps;
+			this.printWriter = printWriter;
 		}
 
 		@Override
 		public void updateMessage( String message ) {
-			Platform.runLater( () -> {
-				if( progressPane != null ) progressPane.setText( message );
-			} );
+			if( isElevated() ) {
+				printWriter.println( ElevatedHandler.MESSAGE + " " + message );
+				// There is always a progress event to flush the stream
+			}
+			if( progressPane != null ) Platform.runLater( () -> progressPane.setText( message ) );
 		}
 
 		@Override
 		public void updateProgress( int step ) {
 			this.step++;
 			double progress = (double)this.step / (double)totalSteps;
-			Platform.runLater( () -> {
-				if( progressPane != null ) progressPane.setProgress( progress );
-			} );
+			if( isElevated() ) {
+				printWriter.println( ElevatedHandler.PROGRESS );
+				printWriter.flush();
+			}
+			if( progressPane != null ) Platform.runLater( () -> progressPane.setProgress( progress ) );
 		}
 
 	}
