@@ -96,7 +96,7 @@ public class Program implements Product {
 		return title;
 	}
 
-	public void start( String[] commands ) {
+	public void start( String... commands ) {
 		// Parse parameters
 		parameters = Parameters.parse( commands );
 

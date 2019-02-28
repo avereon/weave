@@ -118,6 +118,7 @@ class ElevatedHandler {
 
 		Parameters parameters = program.getParameters();
 
+		// FIXME Eventually disable logging on the elevated process
 		if( parameters.isSet( LogFlag.LOG_FILE ) ) {
 			processBuilder.command().add( LogFlag.LOG_FILE );
 			processBuilder.command().add( parameters.get( LogFlag.LOG_FILE ).replace( ".log", "-elevated.log" ) );
