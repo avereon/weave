@@ -22,11 +22,15 @@ import java.util.Optional;
 
 public class Program implements Product {
 
+	public enum Status {
+		STOPPED, STARTING, STARTED, STOPPING
+	}
+
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 
-	private boolean execute;
+	private Status status;
 
-	private boolean started;
+	private boolean execute;
 
 	private Thread executeThread;
 
@@ -52,7 +56,7 @@ public class Program implements Product {
 
 	public Program() {
 		this.execute = true;
-		this.started = false;
+		this.status = Status.STOPPED;
 		this.waitLock = new Object();
 		try {
 			this.card = new ProductCard().init( getClass() );
@@ -96,7 +100,16 @@ public class Program implements Product {
 		return title;
 	}
 
+	public Status getStatus() {
+		return this.status;
+	}
+
 	public void start( String... commands ) {
+		synchronized( this ) {
+			status = Status.STARTING;
+			this.notifyAll();
+		}
+
 		// Parse parameters
 		parameters = Parameters.parse( commands );
 
@@ -138,7 +151,20 @@ public class Program implements Product {
 	}
 
 	synchronized void waitForStart() throws InterruptedException {
-		while( !started ) {
+		while( status == Status.STARTING ) {
+			wait( 1000 );
+		}
+	}
+
+	public synchronized void stop() {
+		execute = false;
+		status = Status.STOPPING;
+		executeThread.interrupt();
+		this.notifyAll();
+	}
+
+	synchronized void waitForStop() throws InterruptedException {
+		while( status == Status.STOPPING ) {
 			wait( 1000 );
 		}
 	}
@@ -153,7 +179,7 @@ public class Program implements Product {
 					Thread.sleep( 500 );
 				}
 				synchronized( this ) {
-					started = true;
+					status = Status.STARTED;
 					this.notifyAll();
 				}
 				execute();
@@ -162,10 +188,14 @@ public class Program implements Product {
 				log.error( elevatedKey() + "Execution error", throwable );
 			} finally {
 				if( isUi() ) hideProgressDialog();
+				synchronized( this ) {
+					status = Status.STOPPED;
+					this.notifyAll();
+				}
 				log.info( elevatedKey() + card.getName() + " finished" );
 			}
-
 		}
+
 	}
 
 	private boolean isUi() {
@@ -199,11 +229,6 @@ public class Program implements Product {
 
 	}
 
-	private void terminate() {
-		execute = false;
-		executeThread.interrupt();
-	}
-
 	private void showProgressDialog() {
 		Platform.startup( () -> {} );
 
@@ -223,7 +248,7 @@ public class Program implements Product {
 			// Set the onHidden handler
 			alert.setOnHidden( ( event ) -> {
 				Optional<ButtonType> result = Optional.ofNullable( alert.getResult() );
-				if( result.isPresent() && result.get() == ButtonType.CANCEL ) terminate();
+				if( result.isPresent() && result.get() == ButtonType.CANCEL ) stop();
 			} );
 
 			alert.show();

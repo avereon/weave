@@ -1,9 +1,11 @@
 package com.xeomar.xevra;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.BufferedInputStream;
@@ -12,8 +14,11 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class ElevatedProcessTest {
+
+	private long wait = 100;
 
 	private Program elevated;
 
@@ -32,16 +37,22 @@ public class ElevatedProcessTest {
 		elevated.waitForStart();
 
 		Socket socket = server.accept();
-		BufferedReader reader = new BufferedReader( new InputStreamReader(socket.getInputStream()) );
-		assertThat( secret, is( reader.readLine() ));
-		//System.out.println( reader.readLine() );
+		NonBlockingReader reader = new NonBlockingReader( new InputStreamReader( socket.getInputStream() ) );
+		assertThat( secret, is( reader.readLine( wait, TimeUnit.MILLISECONDS ) ) );
 
+		// The elevated updater should be running and validated at this point
+		assertThat( elevated.getStatus(), is( Program.Status.STARTED ) );
+	}
 
+	@After
+	public void shutdown() throws Exception {
+		elevated.stop();
+		//elevated.waitForStop();
+		assertThat( elevated.getStatus(), is( Program.Status.STOPPED ) );
 	}
 
 	@Test
 	public void testStartupShutdown() {
-
 	}
 
 }
