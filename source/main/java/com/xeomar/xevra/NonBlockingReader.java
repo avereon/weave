@@ -17,60 +17,56 @@ public class NonBlockingReader {
 
 	private BufferedReader source;
 
-	private IOException exception;
-
-	private InterruptedException interruptedException;
+	private IOException ioexception;
 
 	private boolean closed;
 
 	public NonBlockingReader( Reader reader ) {
 		if( reader == null ) throw new NullPointerException( "Reader cannot be null" );
-		this.source = (reader instanceof BufferedReader ? (BufferedReader)reader : new BufferedReader( reader ));
+		source = (reader instanceof BufferedReader ? (BufferedReader)reader : new BufferedReader( reader ));
 		readerThread = new ReaderTask();
 		readerThread.start();
 	}
 
 	public String readLine( long time, TimeUnit unit ) throws IOException, InterruptedException {
 		this.callerThread = Thread.currentThread();
-		String line = closed && lines.size() == 0 ? null : lines.poll( time, unit );
-		if( this.interruptedException != null ) throw this.interruptedException;
-		if( this.exception != null ) throw this.exception;
-		return line;
+		if( closed && lines.size() == 0 ) return null;
+		try {
+			return lines.poll( time, unit );
+		} catch( InterruptedException exception ) {
+			if( ioexception != null ) throw ioexception;
+			if( closed ) return null;
+			throw exception;
+		}
 	}
 
 	public void close() throws IOException {
+		closed = true;
+		//if( callerThread != null ) callerThread.interrupt();
 		if( readerThread != null ) readerThread.interrupt();
-		if( callerThread != null ) callerThread.interrupt();
-		if( this.exception != null ) throw this.exception;
+		if( ioexception != null ) throw ioexception;
 		readerThread = null;
 	}
 
 	private class ReaderTask extends Thread {
 
-		public ReaderTask() {
+		ReaderTask() {
 			super( "NonBlockingReaderThread" );
 			setDaemon( true );
 		}
 
 		public void run() {
 			try {
-				while( !isInterrupted() ) {
+				while( !interrupted() ) {
 					String line = source.readLine();
-					if( isInterrupted() ) NonBlockingReader.this.interruptedException = new InterruptedException();
-					if( line == null ) break;
+					if( line == null ) return;
 					lines.add( line );
 				}
 			} catch( IOException exception ) {
-				NonBlockingReader.this.exception = exception;
+				ioexception = exception;
 			} finally {
-				NonBlockingReader.this.closed = true;
-				if( source != null ) {
-					try {
-						source.close();
-					} catch( IOException exception ) {
-						NonBlockingReader.this.exception = exception;
-					}
-				}
+				//callerThread.interrupt();
+				closed = true;
 			}
 		}
 

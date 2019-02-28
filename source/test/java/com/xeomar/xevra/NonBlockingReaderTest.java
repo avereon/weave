@@ -15,6 +15,8 @@ import static org.junit.Assert.fail;
 
 public class NonBlockingReaderTest {
 
+	private static long delay = 10;
+
 	@Test
 	public void testReadLine() throws Exception {
 		String line1 = "I am first with five";
@@ -24,10 +26,11 @@ public class NonBlockingReaderTest {
 		String content = line1 + "\n" + line2 + "\n" + line3;
 		NonBlockingReader reader = new NonBlockingReader( new StringReader( content ) );
 
-		assertThat( reader.readLine( 100, TimeUnit.MILLISECONDS ), is( line1 ) );
-		assertThat( reader.readLine( 100, TimeUnit.MILLISECONDS ), is( line2 ) );
-		assertThat( reader.readLine( 100, TimeUnit.MILLISECONDS ), is( line3 ) );
-		assertThat( reader.readLine( 100, TimeUnit.MILLISECONDS ), is( nullValue() ) );
+		long time = delay;
+		assertThat( reader.readLine( time, TimeUnit.MILLISECONDS ), is( line1 ) );
+		assertThat( reader.readLine( time, TimeUnit.MILLISECONDS ), is( line2 ) );
+		assertThat( reader.readLine( time, TimeUnit.MILLISECONDS ), is( line3 ) );
+		assertThat( reader.readLine( time, TimeUnit.MILLISECONDS ), is( nullValue() ) );
 	}
 
 	@Test
@@ -36,7 +39,7 @@ public class NonBlockingReaderTest {
 			NonBlockingReader reader = null;
 			try {
 				reader = new NonBlockingReader( new InputStreamReader( System.in ) );
-				assertThat( reader.readLine( 100, TimeUnit.MILLISECONDS ), is( nullValue() ) );
+				assertThat( reader.readLine( delay, TimeUnit.MILLISECONDS ), is( nullValue() ) );
 			} finally {
 				if( reader != null ) reader.close();
 			}
@@ -47,25 +50,22 @@ public class NonBlockingReaderTest {
 
 	@Test
 	public void testClose() throws Exception {
-		 NonBlockingReader reader = new NonBlockingReader( new InputStreamReader( System.in ) );
+		long time = delay;
 
+		NonBlockingReader reader = new NonBlockingReader( new InputStreamReader( System.in ) );
+
+		// Setup a thread that will close the reader before the read times out
 		new Thread( () -> {
-			System.out.println("Waiting a bit..." );
-			ThreadUtil.pause( 1000 );
+			ThreadUtil.pause( time );
 			try {
 				reader.close();
 			} catch( IOException exception ) {
 				exception.printStackTrace();
 			}
-			System.out.println( "Reader is closed!" );
 		} ).start();
 
-		try {
-			reader.readLine( 2000, TimeUnit.MILLISECONDS );
-			fail( "readLine() should have thrown an exception" );
-		} catch( InterruptedException exception ) {
-			// Intentionally ignore exception
-		}
+		// Read a line with a timeout longer than the closing thread pause
+		assertThat( reader.readLine( 2 * time, TimeUnit.MILLISECONDS ), is( nullValue() ) );
 	}
 
 }
