@@ -36,8 +36,9 @@ public class NonBlockingReader {
 		} catch( InterruptedException exception ) {
 			if( ioexception != null ) throw ioexception;
 			if( closed ) return null;
-			throw exception;
+			//throw exception;
 		}
+		return null;
 	}
 
 	public void close() throws IOException {

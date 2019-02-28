@@ -19,11 +19,16 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class Program implements Product {
 
 	public enum Status {
-		STOPPED, STARTING, STARTED, STOPPING
+		STOPPED,
+		STARTING,
+		STARTED,
+		STOPPING
 	}
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
@@ -150,22 +155,24 @@ public class Program implements Product {
 		executeThread.start();
 	}
 
-	synchronized void waitForStart() throws InterruptedException {
-		while( status == Status.STARTING ) {
-			wait( 1000 );
+	synchronized void waitForStart(long time, TimeUnit unit) throws InterruptedException, TimeoutException {
+		while( status != Status.STARTED ) {
+			wait( unit.toMillis( time ) );
+			if( status != Status.STARTED ) throw new TimeoutException( "Timeout waiting for program to start" );
 		}
 	}
 
 	public synchronized void stop() {
+		if( status != Status.STOPPED ) status = Status.STOPPING;
 		execute = false;
-		status = Status.STOPPING;
-		executeThread.interrupt();
 		this.notifyAll();
+		executeThread.interrupt();
 	}
 
-	synchronized void waitForStop() throws InterruptedException {
-		while( status == Status.STOPPING ) {
-			wait( 1000 );
+	synchronized void waitForStop( long time, TimeUnit unit ) throws InterruptedException, TimeoutException {
+		while( status != Status.STOPPED ) {
+			wait( unit.toMillis( time ) );
+			if( status != Status.STOPPED ) throw new TimeoutException( "Timeout waiting for program to stop" );
 		}
 	}
 
@@ -178,9 +185,9 @@ public class Program implements Product {
 					showProgressDialog();
 					Thread.sleep( 500 );
 				}
-				synchronized( this ) {
+				synchronized( Program.this ) {
 					status = Status.STARTED;
-					this.notifyAll();
+					Program.this.notifyAll();
 				}
 				execute();
 			} catch( Throwable throwable ) {
@@ -188,9 +195,9 @@ public class Program implements Product {
 				log.error( elevatedKey() + "Execution error", throwable );
 			} finally {
 				if( isUi() ) hideProgressDialog();
-				synchronized( this ) {
+				synchronized( Program.this ) {
 					status = Status.STOPPED;
-					this.notifyAll();
+					Program.this.notifyAll();
 				}
 				log.info( elevatedKey() + card.getName() + " finished" );
 			}
@@ -299,11 +306,11 @@ public class Program implements Product {
 		return isElevated() ? runTasksElevated( reader, writer ) : runTasksNormally( reader, writer );
 	}
 
-	private List<TaskResult> runTasksElevated( Reader reader, Writer writer ) throws IOException {
+	private List<TaskResult> runTasksElevated( Reader reader, Writer writer ) throws IOException, InterruptedException {
 		String line;
 		List<TaskResult> results = new ArrayList<>();
-		BufferedReader buffer = new BufferedReader( reader );
-		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
+		NonBlockingReader buffer = new NonBlockingReader( reader );
+		while( !TextUtil.isEmpty( line = buffer.readLine( 1, TimeUnit.SECONDS ) ) ) {
 			log.trace( elevatedKey() + "Parsed: " + line.trim() );
 			AbstractUpdateTask task = parseTask( line.trim() );
 			try {
@@ -322,9 +329,9 @@ public class Program implements Product {
 
 	private List<TaskResult> runTasksNormally( Reader reader, Writer writer ) throws IOException, InterruptedException {
 		String line;
-		BufferedReader buffer = new BufferedReader( reader );
+		NonBlockingReader buffer = new NonBlockingReader( reader );
 		List<AbstractUpdateTask> tasks = new ArrayList<>();
-		while( !TextUtil.isEmpty( line = buffer.readLine() ) ) {
+		while( !TextUtil.isEmpty( line = buffer.readLine( 1, TimeUnit.SECONDS ) ) ) {
 			log.trace( elevatedKey() + "parsed: " + line.trim() );
 			tasks.add( parseTask( line.trim() ) );
 		}

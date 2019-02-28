@@ -2,6 +2,8 @@ package com.xeomar.xevra;
 
 import com.xeomar.util.LogFlag;
 
+import java.util.concurrent.TimeUnit;
+
 public class ProgressDialogCheck {
 
 	public static void main( String[] commands ) {
@@ -12,8 +14,8 @@ public class ProgressDialogCheck {
 
 		try {
 			Program program = new Program();
-			program.start( new String[]{ UpdateFlag.TITLE, "Program Update Check", LogFlag.LOG_LEVEL, "debug", InternalFlag.STRING } );
-			program.waitForStart();
+			program.start( UpdateFlag.TITLE, "Program Update Check", LogFlag.LOG_LEVEL, "debug", InternalFlag.STRING );
+			program.waitForStart( 1, TimeUnit.SECONDS );
 			new Thread( () -> {
 				try {
 					program.runTasksFromString( builder.toString() );
