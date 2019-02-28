@@ -11,6 +11,8 @@ public class NonBlockingReader {
 
 	private final BlockingQueue<String> lines = new LinkedBlockingQueue<>();
 
+	private Thread callerThread;
+
 	private Thread readerThread;
 
 	private BufferedReader source;
@@ -29,6 +31,7 @@ public class NonBlockingReader {
 	}
 
 	public String readLine( long time, TimeUnit unit ) throws IOException, InterruptedException {
+		this.callerThread = Thread.currentThread();
 		String line = closed && lines.size() == 0 ? null : lines.poll( time, unit );
 		if( this.interruptedException != null ) throw this.interruptedException;
 		if( this.exception != null ) throw this.exception;
@@ -37,8 +40,9 @@ public class NonBlockingReader {
 
 	public void close() throws IOException {
 		if( readerThread != null ) readerThread.interrupt();
+		if( callerThread != null ) callerThread.interrupt();
+		if( this.exception != null ) throw this.exception;
 		readerThread = null;
-		//source.close();
 	}
 
 	private class ReaderTask extends Thread {
@@ -51,9 +55,7 @@ public class NonBlockingReader {
 		public void run() {
 			try {
 				while( !isInterrupted() ) {
-					System.out.println( "Reading a line..." );
 					String line = source.readLine();
-					System.out.println( "Thread interrupted: " + isInterrupted() );
 					if( isInterrupted() ) NonBlockingReader.this.interruptedException = new InterruptedException();
 					if( line == null ) break;
 					lines.add( line );
