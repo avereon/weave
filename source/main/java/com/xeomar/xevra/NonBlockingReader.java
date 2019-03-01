@@ -35,9 +35,7 @@ public class NonBlockingReader {
 		if( closed && lines.size() == 0 ) return null;
 		//this.callerThread = Thread.currentThread();
 		try {
-			System.err.println( "(" + System.identityHashCode( this ) + ")>>> waiting for line..." );
 			String line = lines.poll( time, unit );
-			System.err.println( "(" + System.identityHashCode( this ) + ")>>> line retrieved: " + line );
 			return line;
 		} catch( InterruptedException exception ) {
 			if( ioexception != null ) throw ioexception;
@@ -68,7 +66,6 @@ public class NonBlockingReader {
 					String line = source.readLine();
 					if( line == null ) return;
 					lines.add( line );
-					System.err.println( "(" + System.identityHashCode( this ) + ")>>> line added: " + line );
 				}
 			} catch( IOException exception ) {
 				ioexception = exception;

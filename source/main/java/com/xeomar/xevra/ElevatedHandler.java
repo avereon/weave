@@ -35,6 +35,8 @@ class ElevatedHandler {
 
 	private Socket socket;
 
+	private NonBlockingReader reader;
+
 	private Throwable throwable;
 
 	ElevatedHandler( Program program ) {
@@ -68,17 +70,16 @@ class ElevatedHandler {
 		socket.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
 		socket.getOutputStream().write( '\n' );
 		socket.getOutputStream().flush();
-		log.warn( "send > " + task.getOriginalLine() );
+		log.trace( "send > " + task.getOriginalLine() );
 	}
 
 	private TaskResult getTaskResult( AbstractUpdateTask task ) throws IOException, InterruptedException {
 		log.debug( "Reading task result from elevated process..." );
 
-		NonBlockingReader reader = new NonBlockingReader( socket.getInputStream() );
 		String line;
 
 		while( (line = reader.readLine( 5, TimeUnit.SECONDS )) != null ) {
-			log.warn( "recv < " + line );
+			log.trace( "recv < " + line );
 			String[] commands = line.split( " " );
 			String command = commands[ 0 ];
 
@@ -106,7 +107,7 @@ class ElevatedHandler {
 		return null;
 	}
 
-	private void waitForSocket() throws IOException, InterruptedException, TimeoutException {
+	private synchronized void waitForSocket() throws IOException, InterruptedException, TimeoutException {
 		// Wait for the elevated process to get started
 		int index = 0;
 		int attemptCount = 0;
@@ -149,8 +150,9 @@ class ElevatedHandler {
 		new ProcessWatcherThread( process ).start();
 	}
 
-	private synchronized void setSocket( Socket socket ) {
+	private synchronized void setSocket( Socket socket ) throws IOException {
 		this.socket = socket;
+
 		notifyAll();
 	}
 
@@ -166,7 +168,7 @@ class ElevatedHandler {
 				Socket peer = null;
 				while( peer == null ) {
 					peer = server.accept();
-					NonBlockingReader reader = new NonBlockingReader( peer.getInputStream() );
+					reader = new NonBlockingReader( peer.getInputStream() );
 					if( reader.readLine( 100, TimeUnit.MILLISECONDS ).equals( secret ) ) {
 						setSocket( peer );
 						server.close();
