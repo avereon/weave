@@ -1,10 +1,12 @@
 package com.xeomar.xevra;
 
+import com.xeomar.util.LogFlag;
 import com.xeomar.util.OperatingSystem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -33,6 +35,7 @@ public class ElevatedProcessTest {
 
 	@Before
 	public void setup() throws Exception {
+		// Convince the OperatingSystem class that the process is elevated
 		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 
 		// The interface to an elevated process is the socket
@@ -46,7 +49,7 @@ public class ElevatedProcessTest {
 		server.bind( new InetSocketAddress( InetAddress.getLoopbackAddress(), port ) );
 
 		elevated = new Program();
-		elevated.start( ElevatedHandler.CALLBACK_SECRET, secret, ElevatedHandler.CALLBACK_PORT, String.valueOf( port ) );
+		elevated.start( ElevatedHandler.CALLBACK_SECRET, secret, ElevatedHandler.CALLBACK_PORT, String.valueOf( port ), LogFlag.LOG_LEVEL, "none" );
 		elevated.waitForStart( 1, TimeUnit.SECONDS );
 
 		Socket socket = server.accept();
@@ -74,14 +77,41 @@ public class ElevatedProcessTest {
 
 	@Test
 	public void testElevatedEcho() throws Exception {
-		writer.println( "elevated-echo \"Hello Updater!\"\n" );
+		writer.println( "elevated-echo \"Hello Updater!\"" );
 		writer.flush();
-		assertThat( reader.readLine( wait, TimeUnit.MILLISECONDS ), is( "MESSAGE Hello Updater!" ) );
-		assertThat( reader.readLine( wait, TimeUnit.MILLISECONDS ), is( "PROGRESS" ) );
-		assertThat( reader.readLine( wait, TimeUnit.MILLISECONDS ), is( "SUCCESS echo Hello Updater!" ) );
+		assertThat( readNext(), is( "MESSAGE Hello Updater!" ) );
+		assertThat( readNext(), is( "PROGRESS" ) );
+		assertThat( readNext(), is( "SUCCESS echo Hello Updater!" ) );
 		// There really is no further communication at this point,
 		// any more reads will timeout and return a null
-		assertThat( reader.readLine( wait, TimeUnit.MILLISECONDS ), is( nullValue() ) );
+		assertThat( readNext(), is( nullValue() ) );
+	}
+
+	@Test
+	public void testLaunchSuccess() throws Exception {
+		writer.println( UpdateTask.LAUNCH + " java" );
+		writer.flush();
+		assertThat( readNext(), is( "MESSAGE Launch java" ) );
+		assertThat( readNext(), is( "PROGRESS" ) );
+		assertThat( readNext(), is( "SUCCESS launch java" ) );
+		assertThat( readNext(), is( nullValue() ) );
+	}
+
+	@Test
+	public void testLaunchFailure() throws Exception {
+		writer.println( UpdateTask.LAUNCH + " invalid" );
+		writer.flush();
+		assertThat( readNext(), is( "MESSAGE Launch invalid" ) );
+		assertThat( readNext(), is( "FAILURE launch IOException: Cannot run program \"invalid\": error=2, No such file or directory" ) );
+		assertThat( readNext(), is( nullValue() ) );
+	}
+
+	private String readNext() throws IOException, InterruptedException {
+		String line;
+		while( ( line = reader.readLine( wait, TimeUnit.MILLISECONDS ) ) != null ) {
+			if( !line.startsWith( ElevatedHandler.LOG )) return line;
+		}
+		return null;
 	}
 
 }

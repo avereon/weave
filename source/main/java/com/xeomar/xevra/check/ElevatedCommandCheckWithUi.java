@@ -20,7 +20,7 @@ public class ElevatedCommandCheckWithUi extends ElevatedCommandCheck {
 
 	@Override
 	public List<String> getAdditionalCommands() {
-		return List.of(UpdateFlag.TITLE, "ElevatedCommandCheck" );
+		return List.of( UpdateFlag.TITLE, "ElevatedCommandCheck" );
 	}
 
 }

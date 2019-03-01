@@ -34,7 +34,7 @@ public class ElevatedCommandCheck {
 		processBuilder.command().add( LogFlag.LOG_FILE );
 		processBuilder.command().add( "privilege-check.log" );
 		processBuilder.command().add( LogFlag.LOG_LEVEL );
-		processBuilder.command().add( "info" );
+		processBuilder.command().add( "debug" );
 		processBuilder.command().addAll( getAdditionalCommands() );
 
 		try {

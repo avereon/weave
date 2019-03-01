@@ -1,8 +1,7 @@
 package com.xeomar.xevra;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -11,7 +10,7 @@ public class NonBlockingReader {
 
 	private final BlockingQueue<String> lines = new LinkedBlockingQueue<>();
 
-	private Thread callerThread;
+	//private Thread callerThread;
 
 	private Thread readerThread;
 
@@ -21,6 +20,10 @@ public class NonBlockingReader {
 
 	private boolean closed;
 
+	public NonBlockingReader( InputStream input ) {
+		this( new InputStreamReader( input, StandardCharsets.UTF_8 ) );
+	}
+
 	public NonBlockingReader( Reader reader ) {
 		if( reader == null ) throw new NullPointerException( "Reader cannot be null" );
 		source = (reader instanceof BufferedReader ? (BufferedReader)reader : new BufferedReader( reader ));
@@ -29,10 +32,13 @@ public class NonBlockingReader {
 	}
 
 	public String readLine( long time, TimeUnit unit ) throws IOException, InterruptedException {
-		this.callerThread = Thread.currentThread();
 		if( closed && lines.size() == 0 ) return null;
+		//this.callerThread = Thread.currentThread();
 		try {
-			return lines.poll( time, unit );
+			System.err.println( "(" + System.identityHashCode( this ) + ")>>> waiting for line..." );
+			String line = lines.poll( time, unit );
+			System.err.println( "(" + System.identityHashCode( this ) + ")>>> line retrieved: " + line );
+			return line;
 		} catch( InterruptedException exception ) {
 			if( ioexception != null ) throw ioexception;
 			if( closed ) return null;
@@ -62,6 +68,7 @@ public class NonBlockingReader {
 					String line = source.readLine();
 					if( line == null ) return;
 					lines.add( line );
+					System.err.println( "(" + System.identityHashCode( this ) + ")>>> line added: " + line );
 				}
 			} catch( IOException exception ) {
 				ioexception = exception;

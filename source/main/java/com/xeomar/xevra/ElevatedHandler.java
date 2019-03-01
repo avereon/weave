@@ -4,15 +4,13 @@ import com.xeomar.util.*;
 import org.slf4j.Logger;
 
 import javax.net.ServerSocketFactory;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 class ElevatedHandler {
@@ -26,6 +24,8 @@ class ElevatedHandler {
 	static final String MESSAGE = "MESSAGE";
 
 	static final String PROGRESS = "PROGRESS";
+
+	static final String LOG = "LOG";
 
 	private Program program;
 
@@ -57,29 +57,53 @@ class ElevatedHandler {
 		waitForSocket();
 
 		task.setElevated();
+		sendTask( task );
 
+		return getTaskResult( task );
+	}
+
+	private void sendTask( AbstractUpdateTask task ) throws IOException {
 		log.debug( "Sending task commands to elevated process..." );
+		log.debug( "  commands: " + task.getOriginalLine() );
 		socket.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
 		socket.getOutputStream().write( '\n' );
 		socket.getOutputStream().flush();
-		log.debug( "  commands: " + task.getOriginalLine() );
+		log.warn( "send > " + task.getOriginalLine() );
+	}
 
+	private TaskResult getTaskResult( AbstractUpdateTask task ) throws IOException, InterruptedException {
 		log.debug( "Reading task result from elevated process..." );
-		TaskResult result = null;
+
+		NonBlockingReader reader = new NonBlockingReader( socket.getInputStream() );
 		String line;
-		while( (line = readLine( socket.getInputStream() )) != null ) {
-			if( line.startsWith( PROGRESS ) ) {
-				task.incrementProgress();
-			} else if( line.startsWith( MESSAGE ) ) {
-				task.setMessage( line.substring( MESSAGE.length() + 1 ) );
-			} else {
-				result = TaskResult.parse( task, line );
-				break;
+
+		while( (line = reader.readLine( 5, TimeUnit.SECONDS )) != null ) {
+			log.warn( "recv < " + line );
+			String[] commands = line.split( " " );
+			String command = commands[ 0 ];
+
+			switch( command ) {
+				case MESSAGE: {
+					task.setMessage( line.substring( MESSAGE.length() + 1 ) );
+					break;
+				}
+				case PROGRESS: {
+					task.incrementProgress();
+					break;
+				}
+				case LOG: {
+					log.info( line.substring( LOG.length() + 1 ) );
+					break;
+				}
+				default: {
+					TaskResult result = TaskResult.parse( task, line );
+					log.debug( "  result: " + result );
+					return result;
+				}
 			}
 		}
-		log.debug( "  result: " + result );
 
-		return result;
+		return null;
 	}
 
 	private void waitForSocket() throws IOException, InterruptedException, TimeoutException {
@@ -115,21 +139,12 @@ class ElevatedHandler {
 		processBuilder.command().add( secret );
 		processBuilder.command().add( CALLBACK_PORT );
 		processBuilder.command().add( String.valueOf( server.getLocalPort() ) );
-
-		Parameters parameters = program.getParameters();
-
-		// FIXME Eventually disable logging on the elevated process
-		if( parameters.isSet( LogFlag.LOG_FILE ) ) {
-			processBuilder.command().add( LogFlag.LOG_FILE );
-			processBuilder.command().add( parameters.get( LogFlag.LOG_FILE ).replace( ".log", "-elevated.log" ) );
-		}
-		if( parameters.isSet( LogFlag.LOG_LEVEL ) ) {
-			processBuilder.command().add( LogFlag.LOG_LEVEL );
-			processBuilder.command().add( parameters.get( LogFlag.LOG_LEVEL ) );
-		}
+		processBuilder.command().add( LogFlag.LOG_LEVEL );
+		processBuilder.command().add( LogFlag.NONE );
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
 		log.debug( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
+		processBuilder.inheritIO();
 		Process process = processBuilder.start();
 		new ProcessWatcherThread( process ).start();
 	}
@@ -137,10 +152,6 @@ class ElevatedHandler {
 	private synchronized void setSocket( Socket socket ) {
 		this.socket = socket;
 		notifyAll();
-	}
-
-	private String readLine( InputStream input ) throws IOException {
-		return new BufferedReader( new InputStreamReader( input, TextUtil.CHARSET ) ).readLine();
 	}
 
 	private class ClientAcceptThread extends Thread {
@@ -155,7 +166,8 @@ class ElevatedHandler {
 				Socket peer = null;
 				while( peer == null ) {
 					peer = server.accept();
-					if( readLine( peer.getInputStream() ).equals( secret ) ) {
+					NonBlockingReader reader = new NonBlockingReader( peer.getInputStream() );
+					if( reader.readLine( 100, TimeUnit.MILLISECONDS ).equals( secret ) ) {
 						setSocket( peer );
 						server.close();
 					}
@@ -173,9 +185,7 @@ class ElevatedHandler {
 
 		private int exitValue;
 
-		private Exception exception;
-
-		public ProcessWatcherThread( Process process ) {
+		ProcessWatcherThread( Process process ) {
 			this.process = process;
 			setDaemon( true );
 		}
@@ -184,7 +194,7 @@ class ElevatedHandler {
 			try {
 				process.waitFor();
 				exitValue = process.exitValue();
-				if( exitValue != 0 ) throw new IllegalStateException( "Elevated process failed to start" );
+				if( exitValue != 0 ) throw new IllegalStateException( "Elevated process failed: " + exitValue );
 			} catch( Exception exception ) {
 				throwable = exception;
 			}

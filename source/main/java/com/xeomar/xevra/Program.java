@@ -311,11 +311,13 @@ public class Program implements Product {
 		List<TaskResult> results = new ArrayList<>();
 		NonBlockingReader buffer = new NonBlockingReader( reader );
 		while( !TextUtil.isEmpty( line = buffer.readLine( 1, TimeUnit.SECONDS ) ) ) {
-			log.trace( elevatedKey() + "Parsed: " + line.trim() );
+			//log.trace( elevatedKey() + "Parsed: " + line.trim() );
 			AbstractUpdateTask task = parseTask( line.trim() );
 			try {
 				int totalSteps = task.getStepCount();
 				PrintWriter printWriter = new PrintWriter( writer );
+				printWriter.println( ElevatedHandler.LOG + " Received task: " + line.trim() );
+				printWriter.flush();
 				TaskHandler handler = new TaskHandler( totalSteps, printWriter );
 				task.addTaskListener( handler );
 				results.add( executeTask( task, printWriter ) );
@@ -397,7 +399,7 @@ public class Program implements Product {
 			task.validate();
 
 			log.trace( elevatedKey() + "Task needs elevation?: " + task.needsElevation() );
-			if( task.needsElevation() && !isElevated() ) {
+			if( !isElevated() && task.needsElevation() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
 				result = elevatedHandler.execute( task );
 			} else {
@@ -508,7 +510,9 @@ public class Program implements Product {
 		public void updateMessage( String message ) {
 			if( isElevated() ) {
 				printWriter.println( ElevatedHandler.MESSAGE + " " + message );
-				// There is always a progress event to flush the stream
+				// Don't flush the stream here...not sure why this is a problem but,
+				// there is always a following progress event to flush the stream
+				//printWriter.flush();
 			}
 			if( progressPane != null ) Platform.runLater( () -> progressPane.setText( message ) );
 		}
