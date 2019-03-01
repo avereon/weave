@@ -3,9 +3,7 @@ package com.xeomar.xevra;
 import com.xeomar.util.ThreadUtil;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.concurrent.TimeUnit;
 
@@ -66,48 +64,6 @@ public class NonBlockingReaderTest {
 
 		// Read a line with a timeout longer than the closing thread pause
 		assertThat( reader.readLine( 2 * time, TimeUnit.MILLISECONDS ), is( nullValue() ) );
-	}
-
-	@Test
-	public void testIntermittentSource() throws Exception {
-		StringBuilder builder = new StringBuilder();
-		for( int index = 0; index < 100; index++ ) {
-			builder.append( "Line " ).append( index ).append( "\n" );
-		}
-
-		NonBlockingReader reader = new NonBlockingReader( new IntermittentReader( new StringReader( builder.toString().trim() ) ) );
-
-		long time = 1000;
-		for( int index = 0; index < 100; index++ ) {
-			ThreadUtil.pause( 800 );
-			String line = reader.readLine( time, TimeUnit.MILLISECONDS );
-			System.err.println( "line: " + line );
-			assertThat( line, is( "Line " + index ) );
-		}
-
-		// Setup a thread that will close the reader before the read times out
-		//		new Thread( () -> {
-		//			try {
-		//				reader.close();
-		//			} catch( IOException exception ) {
-		//				exception.printStackTrace();
-		//			}
-		//		} ).start();
-
-		// Read a line with a timeout longer than the closing thread pause
-		//assertThat( reader.readLine( 2 * time, TimeUnit.MILLISECONDS ), is( nullValue() ) );
-	}
-
-	private class IntermittentReader extends BufferedReader {
-
-		IntermittentReader( Reader source ) {
-			super(source);
-		}
-
-		@Override
-		public String readLine() throws IOException {
-			return super.readLine();
-		}
 	}
 
 }
