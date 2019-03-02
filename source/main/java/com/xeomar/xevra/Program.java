@@ -311,13 +311,10 @@ public class Program implements Product {
 		List<TaskResult> results = new ArrayList<>();
 		NonBlockingReader buffer = new NonBlockingReader( reader );
 		while( !TextUtil.isEmpty( line = buffer.readLine( 1, TimeUnit.SECONDS ) ) ) {
-			//log.trace( elevatedKey() + "Parsed: " + line.trim() );
 			AbstractUpdateTask task = parseTask( line.trim() );
 			try {
 				int totalSteps = task.getStepCount();
 				PrintWriter printWriter = new PrintWriter( writer );
-				printWriter.println( ElevatedHandler.LOG + " Received task: " + line.trim() );
-				printWriter.flush();
 				TaskHandler handler = new TaskHandler( totalSteps, printWriter );
 				task.addTaskListener( handler );
 				results.add( executeTask( task, printWriter ) );
