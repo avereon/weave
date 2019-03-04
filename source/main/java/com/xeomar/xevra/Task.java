@@ -32,14 +32,6 @@ public abstract class Task {
 		return parameters;
 	}
 
-	public String getOriginalLine() {
-		return originalLine;
-	}
-
-	public void setOriginalLine( String originalLine ) {
-		this.originalLine = originalLine;
-	}
-
 	public abstract int getStepCount() throws Exception;
 
 	public void validate() {}
@@ -48,11 +40,19 @@ public abstract class Task {
 		return false;
 	}
 
-	public void addTaskListener( TaskListener listener  ) {
+	String getOriginalLine() {
+		return originalLine;
+	}
+
+	void setOriginalLine( String originalLine ) {
+		this.originalLine = originalLine;
+	}
+
+	void addTaskListener( TaskListener listener ) {
 		this.listeners.add( listener );
 	}
 
-	public void removeTaskListener( TaskListener listener ) {
+	void removeTaskListener( TaskListener listener ) {
 		this.listeners.remove( listener );
 	}
 
@@ -62,14 +62,11 @@ public abstract class Task {
 		}
 	}
 
-	protected int incrementProgress() {
+	protected void incrementProgress() {
 		currentStep++;
-
 		for( TaskListener listener : listeners ) {
 			listener.updateProgress( currentStep );
 		}
-
-		return currentStep;
 	}
 
 	boolean isElevated() {

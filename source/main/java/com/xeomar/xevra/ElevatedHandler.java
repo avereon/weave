@@ -73,7 +73,7 @@ class ElevatedHandler {
 		log.trace( "send > " + task.getOriginalLine() );
 	}
 
-	private TaskResult getTaskResult( Task task ) throws IOException, InterruptedException {
+	private TaskResult getTaskResult( Task task ) throws IOException {
 		log.debug( "Reading task result from elevated process..." );
 
 		String line;
@@ -150,7 +150,7 @@ class ElevatedHandler {
 		new ProcessWatcherThread( process ).start();
 	}
 
-	private synchronized void setSocket( Socket socket ) throws IOException {
+	private synchronized void setSocket( Socket socket ) {
 		this.socket = socket;
 
 		notifyAll();
@@ -200,10 +200,6 @@ class ElevatedHandler {
 			} catch( Exception exception ) {
 				throwable = exception;
 			}
-		}
-
-		public int getExitValue() {
-			return exitValue;
 		}
 
 	}

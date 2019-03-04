@@ -107,7 +107,7 @@ public class ElevatedProcessTest {
 		assertThat( readNext(), is( nullValue() ) );
 	}
 
-	private String readNext() throws IOException, InterruptedException {
+	private String readNext() throws IOException {
 		String line;
 		while( ( line = reader.readLine( wait, TimeUnit.MILLISECONDS ) ) != null ) {
 			if( !line.startsWith( ElevatedHandler.LOG )) return line;

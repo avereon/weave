@@ -7,6 +7,7 @@ import java.lang.invoke.MethodHandles;
 
 public class TaskResult {
 
+	@SuppressWarnings( "unused" )
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 
 	private Task task;

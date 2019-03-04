@@ -155,7 +155,8 @@ public class Program implements Product {
 		executeThread.start();
 	}
 
-	synchronized void waitForStart(long time, TimeUnit unit) throws InterruptedException, TimeoutException {
+	@SuppressWarnings( "SameParameterValue" )
+	synchronized void waitForStart( long time, TimeUnit unit) throws InterruptedException, TimeoutException {
 		while( status != Status.STARTED ) {
 			wait( unit.toMillis( time ) );
 			if( status != Status.STARTED ) throw new TimeoutException( "Timeout waiting for program to start" );
@@ -169,6 +170,7 @@ public class Program implements Product {
 		executeThread.interrupt();
 	}
 
+	@SuppressWarnings( "SameParameterValue" )
 	synchronized void waitForStop( long time, TimeUnit unit ) throws InterruptedException, TimeoutException {
 		while( status != Status.STOPPED ) {
 			wait( unit.toMillis( time ) );
@@ -272,6 +274,7 @@ public class Program implements Product {
 		return runTasksFromReader( reader, writer );
 	}
 
+	@SuppressWarnings( "UnusedReturnValue" )
 	private List<TaskResult> runTasksFromSocket() throws IOException, InterruptedException {
 		String secret = parameters.get( ElevatedHandler.CALLBACK_SECRET );
 		int port = Integer.parseInt( parameters.get( ElevatedHandler.CALLBACK_PORT ) );
@@ -284,12 +287,14 @@ public class Program implements Product {
 		return runTasksFromStream( socket.getInputStream(), socket.getOutputStream() );
 	}
 
+	@SuppressWarnings( "UnusedReturnValue" )
 	private List<TaskResult> runTasksFromStdIn() throws IOException, InterruptedException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		System.in.transferTo( buffer );
 		return runTasksFromStream( new ByteArrayInputStream( buffer.toByteArray() ), System.out );
 	}
 
+	@SuppressWarnings( "UnusedReturnValue" )
 	private List<TaskResult> runTasksFromFile( File file ) throws IOException, InterruptedException {
 		return runTasksFromStream( new FileInputStream( file ), new ByteArrayOutputStream() );
 	}
@@ -306,7 +311,7 @@ public class Program implements Product {
 		return isElevated() ? runTasksElevated( reader, writer ) : runTasksNormally( reader, writer );
 	}
 
-	private List<TaskResult> runTasksElevated( Reader reader, Writer writer ) throws IOException, InterruptedException {
+	private List<TaskResult> runTasksElevated( Reader reader, Writer writer ) throws IOException {
 		String line;
 		List<TaskResult> results = new ArrayList<>();
 		NonBlockingReader buffer = new NonBlockingReader( reader );
@@ -460,6 +465,10 @@ public class Program implements Product {
 			}
 			case UpdateTask.PAUSE: {
 				task = new PauseTask( parameterList );
+				break;
+			}
+			case UpdateTask.RENAME: {
+				task = new MoveTask( parameterList );
 				break;
 			}
 			case UpdateTask.ELEVATED_PAUSE: {
