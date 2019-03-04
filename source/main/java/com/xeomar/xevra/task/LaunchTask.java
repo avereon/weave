@@ -6,6 +6,8 @@ import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class LaunchTask extends Task {
@@ -26,7 +28,16 @@ public class LaunchTask extends Task {
 	public TaskResult execute() throws Exception {
 		setMessage( message );
 
+		// Determine the working folder
+		Path workingFolder;
+		if( getParameters().size() > 0 ) {
+			workingFolder = Paths.get( getParameters().get( 0 ) ).getParent();
+		} else {
+			workingFolder = Paths.get( System.getProperty( "user.home" ) );
+		}
+
 		ProcessBuilder builder = new ProcessBuilder( getParameters() );
+		builder.directory( workingFolder.toFile() );
 		builder.redirectOutput( ProcessBuilder.Redirect.DISCARD ).redirectError( ProcessBuilder.Redirect.DISCARD );
 		builder.start();
 
