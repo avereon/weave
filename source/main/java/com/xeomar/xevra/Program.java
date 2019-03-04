@@ -311,7 +311,7 @@ public class Program implements Product {
 		List<TaskResult> results = new ArrayList<>();
 		NonBlockingReader buffer = new NonBlockingReader( reader );
 		while( !TextUtil.isEmpty( line = buffer.readLine( 1, TimeUnit.SECONDS ) ) ) {
-			AbstractUpdateTask task = parseTask( line.trim() );
+			Task task = parseTask( line.trim() );
 			try {
 				int totalSteps = task.getStepCount();
 				PrintWriter printWriter = new PrintWriter( writer );
@@ -329,7 +329,7 @@ public class Program implements Product {
 	private List<TaskResult> runTasksNormally( Reader reader, Writer writer ) throws IOException, InterruptedException {
 		String line;
 		NonBlockingReader buffer = new NonBlockingReader( reader );
-		List<AbstractUpdateTask> tasks = new ArrayList<>();
+		List<Task> tasks = new ArrayList<>();
 		while( !TextUtil.isEmpty( line = buffer.readLine( 1, TimeUnit.SECONDS ) ) ) {
 			log.trace( elevatedKey() + "parsed: " + line.trim() );
 			tasks.add( parseTask( line.trim() ) );
@@ -339,7 +339,7 @@ public class Program implements Product {
 
 		// Validate the tasks and determine the step count
 		int totalSteps = 0;
-		for( AbstractUpdateTask task : tasks ) {
+		for( Task task : tasks ) {
 			try {
 				totalSteps += task.getStepCount();
 			} catch( Exception exception ) {
@@ -353,7 +353,7 @@ public class Program implements Product {
 		int taskCompletedCount = 0;
 		PrintWriter printWriter = new PrintWriter( writer );
 		TaskHandler handler = new TaskHandler( totalSteps, printWriter );
-		for( AbstractUpdateTask task : tasks ) {
+		for( Task task : tasks ) {
 			if( !execute ) break;
 
 			if( isUi() ) task.addTaskListener( handler );
@@ -387,7 +387,7 @@ public class Program implements Product {
 		return isElevated() ? "*" : "";
 	}
 
-	private TaskResult executeTask( AbstractUpdateTask task, PrintWriter printWriter ) {
+	private TaskResult executeTask( Task task, PrintWriter printWriter ) {
 		TaskResult result;
 
 		log.debug( elevatedKey() + "Task: " + task.getOriginalLine() );
@@ -415,7 +415,7 @@ public class Program implements Product {
 		return result;
 	}
 
-	private TaskResult getTaskResult( AbstractUpdateTask task, Exception exception ) {
+	private TaskResult getTaskResult( Task task, Exception exception ) {
 		TaskResult result;
 		if( execute ) {
 			if( !TestUtil.isTest() ) log.error( elevatedKey() + "Error executing task", exception );
@@ -427,12 +427,12 @@ public class Program implements Product {
 		return result;
 	}
 
-	private AbstractUpdateTask parseTask( String line ) {
+	private Task parseTask( String line ) {
 		List<String> commands = TextUtil.split( line );
 		String command = commands.get( 0 );
 		List<String> parameterList = commands.subList( 1, commands.size() );
 
-		AbstractUpdateTask task;
+		Task task;
 		switch( command ) {
 			case UpdateTask.DELETE: {
 				task = new DeleteTask( parameterList );

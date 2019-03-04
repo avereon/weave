@@ -1,14 +1,14 @@
 package com.xeomar.xevra.task;
 
 import com.xeomar.util.TextUtil;
-import com.xeomar.xevra.AbstractUpdateTask;
+import com.xeomar.xevra.Task;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
 
 import java.util.List;
 
-public class LaunchTask extends AbstractUpdateTask {
+public class LaunchTask extends Task {
 
 	private String message;
 

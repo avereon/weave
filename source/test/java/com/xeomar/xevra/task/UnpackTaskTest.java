@@ -15,7 +15,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
-public class UnpackTaskTest extends AbstractUpdateTaskTest {
+public class UnpackTaskTest extends TaskTest {
 
 	@Test
 	public void testConstructor() {

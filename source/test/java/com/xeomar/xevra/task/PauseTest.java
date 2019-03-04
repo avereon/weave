@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class PauseTest extends AbstractUpdateTaskTest {
+public class PauseTest extends TaskTest {
 
 	@Test
 	public void testExecute() throws Exception {

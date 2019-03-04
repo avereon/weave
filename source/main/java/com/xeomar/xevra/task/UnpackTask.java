@@ -1,6 +1,6 @@
 package com.xeomar.xevra.task;
 
-import com.xeomar.xevra.AbstractUpdateTask;
+import com.xeomar.xevra.Task;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
@@ -23,7 +23,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-public class UnpackTask extends AbstractUpdateTask {
+public class UnpackTask extends Task {
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 

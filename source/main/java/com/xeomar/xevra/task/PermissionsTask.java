@@ -1,7 +1,7 @@
 package com.xeomar.xevra.task;
 
 import com.xeomar.util.LogUtil;
-import com.xeomar.xevra.AbstractUpdateTask;
+import com.xeomar.xevra.Task;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
@@ -19,7 +19,7 @@ import java.util.List;
  * <p>
  * Parameter 0: The permissions bitmask. Example: 700
  */
-public class PermissionsTask extends AbstractUpdateTask {
+public class PermissionsTask extends Task {
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 

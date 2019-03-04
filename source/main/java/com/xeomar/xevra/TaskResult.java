@@ -9,23 +9,23 @@ public class TaskResult {
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 
-	private AbstractUpdateTask task;
+	private Task task;
 
 	private TaskStatus status;
 
 	private String message;
 
-	public TaskResult( AbstractUpdateTask task, TaskStatus status ) {
+	public TaskResult( Task task, TaskStatus status ) {
 		this( task, status, null );
 	}
 
-	public TaskResult( AbstractUpdateTask task, TaskStatus status, String message ) {
+	public TaskResult( Task task, TaskStatus status, String message ) {
 		this.task = task;
 		this.status = status;
 		this.message = message;
 	}
 
-	public AbstractUpdateTask getTask() {
+	public Task getTask() {
 		return task;
 	}
 
@@ -45,7 +45,7 @@ public class TaskResult {
 		return builder.toString();
 	}
 
-	public static TaskResult parse( AbstractUpdateTask task, String format ) {
+	public static TaskResult parse( Task task, String format ) {
 		String status;
 		String command;
 		String message = "";

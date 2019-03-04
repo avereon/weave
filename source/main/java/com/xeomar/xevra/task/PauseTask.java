@@ -1,7 +1,7 @@
 package com.xeomar.xevra.task;
 
 import com.xeomar.util.LogUtil;
-import com.xeomar.xevra.AbstractUpdateTask;
+import com.xeomar.xevra.Task;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-public class PauseTask extends AbstractUpdateTask {
+public class PauseTask extends Task {
 
 	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
 

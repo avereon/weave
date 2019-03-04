@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-public abstract class AbstractUpdateTask {
+public abstract class Task {
 
 	private String command;
 
@@ -18,7 +18,7 @@ public abstract class AbstractUpdateTask {
 
 	private Set<TaskListener> listeners;
 
-	public AbstractUpdateTask( String command, List<String> parameters ) {
+	public Task( String command, List<String> parameters ) {
 		this.command = command;
 		this.parameters = parameters;
 		this.listeners = new CopyOnWriteArraySet<>();

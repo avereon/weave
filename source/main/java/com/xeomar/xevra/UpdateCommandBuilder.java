@@ -1,24 +1,25 @@
 package com.xeomar.xevra;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class UpdateCommandBuilder {
 
 	private List<List<String>> lines;
 
-	public UpdateCommandBuilder( String... commands ) {
+	public UpdateCommandBuilder() {
 		lines = new ArrayList<>();
-		line();
-		add( commands );
+		lines.add( new ArrayList<>() );
 	}
 
-	public UpdateCommandBuilder add( String... commands ) {
-		return add( Arrays.asList( commands ) );
+	public UpdateCommandBuilder add( String command, String... parameters ) {
+		return add( command, List.of( parameters ) );
 	}
 
-	public UpdateCommandBuilder add( List<String> commands ) {
+	public UpdateCommandBuilder add( String command, List<String> parameters ) {
+		List<String> commands = new ArrayList<>();
+		commands.add( command );
+		commands.addAll( parameters );
 		lines.get( lines.size() - 1 ).addAll( commands );
 		return this;
 	}

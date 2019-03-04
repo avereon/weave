@@ -1,9 +1,6 @@
 package com.xeomar.xevra.task;
 
 import com.xeomar.util.FileUtil;
-import com.xeomar.util.LogFlag;
-import com.xeomar.util.LogUtil;
-import com.xeomar.util.Parameters;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
@@ -18,7 +15,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class MoveTaskTest extends AbstractUpdateTaskTest {
+public class MoveTaskTest extends TaskTest {
 
 	@Test
 	public void testConstructor() {

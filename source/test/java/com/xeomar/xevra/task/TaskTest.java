@@ -11,7 +11,7 @@ import org.junit.Before;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-abstract class AbstractUpdateTaskTest {
+abstract class TaskTest {
 
 	protected Program program;
 

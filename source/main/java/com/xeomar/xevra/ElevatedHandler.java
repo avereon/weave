@@ -55,7 +55,7 @@ class ElevatedHandler {
 		return this;
 	}
 
-	public synchronized TaskResult execute( AbstractUpdateTask task ) throws IOException, InterruptedException, TimeoutException {
+	public synchronized TaskResult execute( Task task ) throws IOException, InterruptedException, TimeoutException {
 		waitForSocket();
 
 		task.setElevated();
@@ -64,7 +64,7 @@ class ElevatedHandler {
 		return getTaskResult( task );
 	}
 
-	private void sendTask( AbstractUpdateTask task ) throws IOException {
+	private void sendTask( Task task ) throws IOException {
 		log.debug( "Sending task commands to elevated process..." );
 		log.debug( "  commands: " + task.getOriginalLine() );
 		socket.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
@@ -73,7 +73,7 @@ class ElevatedHandler {
 		log.trace( "send > " + task.getOriginalLine() );
 	}
 
-	private TaskResult getTaskResult( AbstractUpdateTask task ) throws IOException, InterruptedException {
+	private TaskResult getTaskResult( Task task ) throws IOException, InterruptedException {
 		log.debug( "Reading task result from elevated process..." );
 
 		String line;
