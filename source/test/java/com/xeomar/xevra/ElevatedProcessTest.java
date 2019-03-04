@@ -1,6 +1,7 @@
 package com.xeomar.xevra;
 
 import com.xeomar.util.LogFlag;
+import com.xeomar.util.NonBlockingReader;
 import com.xeomar.util.OperatingSystem;
 import org.junit.After;
 import org.junit.Before;
