@@ -6,17 +6,18 @@ import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * Parameter 0 - The process working folder
+ * Parameter 1 - The executable name or path
+ * Parameter + - Parameters for the executable
+ */
 public class LaunchTask extends Task {
-
-	private String message;
 
 	public LaunchTask( List<String> parameters ) {
 		super( UpdateTask.LAUNCH, parameters );
-		this.message = "Launch " + getParameters().get( 0 );
 	}
 
 	@Override
@@ -26,18 +27,13 @@ public class LaunchTask extends Task {
 
 	@Override
 	public TaskResult execute() throws Exception {
-		setMessage( message );
+		if( getParameters().size() < 1 ) throw new Exception( "Missing working folder" );
+		if( getParameters().size() < 2 ) throw new Exception( "Missing executable" );
 
-		// Determine the working folder
-		Path workingFolder;
-		if( getParameters().size() > 0 ) {
-			workingFolder = Paths.get( getParameters().get( 0 ) ).getParent();
-		} else {
-			workingFolder = Paths.get( System.getProperty( "user.home" ) );
-		}
+		setMessage( "Launching " + getParameters().get( 1 ) );
 
-		ProcessBuilder builder = new ProcessBuilder( getParameters() );
-		builder.directory( workingFolder.toFile() );
+		ProcessBuilder builder = new ProcessBuilder( getParameters().subList( 1, getParameters().size() ) );
+		builder.directory( Paths.get( getParameters().get( 0 ) ).toFile() );
 		builder.redirectOutput( ProcessBuilder.Redirect.DISCARD ).redirectError( ProcessBuilder.Redirect.DISCARD );
 		builder.start();
 

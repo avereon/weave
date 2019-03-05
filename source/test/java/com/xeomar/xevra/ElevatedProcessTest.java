@@ -18,8 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 public class ElevatedProcessTest {
@@ -33,6 +32,8 @@ public class ElevatedProcessTest {
 	private PrintWriter writer;
 
 	private NonBlockingReader reader;
+
+	private String workingFolder = System.getProperty( "user.dir" );
 
 	@Before
 	public void setup() throws Exception {
@@ -90,9 +91,9 @@ public class ElevatedProcessTest {
 
 	@Test
 	public void testLaunchSuccess() throws Exception {
-		writer.println( UpdateTask.LAUNCH + " java" );
+		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " java" );
 		writer.flush();
-		assertThat( readNext(), is( "MESSAGE Launch java" ) );
+		assertThat( readNext(), is( "MESSAGE Launching java" ) );
 		assertThat( readNext(), is( "PROGRESS" ) );
 		assertThat( readNext(), is( "SUCCESS launch java" ) );
 		assertThat( readNext(), is( nullValue() ) );
@@ -100,17 +101,17 @@ public class ElevatedProcessTest {
 
 	@Test
 	public void testLaunchFailure() throws Exception {
-		writer.println( UpdateTask.LAUNCH + " invalid" );
+		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " invalid" );
 		writer.flush();
-		assertThat( readNext(), is( "MESSAGE Launch invalid" ) );
-		assertThat( readNext(), is( "FAILURE launch IOException: Cannot run program \"invalid\": error=2, No such file or directory" ) );
+		assertThat( readNext(), is( "MESSAGE Launching invalid" ) );
+		assertThat( readNext(), startsWith( "FAILURE launch IOException: Cannot run program \"invalid\"" ) );
 		assertThat( readNext(), is( nullValue() ) );
 	}
 
 	private String readNext() throws IOException {
 		String line;
-		while( ( line = reader.readLine( wait, TimeUnit.MILLISECONDS ) ) != null ) {
-			if( !line.startsWith( ElevatedHandler.LOG )) return line;
+		while( (line = reader.readLine( wait, TimeUnit.MILLISECONDS )) != null ) {
+			if( !line.startsWith( ElevatedHandler.LOG ) ) return line;
 		}
 		return null;
 	}
