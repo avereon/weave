@@ -451,6 +451,10 @@ public class Program implements Product {
 				task = new ElevatedEchoTask( parameterList );
 				break;
 			}
+			case UpdateTask.EXECUTE: {
+				task = new ExecuteTask( parameterList );
+				break;
+			}
 			case UpdateTask.LAUNCH: {
 				task = new LaunchTask( parameterList );
 				break;
