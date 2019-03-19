@@ -3,7 +3,6 @@ module com.xeomar.xevra {
 	requires java.logging;
 	requires javafx.controls;
 	requires com.xeomar.zenna;
-	requires org.apache.commons.io;
 	requires org.slf4j;
 
 	exports com.xeomar.xevra;

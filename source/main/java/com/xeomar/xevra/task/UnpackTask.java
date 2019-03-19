@@ -1,20 +1,23 @@
 package com.xeomar.xevra.task;
 
+import com.xeomar.util.FileUtil;
+import com.xeomar.util.HashUtil;
+import com.xeomar.util.IoUtil;
+import com.xeomar.util.LogUtil;
 import com.xeomar.xevra.Task;
 import com.xeomar.xevra.TaskResult;
 import com.xeomar.xevra.TaskStatus;
 import com.xeomar.xevra.UpdateTask;
-import com.xeomar.util.FileUtil;
-import com.xeomar.util.HashUtil;
-import com.xeomar.util.LogUtil;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,7 +124,7 @@ public class UnpackTask extends Task {
 			if( Files.exists( file ) ) Files.move( file, delFile, StandardCopyOption.ATOMIC_MOVE );
 			Files.createDirectories( file.getParent() );
 			try( FileOutputStream output = new FileOutputStream( addFile.toFile() ) ) {
-				IOUtils.copy( input, output );
+				IoUtil.copy( input, output );
 			}
 		}
 
