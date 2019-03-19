@@ -58,12 +58,14 @@
 			<groupId>com.xeomar</groupId>
 			<artifactId>zenna</artifactId>
 			<version>0.1-SNAPSHOT</version>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
 			<version>${javafx.version}</version>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -76,4 +78,3 @@
 	</dependencies>
 
 </project>
-
