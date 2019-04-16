@@ -1,10 +1,10 @@
 import com.xeomar.zenna.Program;
 
-module com.xeomar.xevra {
+module com.xeomar.zenna {
 
 	requires java.logging;
 	requires javafx.controls;
-	requires com.xeomar.zenna;
+	requires com.xeomar.zevra;
 	requires org.slf4j;
 
 	exports com.xeomar.zenna;
