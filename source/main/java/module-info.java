@@ -1,3 +1,5 @@
+import com.xeomar.zenna.Program;
+
 module com.xeomar.xevra {
 
 	requires java.logging;
@@ -5,8 +7,8 @@ module com.xeomar.xevra {
 	requires com.xeomar.zenna;
 	requires org.slf4j;
 
-	exports com.xeomar.xevra;
+	exports com.xeomar.zenna;
 
-	provides com.xeomar.product.Product with com.xeomar.xevra.Program;
+	provides com.xeomar.product.Product with Program;
 
 }
