@@ -5,12 +5,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.xeomar.pom</groupId>
+		<groupId>com.avereon.pom</groupId>
 		<artifactId>prd</artifactId>
 		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>com.xeomar</groupId>
+	<groupId>com.avereon</groupId>
 	<artifactId>zenna</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -31,15 +31,15 @@
 
 	<repositories>
 		<repository>
-			<id>xeo</id>
-			<url>https://repo.xeomar.com/xeo</url>
+			<id>avn</id>
+			<url>https://repo.avereon.com/avn</url>
 		</repository>
 	</repositories>
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>xeo</id>
-			<url>https://repo.xeomar.com/xeo</url>
+			<id>avn</id>
+			<url>https://repo.avereon.com/avn</url>
 		</pluginRepository>
 	</pluginRepositories>
 
@@ -47,15 +47,13 @@
 		<!-- Runtime dependencies -->
 		<!--java.version defined in parent pom -->
 		<javafx.version>11</javafx.version>
-		<controlsfx.version>8.40.14</controlsfx.version>
-		<commonsio.version>2.6</commonsio.version>
 		<slf4j.version>1.8.0-beta2</slf4j.version>
 	</properties>
 
 	<dependencies>
 
 		<dependency>
-			<groupId>com.xeomar</groupId>
+			<groupId>com.avereon</groupId>
 			<artifactId>zevra</artifactId>
 			<version>0.1-SNAPSHOT</version>
 			<optional>true</optional>

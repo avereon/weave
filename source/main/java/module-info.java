@@ -1,14 +1,14 @@
-import com.xeomar.zenna.Program;
+import com.avereon.zenna.Program;
 
-module com.xeomar.zenna {
+module com.avereon.zenna {
 
 	requires java.logging;
 	requires javafx.controls;
-	requires com.xeomar.zevra;
+	requires com.avereon.zevra;
 	requires org.slf4j;
 
-	exports com.xeomar.zenna;
+	exports com.avereon.zenna;
 
-	provides com.xeomar.product.Product with Program;
+	provides com.avereon.product.Product with Program;
 
 }
