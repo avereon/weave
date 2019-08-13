@@ -4,11 +4,13 @@ cache:
   directories:
     - $HOME/.m2
 
-install:
-  - sudo apt install xvfb
-  - Xvfb :2 &
+before_install:
+  - source install-jdk.sh --url 'https://api.adoptopenjdk.net/v2/binary/releases/openjdk11?openjdk_impl=hotspot&os=linux&arch=x64&release=latest&heap_size=normal&type=jdk'
+  - cp .travis/settings.xml $HOME/.m2/settings.xml
+  - export DISPLAY=:0
+  - Xvfb $DISPLAY &
 
 deploy:
   provider: script
   skip_cleanup: true
-  script: mvn --settings .travis/settings.xml -DskipTests=true -Dmaven.javadoc.skip=true -B -V deploy
+  script: mvn -DskipTests=true -Dmaven.javadoc.skip=true -B -V deploy
