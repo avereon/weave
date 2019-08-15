@@ -2,9 +2,25 @@
 
 # Zenna ![alt text][build-status]
 
-A program to apply pre-defined changes. This program is commonly used with other
-programs to automate the update process. If specified, it has a simple UI that 
-can be used to provide user feedback.
+A Java program to apply update. This program is commonly used with other 
+programs to automate the update process. It has pre-defined tasks that can be 
+specified via stream or file to apply the updates. If any task requires elevated
+privileges the user is prompted for proper credentials. If specified, it has a 
+simple UI that can be used to provide user feedback regarding the progress.
+
+## Tasks
+There are several pre-defined tasks that can be specified.
+
+| Task | Description |
+| --- | --- |
+| Move | Move a file or folder |
+| Delete | Delete a file or folder |
+| Unpack | Unpack a zip (or jar) file |
+| Permissions | Change file permissions on a file or folder |
+| Execute | Run a program and wait for it to complete |
+| Launch | Asynchronously run a program |
+| Pause | Show a message and pause for an amount of time |
+| Echo | Output a message to the log file |
 
 # Demonstration
 To run a demonstration of the program use the following command line parameters:
