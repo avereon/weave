@@ -151,7 +151,7 @@ public class Program implements Product {
 		}
 
 		executeThread = new Thread( new Runner() );
-		executeThread.setName( "Annex execute thread" );
+		executeThread.setName( "Zenna execute thread" );
 		executeThread.start();
 	}
 
