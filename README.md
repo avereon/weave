@@ -1,4 +1,4 @@
-[build-status]: https://travis-ci.org/avereon/zenna.svg?branch=master "Build status"
+[build-status]: https://github.com/avereon/zenna/workflows/Avereon%20Zenna%20CI/badge.svg "Build status"
 
 # Zenna ![alt text][build-status]
 
