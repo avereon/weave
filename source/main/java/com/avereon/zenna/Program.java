@@ -140,10 +140,10 @@ public class Program implements Product {
 			inputSource = InputSource.STRING;
 		} else {
 			if( stdin & file ) {
-				log.error( "Cannot use both --stream and --file parameters at the same time" );
+				log.error( "Cannot use both --" + InputSource.STDIN + " and --" + InputSource.FILE + " parameters at the same time" );
 				return;
 			} else if( !(stdin | file) ) {
-				log.error( "Must use either --stream or --file to provide update commands" );
+				log.error( "Must use either --" + InputSource.STDIN + " or --" + InputSource.FILE + " to provide update commands" );
 				return;
 			}
 			if( stdin ) inputSource = InputSource.STDIN;
@@ -156,7 +156,7 @@ public class Program implements Product {
 	}
 
 	@SuppressWarnings( "SameParameterValue" )
-	synchronized void waitForStart( long time, TimeUnit unit) throws InterruptedException, TimeoutException {
+	synchronized void waitForStart( long time, TimeUnit unit ) throws InterruptedException, TimeoutException {
 		while( status != Status.STARTED ) {
 			wait( unit.toMillis( time ) );
 			if( status != Status.STARTED ) throw new TimeoutException( "Timeout waiting for program to start" );
