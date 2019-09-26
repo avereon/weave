@@ -1,7 +1,5 @@
 package com.avereon.zenna;
 
-import com.avereon.util.OperatingSystem;
-
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -24,7 +22,6 @@ public abstract class Task {
 		this.command = command;
 		this.parameters = parameters;
 		this.listeners = new CopyOnWriteArraySet<>();
-		if( OperatingSystem.isMac() ) System.setProperty( "jdk.lang.Process.launchMechanism", "FORK" );
 	}
 
 	public String getCommand() {
