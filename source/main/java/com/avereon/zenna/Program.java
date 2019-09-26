@@ -124,7 +124,7 @@ public class Program implements Product {
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
 
-		log.info( elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "") );
+		log.info( elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "[NORMAL]") );
 		log.info( elevatedKey() + "Parameters: " + parameters );
 		log.debug( elevatedKey() + "Command line: " + ProcessCommands.getCommandLineAsString() );
 		log.debug( elevatedKey() + "Log: " + LogUtil.getLogFile() );
