@@ -145,7 +145,7 @@ class ElevatedHandler {
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
 		log.debug( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
-		processBuilder.inheritIO();
+
 		Process process = processBuilder.start();
 		new ProcessWatcherThread( process ).start();
 	}
@@ -170,6 +170,7 @@ class ElevatedHandler {
 					peer = server.accept();
 					reader = new NonBlockingReader( peer.getInputStream() );
 					if( reader.readLine( 100, TimeUnit.MILLISECONDS ).equals( secret ) ) {
+						log.debug( "Elevated client connected to normal client: " + server.getLocalPort() );
 						setSocket( peer );
 						server.close();
 					}
@@ -196,6 +197,7 @@ class ElevatedHandler {
 			try {
 				process.waitFor();
 				exitValue = process.exitValue();
+				log.debug( "Elevated process finished" );
 				if( exitValue != 0 ) throw new IllegalStateException( "Elevated process failed: " + exitValue );
 			} catch( Exception exception ) {
 				throwable = exception;
