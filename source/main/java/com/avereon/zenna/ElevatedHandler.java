@@ -145,7 +145,7 @@ class ElevatedHandler {
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
 		log.debug( "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
-		processBuilder.inheritIO();
+
 		Process process = processBuilder.start();
 		new ProcessWatcherThread( process ).start();
 	}
