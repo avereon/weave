@@ -46,8 +46,8 @@
 	<properties>
 		<!-- Runtime dependencies -->
 		<!--java.version defined in parent pom -->
-		<javafx.version>11</javafx.version>
-		<slf4j.version>1.8.0-beta2</slf4j.version>
+		<javafx.version>13</javafx.version>
+		<slf4j.version>1.8.0-beta4</slf4j.version>
 	</properties>
 
 	<dependencies>
@@ -63,7 +63,6 @@
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
 			<version>${javafx.version}</version>
-			<optional>true</optional>
 		</dependency>
 
 		<dependency>
