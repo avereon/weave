@@ -2,11 +2,11 @@
 
 # Zenna ![alt text][build-status]
 
-A Java program to apply update. This program is commonly used with other 
+A Java program to apply updates. This program is commonly used with other 
 programs to automate the update process. It has pre-defined tasks that can be 
-specified via stream or file to apply the updates. If any task requires elevated
-privileges the user is prompted for proper credentials. If specified, it has a 
-simple UI that can be used to provide user feedback regarding the progress.
+specified via stdin or file. If any task requires elevated privileges the user 
+is prompted for proper credentials. If specified, it has a simple UI that can 
+be used to provide user feedback regarding the progress.
 
 ## Tasks
 There are several pre-defined tasks that can be specified.
@@ -25,5 +25,5 @@ There are several pre-defined tasks that can be specified.
 # Demonstration
 To run a demonstration of the program use the following command line parameters:
     
-    --title "Zenna Test" --file source/test/resources/commands.txt
+    java -jar zenna.jar --title "Zenna Test" --file source/test/resources/commands.txt
 
