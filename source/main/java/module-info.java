@@ -9,6 +9,9 @@ module com.avereon.zenna {
 
 	exports com.avereon.zenna;
 
+	// For testing
+	opens com.avereon.zenna.task;
+
 	provides com.avereon.product.Product with Program;
 
 }

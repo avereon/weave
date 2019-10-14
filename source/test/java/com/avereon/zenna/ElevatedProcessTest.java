@@ -3,9 +3,9 @@ package com.avereon.zenna;
 import com.avereon.util.LogFlag;
 import com.avereon.util.NonBlockingReader;
 import com.avereon.util.OperatingSystem;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,8 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
 
 public class ElevatedProcessTest {
 
@@ -35,7 +35,7 @@ public class ElevatedProcessTest {
 
 	private String workingFolder = System.getProperty( "user.dir" );
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		// Convince the OperatingSystem class that the process is elevated
 		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
@@ -63,7 +63,7 @@ public class ElevatedProcessTest {
 		assertThat( elevated.getStatus(), is( Program.Status.STARTED ) );
 	}
 
-	@After
+	@AfterEach
 	public void shutdown() throws Exception {
 		elevated.stop();
 		elevated.waitForStop( 1, TimeUnit.SECONDS );

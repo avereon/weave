@@ -4,7 +4,7 @@ import com.avereon.util.*;
 import com.avereon.zenna.TaskResult;
 import com.avereon.zenna.TaskStatus;
 import com.avereon.zenna.UpdateTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,8 +12,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
 
 public class UnpackTaskTest extends TaskTest {
 
