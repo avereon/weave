@@ -4,12 +4,13 @@ import com.avereon.product.ProductCard;
 import com.avereon.util.LogFlag;
 import com.avereon.util.LogUtil;
 import com.avereon.util.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.io.*;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
 
 public class ProgramTest {
 
@@ -21,7 +22,8 @@ public class ProgramTest {
 		assertThat( card, not( is( nullValue() ) ) );
 	}
 
-	@Test( timeout = 2000 )
+	@Test
+	@Timeout( 2 )
 	public void testReadCommandsFromStdin() throws IOException {
 		InputStream originalInput = System.in;
 		PrintStream originalOutput = System.out;
@@ -31,6 +33,7 @@ public class ProgramTest {
 
 		System.setIn( new PipedInputStream( inputPipe ) );
 		System.setOut( new PrintStream( new PipedOutputStream( outputPipe ) ) );
+
 		try {
 			new Thread( () -> {
 				try {
@@ -43,6 +46,7 @@ public class ProgramTest {
 			inputPipe.write( "pause 130\n".getBytes( CHARSET ) );
 			inputPipe.write( "pause 170\n".getBytes( CHARSET ) );
 			inputPipe.close();
+
 			String result1 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
 			assertThat( result1, is( "SUCCESS pause paused 130ms" ) );
 			String result2 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
@@ -54,7 +58,8 @@ public class ProgramTest {
 		}
 	}
 
-	@Test( timeout = 2000 )
+	@Test
+	@Timeout( 2 )
 	public void testReadCommandsFromBytes() throws IOException {
 		PipedReader outputPipe = new PipedReader();
 		PipedWriter inputPipe = new PipedWriter();
@@ -78,7 +83,6 @@ public class ProgramTest {
 
 		String result1 = new BufferedReader( outputPipe ).readLine();
 		assertThat( result1, is( "SUCCESS pause paused 170ms" ) );
-
 		String result2 = new BufferedReader( outputPipe ).readLine();
 		assertThat( result2, is( "SUCCESS pause paused 190ms" ) );
 	}

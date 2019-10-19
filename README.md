@@ -1,6 +1,6 @@
 [build-status]: https://github.com/avereon/zenna/workflows/Avereon%20Zenna%20CI/badge.svg "Build status"
 
-# Zenna ![alt text][build-status]
+# Zenna [![][build-status]](https://github.com/avereon/zenna/actions)
 
 A Java program to apply updates. This program is commonly used with other 
 programs to automate the update process. It has pre-defined tasks that can be 
