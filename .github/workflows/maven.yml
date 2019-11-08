@@ -20,4 +20,4 @@ jobs:
           AVN_REPO_PASSWORD: ${{ secrets.AVN_REPO_PASSWORD }}
         run: |
           gpg --quiet --batch --yes --decrypt --passphrase=$AVN_GPG_PASSWORD --output .github/avereon.keystore .github/avereon.keystore.gpg
-          mvn javadoc:jar deploy -B -U -V --settings .github/settings.xml --file pom.xml
+          mvn deploy -B -U -V --settings .github/settings.xml --file pom.xml
