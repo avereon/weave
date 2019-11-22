@@ -21,3 +21,4 @@ jobs:
         run: |
           gpg --quiet --batch --yes --decrypt --passphrase=$AVN_GPG_PASSWORD --output .github/avereon.keystore .github/avereon.keystore.gpg
           mvn deploy -B -U -V --settings .github/settings.xml --file pom.xml
+          .github/workflows/deploy.sh
