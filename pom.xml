@@ -90,17 +90,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<failOnError>false</failOnError>
-						</configuration>
-					</execution>
-				</executions>
+				<configuration>
+					<links>
+						<link>https://www.avereon.com/product/zevra/docs/api</link>
+					</links>
+					<failOnError>false</failOnError>
+				</configuration>
 			</plugin>
 
 		</plugins>
