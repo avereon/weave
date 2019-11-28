@@ -88,7 +88,7 @@ public class Program implements Product {
 	}
 
 	@Override
-	public ProductBundle getResourceBundle() {
+	public ProductBundle rb() {
 		return resourceBundle;
 	}
 
