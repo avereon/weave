@@ -27,7 +27,7 @@ public class DeleteTask extends Task {
 
 	@Override
 	public boolean needsElevation() {
-		return !Files.isWritable( Paths.get( getParameters().get( 0 ) ) );
+		return Files.exists( target ) && !Files.isWritable( target );
 	}
 
 	@Override
