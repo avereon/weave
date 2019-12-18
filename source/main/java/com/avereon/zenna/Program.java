@@ -69,7 +69,7 @@ public class Program implements Product {
 			throw new RuntimeException( "Error loading product card", exception );
 		}
 		this.title = card.getName();
-		this.resourceBundle = new ProductBundle( getClass() );
+		this.resourceBundle = new ProductBundle( this );
 		this.programDataFolder = OperatingSystem.getUserProgramDataFolder( card.getArtifact(), card.getName() );
 	}
 
