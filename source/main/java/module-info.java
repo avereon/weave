@@ -4,7 +4,8 @@ module com.avereon.zenna {
 
 	requires static java.logging;
 	requires javafx.controls;
-	requires com.avereon.zevra;
+	requires transitive com.avereon.zevra;
+	requires transitive com.avereon.rossa;
 
 	exports com.avereon.zenna;
 

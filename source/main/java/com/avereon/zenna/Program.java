@@ -3,11 +3,14 @@ package com.avereon.zenna;
 import com.avereon.product.Product;
 import com.avereon.product.ProductBundle;
 import com.avereon.product.ProductCard;
+import com.avereon.rossa.icon.UpdateIcon;
 import com.avereon.util.*;
+import com.avereon.venza.image.Images;
 import com.avereon.zenna.task.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 
 import javax.net.SocketFactory;
@@ -250,6 +253,9 @@ public class Program implements Product {
 			alert.setTitle( parameters.get( UpdateFlag.TITLE ) );
 			alert.setHeaderText( "Performing update" );
 			alert.getDialogPane().setContent( progressPane );
+
+			Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+			stage.getIcons().addAll( Images.getStageIcons( new UpdateIcon() ) );
 
 			// The following line is a workaround to dialogs showing with zero size on Linux
 			alert.setResizable( true );
