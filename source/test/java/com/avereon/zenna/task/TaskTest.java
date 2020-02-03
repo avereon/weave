@@ -1,7 +1,7 @@
 package com.avereon.zenna.task;
 
 import com.avereon.util.LogFlag;
-import com.avereon.util.LogUtil;
+import com.avereon.util.Log;
 import com.avereon.util.Parameters;
 import com.avereon.zenna.Program;
 import com.avereon.zenna.TaskResult;
@@ -18,7 +18,7 @@ abstract class TaskTest {
 	@BeforeEach
 	public void setup() {
 		this.program = new Program();
-		LogUtil.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "none" ) );
+		Log.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "none" ) );
 	}
 
 	void assertTaskResult( TaskResult result, TaskStatus status ) {

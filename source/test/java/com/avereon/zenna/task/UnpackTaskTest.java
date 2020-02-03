@@ -101,7 +101,7 @@ public class UnpackTaskTest extends TaskTest {
 
 	@Test
 	public void testInvalidSource() throws Exception {
-		LogUtil.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "info" ) );
+		Log.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "info" ) );
 		String source = "invalidsource";
 		String target = "invalidtarget";
 		List<TaskResult> results =  program.runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );

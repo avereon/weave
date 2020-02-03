@@ -34,7 +34,7 @@ public class Program implements Product {
 		STOPPING
 	}
 
-	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
+	private static final Logger log = Log.get( MethodHandles.lookup().lookupClass() );
 
 	private Status status;
 
@@ -122,7 +122,7 @@ public class Program implements Product {
 		parameters = Parameters.parse( commands );
 
 		// Configure logging
-		LogUtil.configureLogging( this, parameters );
+		Log.configureLogging( this, parameters );
 
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
@@ -130,7 +130,7 @@ public class Program implements Product {
 		log.info( elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "[NORMAL]") );
 		log.info( elevatedKey() + "Parameters: " + parameters );
 		log.debug( elevatedKey() + "Command line: " + ProcessCommands.getCommandLineAsString() );
-		log.debug( elevatedKey() + "Log: " + LogUtil.getLogFile() );
+		log.debug( elevatedKey() + "Log: " + Log.getLogFile() );
 
 		boolean file = parameters.isSet( UpdateFlag.FILE );
 		boolean stdin = parameters.isSet( UpdateFlag.STDIN );

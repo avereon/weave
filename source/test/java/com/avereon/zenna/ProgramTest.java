@@ -2,7 +2,7 @@ package com.avereon.zenna;
 
 import com.avereon.product.ProductCard;
 import com.avereon.util.LogFlag;
-import com.avereon.util.LogUtil;
+import com.avereon.util.Log;
 import com.avereon.util.Parameters;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -70,7 +70,7 @@ public class ProgramTest {
 		new Thread( () -> {
 			try {
 				Program program = new Program();
-				LogUtil.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "none" ) );
+				Log.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "none" ) );
 				program.runTasksFromReader( reader, writer );
 			} catch( Exception exception ) {
 				exception.printStackTrace( System.err );

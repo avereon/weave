@@ -3,7 +3,7 @@ package com.avereon.zenna.task;
 import com.avereon.util.FileUtil;
 import com.avereon.util.HashUtil;
 import com.avereon.util.IoUtil;
-import com.avereon.util.LogUtil;
+import com.avereon.util.Log;
 import com.avereon.zenna.Task;
 import com.avereon.zenna.TaskResult;
 import com.avereon.zenna.TaskStatus;
@@ -28,7 +28,7 @@ import java.util.zip.ZipFile;
 
 public class UnpackTask extends Task {
 
-	private static final Logger log = LogUtil.get( MethodHandles.lookup().lookupClass() );
+	private static final Logger log = Log.get( MethodHandles.lookup().lookupClass() );
 
 	private static final String DEL_SUFFIX = ".del";
 
