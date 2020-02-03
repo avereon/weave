@@ -11,11 +11,10 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
-import org.slf4j.Logger;
 
 import javax.net.SocketFactory;
 import java.io.*;
-import java.lang.invoke.MethodHandles;
+import java.lang.System.Logger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Path;
@@ -34,7 +33,7 @@ public class Program implements Product {
 		STOPPING
 	}
 
-	private static final Logger log = Log.get( MethodHandles.lookup().lookupClass() );
+	private static final Logger log = Log.log();
 
 	private Status status;
 
@@ -127,10 +126,10 @@ public class Program implements Product {
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
 
-		log.info( elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "[NORMAL]") );
-		log.info( elevatedKey() + "Parameters: " + parameters );
-		log.debug( elevatedKey() + "Command line: " + ProcessCommands.getCommandLineAsString() );
-		log.debug( elevatedKey() + "Log: " + Log.getLogFile() );
+		log.log( Log.INFO, elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "[NORMAL]") );
+		log.log( Log.INFO, elevatedKey() + "Parameters: " + parameters );
+		log.log( Log.DEBUG, elevatedKey() + "Command line: " + ProcessCommands.getCommandLineAsString() );
+		log.log( Log.DEBUG, elevatedKey() + "Log: " + Log.getLogFile() );
 
 		boolean file = parameters.isSet( UpdateFlag.FILE );
 		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
@@ -143,10 +142,10 @@ public class Program implements Product {
 			inputSource = InputSource.STRING;
 		} else {
 			if( stdin & file ) {
-				log.error( "Cannot use both --" + InputSource.STDIN + " and --" + InputSource.FILE + " parameters at the same time" );
+				log.log( Log.ERROR, "Cannot use both --" + InputSource.STDIN + " and --" + InputSource.FILE + " parameters at the same time" );
 				return;
 			} else if( !(stdin | file) ) {
-				log.error( "Must use either --" + InputSource.STDIN + " or --" + InputSource.FILE + " to provide update commands" );
+				log.log( Log.ERROR, "Must use either --" + InputSource.STDIN + " or --" + InputSource.FILE + " to provide update commands" );
 				return;
 			}
 			if( stdin ) inputSource = InputSource.STDIN;
@@ -197,14 +196,14 @@ public class Program implements Product {
 				execute();
 			} catch( Throwable throwable ) {
 				throwable.printStackTrace( System.err );
-				log.error( elevatedKey() + "Execution error", throwable );
+				log.log( Log.ERROR, elevatedKey() + "Execution error", throwable );
 			} finally {
 				if( isUi() ) hideProgressDialog();
 				synchronized( Program.this ) {
 					status = Status.STOPPED;
 					Program.this.notifyAll();
 				}
-				log.info( elevatedKey() + card.getName() + " finished" );
+				log.log( Log.INFO, elevatedKey() + card.getName() + " finished" );
 			}
 		}
 
@@ -342,7 +341,7 @@ public class Program implements Product {
 		NonBlockingReader buffer = new NonBlockingReader( reader );
 		List<Task> tasks = new ArrayList<>();
 		while( !TextUtil.isEmpty( line = buffer.readLine( 1, TimeUnit.SECONDS ) ) ) {
-			log.trace( elevatedKey() + "parsed: " + line.trim() );
+			log.log( Log.TRACE, elevatedKey() + "parsed: " + line.trim() );
 			tasks.add( parseTask( line.trim() ) );
 		}
 
@@ -386,7 +385,7 @@ public class Program implements Product {
 		}
 
 		synchronized( waitLock ) {
-			log.debug( elevatedKey() + "Tasks completed: " + taskCompletedCount );
+			log.log( Log.DEBUG, elevatedKey() + "Tasks completed: " + taskCompletedCount );
 			execute = false;
 			waitLock.notifyAll();
 		}
@@ -401,12 +400,12 @@ public class Program implements Product {
 	private TaskResult executeTask( Task task, PrintWriter printWriter ) {
 		TaskResult result;
 
-		log.debug( elevatedKey() + "Task: " + task.getOriginalLine() );
+		log.log( Log.DEBUG, elevatedKey() + "Task: " + task.getOriginalLine() );
 
 		try {
 			task.validate();
 
-			log.trace( elevatedKey() + "Task needs elevation?: " + task.needsElevation() );
+			log.log( Log.TRACE, elevatedKey() + "Task needs elevation?: " + task.needsElevation() );
 			if( !isElevated() && task.needsElevation() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
 				result = elevatedHandler.execute( task );
@@ -415,13 +414,13 @@ public class Program implements Product {
 			}
 		} catch( Exception exception ) {
 			result = getTaskResult( task, exception );
-			log.warn( "", exception );
+			log.log( Log.WARN, "", exception );
 		}
 
 		printWriter.println( result.format() );
 		printWriter.flush();
 
-		log.info( elevatedKey() + "Result: " + result );
+		log.log( Log.INFO, elevatedKey() + "Result: " + result );
 
 		return result;
 	}
@@ -429,7 +428,7 @@ public class Program implements Product {
 	private TaskResult getTaskResult( Task task, Exception exception ) {
 		TaskResult result;
 		if( execute ) {
-			if( !TestUtil.isTest() ) log.error( elevatedKey() + "Error executing task", exception );
+			if( !TestUtil.isTest() ) log.log( Log.ERROR, elevatedKey() + "Error executing task", exception );
 			String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
 			result = new TaskResult( task, TaskStatus.FAILURE, message );
 		} else {

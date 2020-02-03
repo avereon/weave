@@ -5,14 +5,13 @@ import com.avereon.zenna.Task;
 import com.avereon.zenna.TaskResult;
 import com.avereon.zenna.TaskStatus;
 import com.avereon.zenna.UpdateTask;
-import org.slf4j.Logger;
 
-import java.lang.invoke.MethodHandles;
+import java.lang.System.Logger;
 import java.util.List;
 
 public class PauseTask extends Task {
 
-	private static final Logger log = Log.get( MethodHandles.lookup().lookupClass() );
+	private static final Logger log = Log.log();
 
 	// The number of milliseconds per increment
 	private static long increment = 100;

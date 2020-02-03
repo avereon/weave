@@ -1,14 +1,13 @@
 package com.avereon.zenna;
 
 import com.avereon.util.Log;
-import org.slf4j.Logger;
 
-import java.lang.invoke.MethodHandles;
+import java.lang.System.Logger;
 
 public class TaskResult {
 
 	@SuppressWarnings( "unused" )
-	private static final Logger log = Log.get( MethodHandles.lookup().lookupClass() );
+	private static final Logger log = Log.log();
 
 	private Task task;
 
@@ -54,8 +53,8 @@ public class TaskResult {
 		String string = format.trim();
 
 		String[] elements = string.split( " " );
-		status = elements[0];
-		command = elements[1];
+		status = elements[ 0 ];
+		command = elements[ 1 ];
 
 		// Parse message
 		int index = string.indexOf( command ) + command.length() + 1;
@@ -67,7 +66,7 @@ public class TaskResult {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		if( task.isElevated() ) builder.append( "*");
+		if( task.isElevated() ) builder.append( "*" );
 		builder.append( format() );
 		return builder.toString();
 	}

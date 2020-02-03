@@ -5,9 +5,8 @@ import com.avereon.zenna.Task;
 import com.avereon.zenna.TaskResult;
 import com.avereon.zenna.TaskStatus;
 import com.avereon.zenna.UpdateTask;
-import org.slf4j.Logger;
 
-import java.lang.invoke.MethodHandles;
+import java.lang.System.Logger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,7 +20,7 @@ import java.util.List;
  */
 public class PermissionsTask extends Task {
 
-	private static final Logger log = Log.get( MethodHandles.lookup().lookupClass() );
+	private static final Logger log = Log.log();
 
 	public PermissionsTask( List<String> parameters ) {
 		super( UpdateTask.PERMISSIONS, parameters );
@@ -72,7 +71,7 @@ public class PermissionsTask extends Task {
 
 			// Skip missing files
 			if( !Files.exists( file ) ) continue;
-			log.debug( "Setting permission on: " + file );
+			log.log( Log.DEBUG, "Setting permission on: " + file );
 
 			boolean read = file.toFile().setReadable( userRead, worldRead );
 			boolean write = file.toFile().setWritable( userWrite, worldWrite );
