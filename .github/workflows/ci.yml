@@ -85,18 +85,18 @@ jobs:
           ssh -t ${{env.AVN_REPO_USERNAME}}@avereon.com "mkdir -p ${{env.JAVADOC_TARGET_PATH}};rm -rf ${{env.JAVADOC_TARGET_PATH}}/*;unzip -o ${{env.JAVADOC_DEPLOY_PATH}}/javadoc.jar -d ${{env.JAVADOC_TARGET_PATH}}"
           if [ $? -ne 0 ]; then exit 1; fi
 
-      - name: Build Assemblies
-        run: |
-          mvn ${{env.MAVEN_PARMS}} verify -P testui,platform-agnostic-assemblies
-
-      - name: Deploy Product Pack
-        run: |
-          scp -B target/*product.jar ${{env.AVN_REPO_USERNAME}}@avereon.com:${PRODUCT_DEPLOY_PATH} 2>&1
-
-      - name: Deploy Product Icon
-        run: |
-          scp -B target/main/images/*product.png ${{env.AVN_REPO_USERNAME}}@avereon.com:${PRODUCT_DEPLOY_PATH} 2>&1
-
-      - name: Deploy Product Card
-        run: |
-          scp -B target/main/java/META-INF/*.card ${{env.AVN_REPO_USERNAME}}@avereon.com:${PRODUCT_DEPLOY_PATH} 2>&1
+#      - name: Build Assemblies
+#        run: |
+#          mvn ${{env.MAVEN_PARMS}} verify -P testui,platform-agnostic-assemblies
+#
+#      - name: Deploy Product Pack
+#        run: |
+#          scp -B target/*product.jar ${{env.AVN_REPO_USERNAME}}@avereon.com:${PRODUCT_DEPLOY_PATH} 2>&1
+#
+#      - name: Deploy Product Icon
+#        run: |
+#          scp -B target/main/images/*product.png ${{env.AVN_REPO_USERNAME}}@avereon.com:${PRODUCT_DEPLOY_PATH} 2>&1
+#
+#      - name: Deploy Product Card
+#        run: |
+#          scp -B target/main/java/META-INF/*.card ${{env.AVN_REPO_USERNAME}}@avereon.com:${PRODUCT_DEPLOY_PATH} 2>&1
