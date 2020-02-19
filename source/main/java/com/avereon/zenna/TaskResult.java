@@ -7,7 +7,7 @@ import java.lang.System.Logger;
 public class TaskResult {
 
 	@SuppressWarnings( "unused" )
-	private static final Logger log = Log.log();
+	private static final Logger log = Log.get();
 
 	private Task task;
 

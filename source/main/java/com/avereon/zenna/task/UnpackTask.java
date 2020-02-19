@@ -27,7 +27,7 @@ import java.util.zip.ZipFile;
 
 public class UnpackTask extends Task {
 
-	private static final Logger log = Log.log();
+	private static final Logger log = Log.get();
 
 	private static final String DEL_SUFFIX = ".del";
 

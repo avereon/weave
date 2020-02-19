@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class PermissionsTask extends Task {
 
-	private static final Logger log = Log.log();
+	private static final Logger log = Log.get();
 
 	public PermissionsTask( List<String> parameters ) {
 		super( UpdateTask.PERMISSIONS, parameters );

@@ -14,7 +14,7 @@ import java.util.concurrent.TimeoutException;
 
 class ElevatedHandler {
 
-	private static final Logger log = Log.log();
+	private static final Logger log = Log.get();
 
 	static final String CALLBACK_SECRET = "--callback-secret";
 
