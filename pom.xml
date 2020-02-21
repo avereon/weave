@@ -50,8 +50,7 @@
 		<!-- Version numbers updated 02 Oct 2019 -->
 		<!-- Runtime dependencies -->
 		<!--java.version defined in parent pom -->
-		<javafx.version>13</javafx.version>
-		<slf4j.version>1.8.0-beta4</slf4j.version>
+		<openjfx.version>13</openjfx.version>
 	</properties>
 
 	<dependencies>
@@ -73,7 +72,7 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
-			<version>${javafx.version}</version>
+			<version>${openjfx.version}</version>
 		</dependency>
 
 	</dependencies>

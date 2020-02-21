@@ -11,7 +11,7 @@ import java.util.List;
 
 public class PauseTask extends Task {
 
-	private static final Logger log = Log.log();
+	private static final Logger log = Log.get();
 
 	// The number of milliseconds per increment
 	private static long increment = 100;

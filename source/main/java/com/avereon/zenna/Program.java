@@ -33,7 +33,7 @@ public class Program implements Product {
 		STOPPING
 	}
 
-	private static final Logger log = Log.log();
+	private static final Logger log = Log.get();
 
 	private Status status;
 
