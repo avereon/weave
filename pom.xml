@@ -12,7 +12,7 @@
 
 	<groupId>com.avereon</groupId>
 	<artifactId>zenna</artifactId>
-	<version>0.3</version>
+	<version>0.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Zenna</name>
@@ -50,7 +50,7 @@
 		<!-- Version numbers updated 02 Oct 2019 -->
 		<!-- Runtime dependencies -->
 		<!--java.version defined in parent pom -->
-		<openjfx.version>13.0.2</openjfx.version>
+		<openjfx.version>14.0.1</openjfx.version>
 	</properties>
 
 	<dependencies>
@@ -58,14 +58,14 @@
 		<dependency>
 			<groupId>com.avereon</groupId>
 			<artifactId>rossa</artifactId>
-			<version>0.1</version>
+			<version>0.2</version>
 			<optional>true</optional>
 		</dependency>
 
 		<dependency>
 			<groupId>com.avereon</groupId>
 			<artifactId>zevra</artifactId>
-			<version>0.2</version>
+			<version>0.3</version>
 			<optional>true</optional>
 		</dependency>
 
