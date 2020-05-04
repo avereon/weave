@@ -12,7 +12,7 @@
 
 	<groupId>com.avereon</groupId>
 	<artifactId>zenna</artifactId>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.3</version>
 	<packaging>jar</packaging>
 
 	<name>Zenna</name>
