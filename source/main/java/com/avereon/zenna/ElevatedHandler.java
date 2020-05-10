@@ -26,7 +26,7 @@ class ElevatedHandler {
 
 	static final String LOG = "LOG";
 
-	private Program program;
+	private final Program program;
 
 	private String secret;
 
@@ -183,9 +183,7 @@ class ElevatedHandler {
 
 	private class ProcessWatcherThread extends Thread {
 
-		private Process process;
-
-		private int exitValue;
+		private final Process process;
 
 		ProcessWatcherThread( Process process ) {
 			this.process = process;
@@ -195,7 +193,7 @@ class ElevatedHandler {
 		public void run() {
 			try {
 				process.waitFor();
-				exitValue = process.exitValue();
+				int exitValue = process.exitValue();
 				log.log( Log.DEBUG, "Elevated process finished" );
 				if( exitValue != 0 ) throw new IllegalStateException( "Elevated process failed: " + exitValue );
 			} catch( Exception exception ) {

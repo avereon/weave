@@ -9,11 +9,11 @@ public class TaskResult {
 	@SuppressWarnings( "unused" )
 	private static final Logger log = Log.get();
 
-	private Task task;
+	private final Task task;
 
-	private TaskStatus status;
+	private final TaskStatus status;
 
-	private String message;
+	private final String message;
 
 	public TaskResult( Task task, TaskStatus status ) {
 		this( task, status, null );

@@ -6,9 +6,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 public abstract class Task {
 
-	private String command;
+	private final String command;
 
-	private List<String> parameters;
+	private final List<String> parameters;
 
 	private String originalLine;
 
@@ -16,7 +16,7 @@ public abstract class Task {
 
 	private int currentStep = 0;
 
-	private Set<TaskListener> listeners;
+	private final Set<TaskListener> listeners;
 
 	public Task( String command, List<String> parameters ) {
 		this.command = command;
