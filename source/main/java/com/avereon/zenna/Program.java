@@ -409,15 +409,17 @@ public class Program implements Product {
 			if( !isElevated() && task.needsElevation() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
 				result = elevatedHandler.execute( task );
+				if( result == null ) log.log( Log.WARN, "Result from elevated handler is null" );
 			} else {
 				result = task.execute();
+				if( result == null ) log.log( Log.WARN, "Result from normal handler is null" );
 			}
 		} catch( Exception exception ) {
 			result = getTaskResult( task, exception );
 			log.log( Log.WARN, "", exception );
 		}
 
-		printWriter.println( result.format() );
+		if( result != null ) printWriter.println( result.format() );
 		printWriter.flush();
 
 		log.log( Log.INFO, elevatedKey() + "Result: " + result );
