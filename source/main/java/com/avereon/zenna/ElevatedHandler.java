@@ -43,6 +43,7 @@ class ElevatedHandler {
 	}
 
 	public ElevatedHandler start() throws IOException {
+		secret = UUID.randomUUID().toString();
 		startServerSocket();
 		startElevatedUpdater();
 		return this;
@@ -129,8 +130,6 @@ class ElevatedHandler {
 	}
 
 	private void startElevatedUpdater() throws IOException {
-		secret = UUID.randomUUID().toString();
-
 		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule() );
 		processBuilder.inheritIO();
 
@@ -151,7 +150,6 @@ class ElevatedHandler {
 
 	private synchronized void setSocket( Socket socket ) {
 		this.socket = socket;
-
 		notifyAll();
 	}
 
