@@ -409,11 +409,10 @@ public class Program implements Product {
 			if( !isElevated() && task.needsElevation() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
 				result = elevatedHandler.execute( task );
-				if( result == null ) log.log( Log.WARN, "Result from elevated handler is null" );
 			} else {
 				result = task.execute();
-				if( result == null ) log.log( Log.WARN, "Result from normal handler is null" );
 			}
+			if( result == null ) log.log( Log.ERROR, "Null result executing " + task );
 		} catch( Exception exception ) {
 			result = getTaskResult( task, exception );
 			log.log( Log.WARN, "", exception );
