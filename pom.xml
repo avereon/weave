@@ -58,22 +58,22 @@
 		<dependency>
 			<groupId>com.avereon</groupId>
 			<artifactId>rossa</artifactId>
-			<version>0.2</version>
+			<version>0.3-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 
 		<dependency>
 			<groupId>com.avereon</groupId>
 			<artifactId>zevra</artifactId>
-			<version>0.3</version>
+			<version>0.4-SNAPSHOT</version>
 			<optional>true</optional>
 		</dependency>
 
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>${openjfx.version}</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.openjfx</groupId>-->
+<!--			<artifactId>javafx-controls</artifactId>-->
+<!--			<version>${openjfx.version}</version>-->
+<!--		</dependency>-->
 
 	</dependencies>
 

@@ -3,7 +3,7 @@ package com.avereon.zenna;
 import com.avereon.product.Product;
 import com.avereon.product.ProductBundle;
 import com.avereon.product.ProductCard;
-import com.avereon.rossa.icon.UpdateIcon;
+import com.avereon.rossa.icon.flat.UpdateIcon;
 import com.avereon.util.*;
 import com.avereon.venza.image.Images;
 import com.avereon.zenna.task.*;
@@ -185,6 +185,7 @@ public class Program implements Product {
 		@Override
 		public void run() {
 			try {
+				log.log( Log.INFO, "Show progress UI=" + isUi() );
 				if( isUi() ) {
 					showProgressDialog();
 					Thread.sleep( 500 );
@@ -195,8 +196,8 @@ public class Program implements Product {
 				}
 				execute();
 			} catch( Throwable throwable ) {
-				throwable.printStackTrace( System.err );
 				log.log( Log.ERROR, elevatedKey() + "Execution error", throwable );
+				throwable.printStackTrace( System.err );
 			} finally {
 				if( isUi() ) hideProgressDialog();
 				synchronized( Program.this ) {
@@ -210,7 +211,7 @@ public class Program implements Product {
 	}
 
 	private boolean isUi() {
-		return parameters != null && parameters.isSet( UpdateFlag.TITLE ) || alert != null;
+		return alert != null || ( parameters != null && parameters.isSet( UpdateFlag.TITLE ) );
 	}
 
 	private void execute() throws Exception {
@@ -344,6 +345,8 @@ public class Program implements Product {
 			log.log( Log.TRACE, elevatedKey() + "parsed: " + line.trim() );
 			tasks.add( parseTask( line.trim() ) );
 		}
+
+		log.log( Log.INFO, "Task count=" + tasks.size() );
 
 		List<TaskResult> results = new ArrayList<>();
 
