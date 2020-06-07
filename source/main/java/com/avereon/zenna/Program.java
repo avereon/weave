@@ -14,7 +14,6 @@ import javafx.stage.Stage;
 
 import javax.net.SocketFactory;
 import java.io.*;
-import java.lang.System.Logger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Path;
@@ -33,7 +32,7 @@ public class Program implements Product {
 		STOPPING
 	}
 
-	private static final Logger log = Log.get();
+	private static final System.Logger log = Log.get();
 
 	private Status status;
 
@@ -43,13 +42,13 @@ public class Program implements Product {
 
 	private final Object waitLock;
 
-	private ProductCard card;
+	private final ProductCard card;
 
-	private ProductBundle resourceBundle;
+	private final ProductBundle resourceBundle;
 
-	private Path programDataFolder;
+	private final Path programDataFolder;
 
-	private String title;
+	private final String title;
 
 	private InputSource inputSource;
 
@@ -122,6 +121,7 @@ public class Program implements Product {
 
 		// Configure logging
 		Log.configureLogging( this, parameters );
+		Log.setPackageLogLevel( "com.avereon", parameters.get( LogFlag.LOG_LEVEL, LogFlag.INFO ) );
 
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
@@ -211,7 +211,7 @@ public class Program implements Product {
 	}
 
 	private boolean isUi() {
-		return alert != null || ( parameters != null && parameters.isSet( UpdateFlag.TITLE ) );
+		return alert != null || (parameters != null && parameters.isSet( UpdateFlag.TITLE ));
 	}
 
 	private void execute() throws Exception {
@@ -254,7 +254,7 @@ public class Program implements Product {
 			alert.setHeaderText( "Performing update" );
 			alert.getDialogPane().setContent( progressPane );
 
-			Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+			Stage stage = (Stage)alert.getDialogPane().getScene().getWindow();
 			stage.getIcons().addAll( Images.getStageIcons( new UpdateIcon() ) );
 
 			// The following line is a workaround to dialogs showing with zero size on Linux
@@ -403,27 +403,33 @@ public class Program implements Product {
 	private TaskResult executeTask( Task task, PrintWriter printWriter ) {
 		TaskResult result;
 
-		log.log( Log.DEBUG, elevatedKey() + "Task: " + task.getOriginalLine() );
+		// Try to keep the prompt the same size as the result prompt below
+		log.log( Log.DEBUG, elevatedKey() + "Running task:   " + task.getOriginalLine() );
 
 		try {
 			task.validate();
 
-			log.log( Log.TRACE, elevatedKey() + "Task needs elevation?: " + task.needsElevation() );
-			if( !isElevated() && task.needsElevation() ) {
+			boolean needsElevation = task.needsElevation();
+			log.log( Log.TRACE, elevatedKey() + "Task needs elevation?: " + needsElevation );
+			if( needsElevation && !isElevated() ) {
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
 				result = elevatedHandler.execute( task );
 			} else {
 				result = task.execute();
 			}
-			if( result == null ) log.log( Log.ERROR, "Null result executing " + task );
 		} catch( Exception exception ) {
 			result = getTaskResult( task, exception );
 			log.log( Log.WARN, "", exception );
 		}
 
-		if( result != null ) printWriter.println( result.format() );
-		printWriter.flush();
+		if( result == null ) {
+			log.log( Log.ERROR, "Null result executing " + task );
+		} else {
+			printWriter.println( result.format() );
+			printWriter.flush();
+		}
 
+		// Try to keep the prompt the same size as the running prompt above
 		log.log( Log.INFO, elevatedKey() + "Result: " + result );
 
 		return result;
@@ -452,23 +458,28 @@ public class Program implements Product {
 				task = new DeleteTask( parameterList );
 				break;
 			}
-			case UpdateTask.ECHO: {
-				task = new EchoTask( parameterList );
+			case UpdateTask.LOG: {
+				task = new LogTask( parameterList );
 				break;
 			}
-			case UpdateTask.ELEVATED_ECHO: {
-				task = new ElevatedEchoTask( parameterList );
+			case UpdateTask.ELEVATED_LOG: {
+				task = new ElevatedLogTask( parameterList );
 				break;
 			}
 			case UpdateTask.EXECUTE: {
 				task = new ExecuteTask( parameterList );
 				break;
 			}
+			case UpdateTask.HEADER: {
+				task = new HeaderTask( parameterList );
+				break;
+			}
 			case UpdateTask.LAUNCH: {
 				task = new LaunchTask( parameterList );
 				break;
 			}
-			case UpdateTask.MOVE: {
+			case UpdateTask.MOVE:
+			case UpdateTask.RENAME: {
 				task = new MoveTask( parameterList );
 				break;
 			}
@@ -478,10 +489,6 @@ public class Program implements Product {
 			}
 			case UpdateTask.PAUSE: {
 				task = new PauseTask( parameterList );
-				break;
-			}
-			case UpdateTask.RENAME: {
-				task = new MoveTask( parameterList );
 				break;
 			}
 			case UpdateTask.ELEVATED_PAUSE: {
@@ -516,9 +523,9 @@ public class Program implements Product {
 
 		private int step;
 
-		private int totalSteps;
+		private final int totalSteps;
 
-		private PrintWriter printWriter;
+		private final PrintWriter printWriter;
 
 		TaskHandler( int totalSteps, PrintWriter printWriter ) {
 			this.totalSteps = totalSteps;
@@ -526,13 +533,20 @@ public class Program implements Product {
 		}
 
 		@Override
+		public void updateHeader( String header ) {
+			if( isElevated() ) printWriter.println( ElevatedHandler.HEADER + " " + header );
+			// Don't flush the stream here...not sure why this is a problem but,
+			// there is always a following progress event to flush the stream
+			//printWriter.flush();
+			if( alert != null ) Platform.runLater( () -> alert.setHeaderText( header ) );
+		}
+
+		@Override
 		public void updateMessage( String message ) {
-			if( isElevated() ) {
-				printWriter.println( ElevatedHandler.MESSAGE + " " + message );
-				// Don't flush the stream here...not sure why this is a problem but,
-				// there is always a following progress event to flush the stream
-				//printWriter.flush();
-			}
+			if( isElevated() ) printWriter.println( ElevatedHandler.MESSAGE + " " + message );
+			// Don't flush the stream here...not sure why this is a problem but,
+			// there is always a following progress event to flush the stream
+			//printWriter.flush();
 			if( progressPane != null ) Platform.runLater( () -> progressPane.setText( message ) );
 		}
 

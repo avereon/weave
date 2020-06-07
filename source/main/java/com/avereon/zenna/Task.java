@@ -56,6 +56,12 @@ public abstract class Task {
 		this.listeners.remove( listener );
 	}
 
+	protected void setHeader( String header ) {
+		for( TaskListener listener : listeners ) {
+			listener.updateHeader( header );
+		}
+	}
+
 	protected void setMessage( String message ) {
 		for( TaskListener listener : listeners ) {
 			listener.updateMessage( message );

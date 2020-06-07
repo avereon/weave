@@ -2,6 +2,7 @@ package com.avereon.zenna.check;
 
 import com.avereon.zenna.UpdateFlag;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,8 +20,15 @@ public class ElevatedCommandCheckWithUi extends ElevatedCommandCheck {
 	}
 
 	@Override
-	public List<String> getAdditionalCommands() {
-		return List.of( UpdateFlag.TITLE, "ElevatedCommandCheck" );
+	protected String getLogFile() {
+		return "target/privilege-check-ui.log";
+	}
+
+	@Override
+	public List<String> getProgramCommands() {
+		List<String> commands = new ArrayList<>( super.getProgramCommands() );
+		commands.addAll( List.of( UpdateFlag.TITLE, "ElevatedCommandCheck" ) );
+		return commands;
 	}
 
 }

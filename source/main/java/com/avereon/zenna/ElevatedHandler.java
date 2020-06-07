@@ -20,6 +20,8 @@ class ElevatedHandler {
 
 	static final String CALLBACK_PORT = "--callback-port";
 
+	static final String HEADER = "HEADER";
+
 	static final String MESSAGE = "MESSAGE";
 
 	static final String PROGRESS = "PROGRESS";
@@ -84,6 +86,10 @@ class ElevatedHandler {
 			String command = commands[ 0 ];
 
 			switch( command ) {
+				case HEADER: {
+					task.setHeader( line.substring( HEADER.length() + 1 ) );
+					break;
+				}
 				case MESSAGE: {
 					task.setMessage( line.substring( MESSAGE.length() + 1 ) );
 					break;

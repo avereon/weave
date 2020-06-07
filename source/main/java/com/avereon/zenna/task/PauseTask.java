@@ -11,12 +11,13 @@ import java.util.List;
 
 public class PauseTask extends Task {
 
+	@SuppressWarnings( "unused" )
 	private static final Logger log = Log.get();
 
 	// The number of milliseconds per increment
-	private static long increment = 100;
+	private static final long increment = 10;
 
-	private String message;
+	private final String message;
 
 	private long time;
 
@@ -35,13 +36,14 @@ public class PauseTask extends Task {
 	}
 
 	@Override
+	@SuppressWarnings( "BusyWait" )
 	public TaskResult execute() throws Exception {
 		setMessage( message );
 		for( int index = 0; index < steps; index++ ) {
 			Thread.sleep( increment );
 			incrementProgress();
 		}
-		return new TaskResult( this, TaskStatus.SUCCESS, "paused " + time + "ms" );
+		return new TaskResult( this, TaskStatus.SUCCESS, time + " \"" + message + "\"" );
 	}
 
 }

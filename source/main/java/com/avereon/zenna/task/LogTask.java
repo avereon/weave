@@ -4,16 +4,15 @@ import com.avereon.zenna.Task;
 import com.avereon.zenna.TaskResult;
 import com.avereon.zenna.TaskStatus;
 import com.avereon.zenna.UpdateTask;
-import com.avereon.util.TextUtil;
 
 import java.util.List;
 
-public class EchoTask extends Task {
+public class LogTask extends Task {
 
-	private String message;
+	private final String message;
 
-	public EchoTask( List<String> parameters ) {
-		super( UpdateTask.ECHO, parameters );
+	public LogTask( List<String> parameters ) {
+		super( UpdateTask.LOG, parameters );
 		this.message = getParameters().get( 0 );
 	}
 
@@ -24,9 +23,8 @@ public class EchoTask extends Task {
 
 	@Override
 	public TaskResult execute() throws Exception {
-		setMessage( message );
 		incrementProgress();
-		return new TaskResult( this, TaskStatus.SUCCESS, TextUtil.toString( getParameters(), " " ) );
+		return new TaskResult( this, TaskStatus.SUCCESS, "\"" + message + "\"" );
 	}
 
 }

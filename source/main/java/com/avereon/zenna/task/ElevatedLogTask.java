@@ -4,9 +4,9 @@ import com.avereon.util.OperatingSystem;
 
 import java.util.List;
 
-public class ElevatedEchoTask extends EchoTask {
+public class ElevatedLogTask extends LogTask {
 
-	public ElevatedEchoTask( List<String> parameters ) {
+	public ElevatedLogTask( List<String> parameters ) {
 		super( parameters );
 	}
 

@@ -2,6 +2,8 @@ package com.avereon.zenna;
 
 public interface UpdateTask {
 
+	String ELEVATED_PREFIX = "elevated-";
+
 	/**
 	 * The delete command indicates that a path be deleted.
 	 */
@@ -10,15 +12,21 @@ public interface UpdateTask {
 	/**
 	 * Echo the command parameters to the log.
 	 */
-	String ECHO = "echo";
+	String LOG = "log";
 
-	String ELEVATED_ECHO  = "elevated-echo";
+	String ELEVATED_LOG = ELEVATED_PREFIX + LOG;
 
 	/**
 	 * The execute command indicates that a new process should be launched. The
 	 * task will wait for the process to complete.
 	 */
 	String EXECUTE = "execute";
+
+	/**
+	 * The header command sets the UI header, not the progress message. The header
+	 * should be set for every significant group of tasks.
+	 */
+	String HEADER = "header";
 
 	/**
 	 * The launch command indicates that a new process should be launched. This
@@ -41,7 +49,7 @@ public interface UpdateTask {
 	 */
 	String PAUSE = "pause";
 
-	String ELEVATED_PAUSE = "elevated-pause";
+	String ELEVATED_PAUSE = ELEVATED_PREFIX + PAUSE;
 
 	String PERMISSIONS = "permissions";
 
