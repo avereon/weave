@@ -43,7 +43,8 @@ public class PauseTask extends Task {
 			Thread.sleep( increment );
 			incrementProgress();
 		}
-		return new TaskResult( this, TaskStatus.SUCCESS, time + " \"" + message + "\"" );
+
+		return new TaskResult( this, TaskStatus.SUCCESS, time + (message == null ? "" : " \"" + message + "\"") );
 	}
 
 }

@@ -24,7 +24,7 @@ public class LogTask extends Task {
 	@Override
 	public TaskResult execute() throws Exception {
 		incrementProgress();
-		return new TaskResult( this, TaskStatus.SUCCESS, "\"" + message + "\"" );
+		return new TaskResult( this, TaskStatus.SUCCESS, message == null ? "" : "\"" + message + "\"" );
 	}
 
 }

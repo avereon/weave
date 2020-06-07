@@ -78,12 +78,12 @@ public class ElevatedProcessTest {
 	}
 
 	@Test
-	public void testElevatedEcho() throws Exception {
-		writer.println( "elevated-echo \"Hello Updater!\"" );
+	public void testElevatedLog() throws Exception {
+		writer.println( "elevated-log \"Hello Updater!\"" );
 		writer.flush();
-		assertThat( readNext(), is( "MESSAGE Hello Updater!" ) );
+		//assertThat( readNext(), is( "MESSAGE Hello Updater!" ) );
 		assertThat( readNext(), is( "PROGRESS" ) );
-		assertThat( readNext(), is( "SUCCESS echo Hello Updater!" ) );
+		assertThat( readNext(), is( "SUCCESS log \"Hello Updater!\"" ) );
 		// There really is no further communication at this point,
 		// any more reads will timeout and return a null
 		assertThat( readNext(), is( nullValue() ) );

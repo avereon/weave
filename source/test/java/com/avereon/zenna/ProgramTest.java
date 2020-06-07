@@ -48,9 +48,9 @@ public class ProgramTest {
 			inputPipe.close();
 
 			String result1 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
-			assertThat( result1, is( "SUCCESS pause paused 130ms" ) );
+			assertThat( result1, is( "SUCCESS pause 130" ) );
 			String result2 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
-			assertThat( result2, is( "SUCCESS pause paused 170ms" ) );
+			assertThat( result2, is( "SUCCESS pause 170" ) );
 		} finally {
 			// Restore the original streams
 			System.setOut( originalOutput );
@@ -82,9 +82,9 @@ public class ProgramTest {
 		inputPipe.close();
 
 		String result1 = new BufferedReader( outputPipe ).readLine();
-		assertThat( result1, is( "SUCCESS pause paused 170ms" ) );
+		assertThat( result1, is( "SUCCESS pause 170" ) );
 		String result2 = new BufferedReader( outputPipe ).readLine();
-		assertThat( result2, is( "SUCCESS pause paused 190ms" ) );
+		assertThat( result2, is( "SUCCESS pause 190" ) );
 	}
 
 }

@@ -24,7 +24,7 @@ public class HeaderTask extends Task {
 	@Override
 	public TaskResult execute() throws Exception {
 		setHeader( header );
-		return new TaskResult( this, TaskStatus.SUCCESS, "\"" + header + "\"" );
+		return new TaskResult( this, TaskStatus.SUCCESS, header == null ? "" : "\"" + header + "\"" );
 	}
 
 }
