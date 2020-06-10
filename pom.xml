@@ -101,11 +101,13 @@
 								<image>
 									<class>com.avereon.rossa.icon.ZinniaIcon</class>
 									<target>${images-folder}/zenna.png</target>
+									<theme>light</theme>
 								</image>
 							</images>
 							<icons>
 								<icon>
 									<target>${images-folder}/zenna.ico</target>
+									<theme>light</theme>
 									<images>
 										<image>
 											<class>com.avereon.rossa.icon.ZinniaIcon</class>
