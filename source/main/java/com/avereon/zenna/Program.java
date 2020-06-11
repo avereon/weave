@@ -3,7 +3,7 @@ package com.avereon.zenna;
 import com.avereon.product.Product;
 import com.avereon.product.ProductBundle;
 import com.avereon.product.ProductCard;
-import com.avereon.rossa.icon.flat.UpdateIcon;
+import com.avereon.rossa.icon.UpdateIcon;
 import com.avereon.util.*;
 import com.avereon.venza.image.Images;
 import com.avereon.zenna.task.*;
