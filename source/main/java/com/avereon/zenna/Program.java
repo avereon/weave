@@ -247,7 +247,7 @@ public class Program implements Product {
 		Platform.runLater( () -> {
 			progressPane = new ProgressPane();
 			progressPane.setPrefWidth( 400 );
-			progressPane.setText( "Starting update" );
+			progressPane.setMessage( "Starting update" );
 
 			alert = new Alert( Alert.AlertType.INFORMATION, "", ButtonType.CANCEL );
 			alert.setTitle( parameters.get( UpdateFlag.TITLE ) );
@@ -382,8 +382,8 @@ public class Program implements Product {
 		if( elevatedHandler != null ) elevatedHandler.stop();
 
 		if( isUi() ) {
-			if( progressPane != null ) Platform.runLater( () -> progressPane.setText( "Update complete" ) );
-			if( progressPane != null ) Platform.runLater( () -> progressPane.setProgress( 1.0 ) );
+			if( progressPane != null ) progressPane.setMessage( "Update complete" );
+			if( progressPane != null ) progressPane.setProgress( 1.0 );
 			Thread.sleep( 1000 );
 		}
 
@@ -547,7 +547,7 @@ public class Program implements Product {
 			// Don't flush the stream here...not sure why this is a problem but,
 			// there is always a following progress event to flush the stream
 			//printWriter.flush();
-			if( progressPane != null ) Platform.runLater( () -> progressPane.setText( message ) );
+			if( progressPane != null ) Platform.runLater( () -> progressPane.setMessage( message ) );
 		}
 
 		@Override
