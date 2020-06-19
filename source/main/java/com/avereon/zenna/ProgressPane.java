@@ -21,7 +21,7 @@ public class ProgressPane extends VBox {
 		setSpacing( 5 );
 		message = new Label();
 		message.prefWidthProperty().bind( this.widthProperty() );
-		indicator = new ProgressBar();
+		indicator = new ProgressBar(0);
 		indicator.prefWidthProperty().bind( this.widthProperty() );
 		throughput = new Label();
 		throughput.prefWidthProperty().bind( this.widthProperty() );
@@ -44,15 +44,17 @@ public class ProgressPane extends VBox {
 		Platform.runLater( () -> {
 			indicator.setProgress( progress );
 			if( showRemaining ) {
-				throughput.setText( "Remaining: " + formatDuration( remaining ) );
-			} else if( progress == 1.0 ) {
-				throughput.setText( "Completed: " + formatDuration( duration ) );
+				if( progress == 1.0 ) {
+					throughput.setText( "Completed: " + formatDuration( duration ) );
+				} else {
+					throughput.setText( "Remaining: " + formatDuration( remaining ) );
+				}
 			}
 		} );
 	}
 
 	private String formatDuration( long duration ) {
-		return String.format( "%1.0f seconds", Math.ceil( duration / 1000.0 ) );
+		return String.format( "%2.0f seconds", Math.ceil( duration / 1000.0 ) );
 	}
 
 }

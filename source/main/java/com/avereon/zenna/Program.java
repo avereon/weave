@@ -185,7 +185,7 @@ public class Program implements Product {
 		@Override
 		public void run() {
 			try {
-				log.log( Log.INFO, "Show progress UI=" + isUi() );
+				log.log( Log.DEBUG, "Show progress UI=" + isUi() );
 				if( isUi() ) {
 					showProgressDialog();
 					Thread.sleep( 500 );
@@ -242,9 +242,7 @@ public class Program implements Product {
 	}
 
 	private void showProgressDialog() {
-		Platform.startup( () -> {} );
-
-		Platform.runLater( () -> {
+		Platform.startup( () -> {
 			progressPane = new ProgressPane();
 			progressPane.setPrefWidth( 400 );
 			progressPane.setMessage( "Starting update" );

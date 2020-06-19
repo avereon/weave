@@ -8,14 +8,26 @@ import com.avereon.zenna.UpdateFlag;
 import com.avereon.zenna.UpdateTask;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class CommandCheck {
 
+	private static final int PRODUCT_COUNT = 13;
+
+	private static final Random random = new Random();
+
 	public static void main( String[] commands ) {
 		new CommandCheck().run();
+	}
+
+	public Map<String, String[]> parameters;
+
+	CommandCheck() {
+		parameters = new HashMap<>();
+		for( int groupIndex = 0; groupIndex < PRODUCT_COUNT; groupIndex++ ) {
+			int steps = random.nextInt( 3 ) + 2;
+			parameters.put( String.valueOf( (char)(groupIndex + 65) ), new String[]{ "100", String.valueOf( steps ) } );
+		}
 	}
 
 	public List<String> getProgramCommands() {
@@ -36,13 +48,15 @@ public class CommandCheck {
 		List<String> commands = new ArrayList<>();
 		commands.add( UpdateTask.LOG + " \"starting updates...\"\n" );
 
-		int steps = 10;
-		for( int groupIndex = 0; groupIndex < 5; groupIndex++ ) {
-			commands.add( UpdateTask.HEADER + " \"Updating Product " + (char)(groupIndex + 65) + "\"\n" );
+		List<String> groups = new ArrayList<>( parameters.keySet() );
+		groups.sort( null );
+		for( String groupName : groups ) {
+			String duration = parameters.get( groupName )[ 0 ];
+			int steps = Integer.parseInt( parameters.get( groupName )[ 1 ] );
+			commands.add( UpdateTask.HEADER + " \"Updating Product " + groupName + "\"\n" );
 			for( int index = 0; index < steps; index++ ) {
-				commands.add( UpdateTask.PAUSE + " 100 \"update step " + index + "\"\n" );
+				commands.add( UpdateTask.PAUSE + " " + duration + " \"Step " + (index + 1) + "\"\n" );
 			}
-			steps = 2;
 		}
 
 		commands.add( UpdateTask.LOG + " \"updates complete\"\n" );
@@ -52,13 +66,15 @@ public class CommandCheck {
 	public void check( Process process ) throws Exception {
 		check( "SUCCESS log \"starting updates...\"", readLine( process.getInputStream() ) );
 
-		int steps = 10;
-		for( int groupIndex = 0; groupIndex < 5; groupIndex++ ) {
-			check( "SUCCESS " + UpdateTask.HEADER + " \"Updating Product " + (char)(groupIndex + 65) + "\"", readLine( process.getInputStream() ) );
+		List<String> groups = new ArrayList<>( parameters.keySet() );
+		groups.sort( null );
+		for( String groupName : groups ) {
+			String duration = parameters.get( groupName )[ 0 ];
+			int steps = Integer.parseInt( parameters.get( groupName )[ 1 ] );
+			check( "SUCCESS " + UpdateTask.HEADER + " \"Updating Product " + groupName + "\"", readLine( process.getInputStream() ) );
 			for( int index = 0; index < steps; index++ ) {
-				check( "SUCCESS " + UpdateTask.PAUSE + " 100 \"update step " + index + "\"", readLine( process.getInputStream() ) );
+				check( "SUCCESS " + UpdateTask.PAUSE + " " + duration + " \"Step " + (index + 1) + "\"", readLine( process.getInputStream() ) );
 			}
-			steps = 2;
 		}
 
 		check( "SUCCESS log \"updates complete\"", readLine( process.getInputStream() ) );
@@ -84,7 +100,7 @@ public class CommandCheck {
 
 			watch( process );
 			check( process );
-			System.err.println( "Command check=success");
+			System.err.println( "Command check=success" );
 		} catch( Exception exception ) {
 			exception.printStackTrace();
 		}
