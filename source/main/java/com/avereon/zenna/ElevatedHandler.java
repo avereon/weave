@@ -136,7 +136,11 @@ class ElevatedHandler {
 	}
 
 	private void startElevatedUpdater() throws IOException {
-		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule() );
+		String updaterModulePath = System.getProperty( "jdk.module.path" );
+		String updaterModuleMain = com.avereon.zenna.Program.class.getModule().getName();
+		String updaterModuleMainClass = com.avereon.zenna.Program.class.getName();
+
+		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule( null, updaterModulePath, updaterModuleMain, updaterModuleMainClass ) );
 		processBuilder.inheritIO();
 
 		// Send the callback port and secret
