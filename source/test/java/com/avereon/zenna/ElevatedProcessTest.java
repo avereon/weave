@@ -38,7 +38,7 @@ public class ElevatedProcessTest {
 	@BeforeEach
 	public void setup() throws Exception {
 		// Convince the OperatingSystem class that the process is elevated
-		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
+		System.setProperty( OperatingSystem.PROCESS_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 
 		// The interface to an elevated process is the socket
 		// so to use it a server socket needs to be started
@@ -69,7 +69,7 @@ public class ElevatedProcessTest {
 		elevated.waitForStop( 1, TimeUnit.SECONDS );
 		assertThat( elevated.getStatus(), is( Program.Status.STOPPED ) );
 		server.close();
-		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.NORMAL_PRIVILEGE_VALUE );
+		System.setProperty( OperatingSystem.PROCESS_PRIVILEGE_KEY, OperatingSystem.NORMAL_PRIVILEGE_VALUE );
 	}
 
 	@Test
