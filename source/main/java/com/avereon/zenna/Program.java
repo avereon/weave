@@ -75,7 +75,7 @@ public class Program implements Product {
 	}
 
 	public static void main( String[] commands ) {
-		new Program().start( commands );
+		new Program().configAndStart( commands );
 	}
 
 	@Override
@@ -110,12 +110,7 @@ public class Program implements Product {
 		return this.status;
 	}
 
-	public void start( String... commands ) {
-		synchronized( this ) {
-			status = Status.STARTING;
-			this.notifyAll();
-		}
-
+	public void configAndStart( String... commands ) {
 		// Parse parameters
 		parameters = Parameters.parse( commands );
 
@@ -126,15 +121,26 @@ public class Program implements Product {
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
 
+		start( commands );
+	}
+
+	public void start( String... commands ) {
+		if( parameters == null ) parameters = Parameters.parse( commands );
+
+		synchronized( this ) {
+			status = Status.STARTING;
+			this.notifyAll();
+		}
+
 		log.log( Log.INFO, elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "[NORMAL]") );
-		log.log( Log.INFO, elevatedKey() + "Parameters: " + parameters );
 		log.log( Log.DEBUG, elevatedKey() + "Command line: " + ProcessCommands.getCommandLineAsString() );
+		log.log( Log.DEBUG, elevatedKey() + "Parameters:   " + parameters );
 		log.log( Log.DEBUG, elevatedKey() + "Log: " + Log.getLogFile() );
 
 		boolean file = parameters.isSet( UpdateFlag.FILE );
 		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
 		boolean string = parameters.isSet( InternalFlag.STRING );
-		boolean callback = parameters.isSet( ElevatedHandler.CALLBACK_SECRET );
+		boolean callback = parameters.isSet( ElevatedFlag.CALLBACK_SECRET );
 
 		if( callback ) {
 			inputSource = InputSource.SOCKET;
@@ -153,7 +159,7 @@ public class Program implements Product {
 		}
 
 		executeThread = new Thread( new Runner() );
-		executeThread.setName( "Zenna execute thread" );
+		executeThread.setName( "Zenna " + (isElevated() ? "elevated" : "execute") + " thread" );
 		executeThread.start();
 	}
 
@@ -280,8 +286,8 @@ public class Program implements Product {
 
 	@SuppressWarnings( "UnusedReturnValue" )
 	private List<TaskResult> runTasksFromSocket() throws IOException, InterruptedException {
-		String secret = parameters.get( ElevatedHandler.CALLBACK_SECRET );
-		int port = Integer.parseInt( parameters.get( ElevatedHandler.CALLBACK_PORT ) );
+		String secret = parameters.get( ElevatedFlag.CALLBACK_SECRET );
+		int port = Integer.parseInt( parameters.get( ElevatedFlag.CALLBACK_PORT ) );
 		if( port < 1 ) return null;
 
 		Socket socket = SocketFactory.getDefault().createSocket( InetAddress.getLoopbackAddress(), port );

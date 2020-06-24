@@ -16,10 +16,6 @@ class ElevatedHandler {
 
 	private static final Logger log = Log.get();
 
-	static final String CALLBACK_SECRET = "--callback-secret";
-
-	static final String CALLBACK_PORT = "--callback-port";
-
 	static final String HEADER = "HEADER";
 
 	static final String MESSAGE = "MESSAGE";
@@ -136,19 +132,22 @@ class ElevatedHandler {
 	}
 
 	private void startElevatedUpdater() throws IOException {
+		Parameters parameters = program.getParameters();
+
 		ProcessBuilder processBuilder = new ProcessBuilder( OperatingSystem.getJavaLauncherPath() );
-		processBuilder.command().addAll( program.getParameters().getOriginalCommands() );
+		//processBuilder.command().addAll( program.getParameters().getOriginalCommands() );
 
 		// Send the callback port and secret
-		processBuilder.command().add( "--mvs" );
-		processBuilder.command().add( CALLBACK_SECRET );
+		processBuilder.command().add( ElevatedFlag.CALLBACK_SECRET );
 		processBuilder.command().add( secret );
-		processBuilder.command().add( CALLBACK_PORT );
+		processBuilder.command().add( ElevatedFlag.CALLBACK_PORT );
 		processBuilder.command().add( String.valueOf( server.getLocalPort() ) );
-		processBuilder.command().add( LogFlag.LOG_LEVEL );
-		processBuilder.command().add( program.getParameters().get( LogFlag.LOG_LEVEL ) );
-		//processBuilder.command().add( LogFlag.LOG_FILE );
-		//processBuilder.command().add( "elevated.%u.log" );
+		processBuilder.command().add( LogFlag.LOG_FILE );
+		processBuilder.command().add( "elevated.%u.log" );
+		if( parameters.isSet(LogFlag.LOG_LEVEL)){
+			processBuilder.command().add( LogFlag.LOG_LEVEL );
+			processBuilder.command().add( program.getParameters().get( LogFlag.LOG_LEVEL ) );
+		}
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
 		log.log( Log.DEBUG, "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );

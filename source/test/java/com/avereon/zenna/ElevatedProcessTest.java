@@ -51,7 +51,7 @@ public class ElevatedProcessTest {
 		server.bind( new InetSocketAddress( InetAddress.getLoopbackAddress(), port ) );
 
 		elevated = new Program();
-		elevated.start( ElevatedHandler.CALLBACK_SECRET, secret, ElevatedHandler.CALLBACK_PORT, String.valueOf( port ), LogFlag.LOG_LEVEL, "none" );
+		elevated.configAndStart( ElevatedFlag.CALLBACK_SECRET, secret, ElevatedFlag.CALLBACK_PORT, String.valueOf( port ), LogFlag.LOG_LEVEL, "none" );
 		elevated.waitForStart( 1, TimeUnit.SECONDS );
 
 		Socket socket = server.accept();
