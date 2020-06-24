@@ -147,8 +147,8 @@ class ElevatedHandler {
 		processBuilder.command().add( String.valueOf( server.getLocalPort() ) );
 		processBuilder.command().add( LogFlag.LOG_LEVEL );
 		processBuilder.command().add( program.getParameters().get( LogFlag.LOG_LEVEL ) );
-		processBuilder.command().add( LogFlag.LOG_FILE );
-		processBuilder.command().add( "elevated.%u.log" );
+		//processBuilder.command().add( LogFlag.LOG_FILE );
+		//processBuilder.command().add( "elevated.%u.log" );
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
 		log.log( Log.DEBUG, "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
