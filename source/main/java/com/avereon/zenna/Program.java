@@ -74,10 +74,6 @@ public class Program implements Product {
 		this.programDataFolder = OperatingSystem.getUserProgramDataFolder( card.getArtifact(), card.getName() );
 	}
 
-	public static void main( String[] commands ) {
-		new Program().configAndStart( commands );
-	}
-
 	@Override
 	public ProductCard getCard() {
 		return card;
@@ -244,7 +240,6 @@ public class Program implements Product {
 				break;
 			}
 		}
-
 	}
 
 	private void showProgressDialog() {
