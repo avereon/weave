@@ -136,25 +136,24 @@ class ElevatedHandler {
 	}
 
 	private void startElevatedUpdater() throws IOException {
-		String updaterModulePath = System.getProperty( "jdk.module.path" );
-		String updaterModuleMain = com.avereon.zenna.Program.class.getModule().getName();
-		String updaterModuleMainClass = com.avereon.zenna.Program.class.getName();
-
-		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule( null, updaterModulePath, updaterModuleMain, updaterModuleMainClass ) );
-		processBuilder.inheritIO();
+		ProcessBuilder processBuilder = new ProcessBuilder( OperatingSystem.getJavaLauncherPath() );
+		processBuilder.command().addAll( program.getParameters().getOriginalCommands() );
 
 		// Send the callback port and secret
+		processBuilder.command().add( "--mvs" );
 		processBuilder.command().add( CALLBACK_SECRET );
 		processBuilder.command().add( secret );
 		processBuilder.command().add( CALLBACK_PORT );
 		processBuilder.command().add( String.valueOf( server.getLocalPort() ) );
 		processBuilder.command().add( LogFlag.LOG_LEVEL );
-		processBuilder.command().add( LogFlag.NONE );
+		processBuilder.command().add( program.getParameters().get( LogFlag.LOG_LEVEL ) );
+		processBuilder.command().add( LogFlag.LOG_FILE );
+		processBuilder.command().add( "elevated.%u.log" );
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
 		log.log( Log.DEBUG, "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
 
-		Process process = processBuilder.start();
+		Process process = processBuilder.inheritIO().start();
 		new ProcessWatcherThread( process ).start();
 	}
 
