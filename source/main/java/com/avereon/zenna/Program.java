@@ -202,7 +202,9 @@ public class Program implements Product {
 				}
 				log.log( Log.INFO, elevatedKey() + card.getName() + " finished" );
 			}
-			System.exit( 0 );
+
+			// WORKAROUND Until I figure out why the thread doesn't exit
+			if( !TestUtil.isTest() ) System.exit( 0 );
 		}
 
 	}
