@@ -37,7 +37,7 @@ public class ProgramTest {
 		try {
 			new Thread( () -> {
 				try {
-					new Program().configAndStart( UpdateFlag.STDIN, LogFlag.LOG_LEVEL, "none" );
+					new Program().start( UpdateFlag.STDIN, LogFlag.LOG_LEVEL, "none" );
 				} catch( Exception exception ) {
 					exception.printStackTrace( System.err );
 				}

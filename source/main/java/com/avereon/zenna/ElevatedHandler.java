@@ -134,22 +134,21 @@ class ElevatedHandler {
 	private void startElevatedUpdater() throws IOException {
 		Parameters parameters = program.getParameters();
 
-		ProcessBuilder processBuilder = new ProcessBuilder( OperatingSystem.getJavaLauncherPath() );
+		//String logFolder = PathUtil.getParent( Log.getLogFile() );
+		//String logFile = PathUtil.resolve( logFolder, "elevated.%u.log" );
 
-		//processBuilder.command().addAll( program.getParameters().getOriginalCommands() );
-
-		processBuilder.command().add( "-Djdk.module.main.class=" + com.avereon.zenna.Program.class.getName() );
 		// Send the callback port and secret
+		ProcessBuilder processBuilder = new ProcessBuilder( OperatingSystem.getJavaLauncherPath() );
 		processBuilder.command().add( ElevatedFlag.CALLBACK_SECRET );
 		processBuilder.command().add( secret );
 		processBuilder.command().add( ElevatedFlag.CALLBACK_PORT );
 		processBuilder.command().add( String.valueOf( server.getLocalPort() ) );
-		processBuilder.command().add( LogFlag.LOG_FILE );
-		processBuilder.command().add( "elevated.%u.log" );
-		if( parameters.isSet( LogFlag.LOG_LEVEL ) ) {
-			processBuilder.command().add( LogFlag.LOG_LEVEL );
-			processBuilder.command().add( program.getParameters().get( LogFlag.LOG_LEVEL ) );
-		}
+		//processBuilder.command().add( LogFlag.LOG_FILE );
+		//processBuilder.command().add( logFile );
+//		if( parameters.isSet( LogFlag.LOG_LEVEL ) ) {
+//			processBuilder.command().add( LogFlag.LOG_LEVEL );
+//			processBuilder.command().add( "none");
+//		}
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
 		log.log( Log.DEBUG, "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );

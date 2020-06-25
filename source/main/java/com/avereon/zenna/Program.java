@@ -106,27 +106,21 @@ public class Program implements Product {
 		return this.status;
 	}
 
-	public void configAndStart( String... commands ) {
-		// Parse parameters
-		parameters = Parameters.parse( commands );
-
-		// Configure logging
-		Log.configureLogging( this, parameters );
-		Log.setPackageLogLevel( "com.avereon", parameters.get( LogFlag.LOG_LEVEL, LogFlag.INFO ) );
-
-		// Print the program header
-		if( !isElevated() ) printHeader( card );
-
-		start( commands );
-	}
-
 	public void start( String... commands ) {
-		if( parameters == null ) parameters = Parameters.parse( commands );
-
 		synchronized( this ) {
 			status = Status.STARTING;
 			this.notifyAll();
 		}
+
+		// Parse parameters
+		parameters = Parameters.parse( commands );
+
+		// Configure logging
+		Log.configureLogging( this, parameters, null, "update.%u.log" );
+		Log.setPackageLogLevel( "com.avereon", parameters.get( LogFlag.LOG_LEVEL, LogFlag.INFO ) );
+
+		// Print the program header
+		if( !isElevated() ) printHeader( card );
 
 		log.log( Log.INFO, elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "[NORMAL]") );
 		log.log( Log.DEBUG, elevatedKey() + "Command line: " + ProcessCommands.getCommandLineAsString() );

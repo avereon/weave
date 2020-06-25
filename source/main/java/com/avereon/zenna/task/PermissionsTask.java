@@ -6,6 +6,7 @@ import com.avereon.zenna.TaskResult;
 import com.avereon.zenna.TaskStatus;
 import com.avereon.zenna.UpdateTask;
 
+import java.io.File;
 import java.lang.System.Logger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +17,7 @@ import java.util.List;
  * The permissions task allows permissions to be set on one or more files. The
  * same permissions are set on all files specified.
  * <p>
- * Parameter 0: The permissions bitmask. Example: 700
+ * Parameter 0: The permissions bitmask. Example: 755
  */
 public class PermissionsTask extends Task {
 
@@ -59,25 +60,27 @@ public class PermissionsTask extends Task {
 		int world = getWorldPermissions( permissions );
 
 		boolean userRead = isRead( user );
-		boolean worldRead = userRead && isRead( world );
+		boolean userReadOnly = !isRead( world );
 		boolean userWrite = isWrite( user );
-		boolean worldWrite = userWrite && isWrite( world );
+		boolean userWriteOnly = !isWrite( world );
 		boolean userExec = isExec( user );
-		boolean worldExec = userExec && isExec( world );
+		boolean userExecOnly = !isExec( world );
 
 		int size = getParameters().size();
 		for( int index = 1; index < size; index++ ) {
-			Path file = Paths.get( getParameters().get( index ) );
+			Path path = Paths.get( getParameters().get( index ) );
 
 			// Skip missing files
-			if( !Files.exists( file ) ) continue;
-			log.log( Log.DEBUG, "Setting permission on: " + file );
+			if( !Files.exists( path ) ) continue;
 
-			boolean read = file.toFile().setReadable( userRead, worldRead );
-			boolean write = file.toFile().setWritable( userWrite, worldWrite );
-			boolean exec = file.toFile().setExecutable( userExec, worldExec );
+			log.log( Log.DEBUG, "Setting permission on: " + path );
 
-			if( !(read & write & exec) ) return new TaskResult( this, TaskStatus.FAILURE, "Unable to set permission on: " + file );
+			File file = path.toFile();
+			boolean read = file.setReadable( userRead, userReadOnly );
+			boolean write = file.setWritable( userWrite, userWriteOnly );
+			boolean exec = file.setExecutable( userExec, userExecOnly );
+
+			if( !(read & write & exec) ) return new TaskResult( this, TaskStatus.FAILURE, "Unable to set permission on: " + path );
 
 			incrementProgress();
 		}
