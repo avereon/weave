@@ -201,6 +201,7 @@ public class Program implements Product {
 					Program.this.notifyAll();
 				}
 				log.log( Log.INFO, elevatedKey() + card.getName() + " finished" );
+				System.exit( 0 );
 			}
 		}
 
