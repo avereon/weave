@@ -15,6 +15,8 @@ public class ProgressPane extends VBox {
 
 	private final long startTimestamp;
 
+	private long elevatedStartDelay;
+
 	private boolean showRemaining;
 
 	public ProgressPane() {
@@ -36,7 +38,7 @@ public class ProgressPane extends VBox {
 	}
 
 	public void setProgress( double progress ) {
-		long duration = System.currentTimeMillis() - startTimestamp;
+		long duration = System.currentTimeMillis() - startTimestamp - elevatedStartDelay;
 		double rate = progress / duration;
 		long remaining = (long)((1 - progress) / rate);
 		showRemaining = showRemaining || (duration > 5000);
@@ -51,6 +53,10 @@ public class ProgressPane extends VBox {
 				}
 			}
 		} );
+	}
+
+	void setElevatedStartDelay( long elevatedStartDelay ) {
+		this.elevatedStartDelay = elevatedStartDelay;
 	}
 
 	private String formatDuration( long duration ) {

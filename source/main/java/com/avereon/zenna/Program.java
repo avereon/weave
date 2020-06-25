@@ -405,7 +405,9 @@ public class Program implements Product {
 			boolean needsElevation = task.needsElevation();
 			log.log( Log.TRACE, elevatedKey() + "Task needs elevation?: " + needsElevation );
 			if( needsElevation && !isElevated() ) {
+				long elevatedHandlerStart = System.currentTimeMillis();
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
+				if( progressPane != null ) progressPane.setElevatedStartDelay( System.currentTimeMillis() - elevatedHandlerStart );
 				result = elevatedHandler.execute( task );
 			} else {
 				result = task.execute();
