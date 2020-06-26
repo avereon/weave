@@ -5,11 +5,10 @@ import java.util.List;
 
 public class UpdateCommandBuilder {
 
-	private List<List<String>> lines;
+	private final List<List<String>> lines;
 
 	public UpdateCommandBuilder() {
 		lines = new ArrayList<>();
-		lines.add( new ArrayList<>() );
 	}
 
 	public UpdateCommandBuilder add( String command, String... parameters ) {
@@ -20,12 +19,14 @@ public class UpdateCommandBuilder {
 		List<String> commands = new ArrayList<>();
 		commands.add( command );
 		commands.addAll( parameters );
-		lines.get( lines.size() - 1 ).addAll( commands );
+		//lines.get( lines.size() - 1 ).addAll( commands );
+		lines.add( commands );
 		return this;
 	}
 
+	@Deprecated
 	public UpdateCommandBuilder line() {
-		lines.add( new ArrayList<>() );
+		//lines.add( new ArrayList<>() );
 		return this;
 	}
 

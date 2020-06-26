@@ -10,7 +10,7 @@ public class UpdateCommandBuilderTest {
 	@Test
 	public void testConstructor() {
 		UpdateCommandBuilder builder = new UpdateCommandBuilder();
-		assertThat( builder.toString(), is( "\n" ) );
+		assertThat( builder.toString(), is( "" ) );
 	}
 
 	@Test
@@ -49,10 +49,10 @@ public class UpdateCommandBuilderTest {
 	@Test
 	public void testChainedLines() {
 		UpdateCommandBuilder builder = new UpdateCommandBuilder();
-		builder.add( UpdateTask.LOG, "Hello 1" ).line();
-		builder.add( UpdateTask.LOG, "Hello 2" ).line();
-		builder.add( UpdateTask.LOG, "Hello 3" ).line();
-		assertThat( builder.toString(), is( UpdateTask.LOG + " \"Hello 1\"\n" + UpdateTask.LOG + " \"Hello 2\"\n" + UpdateTask.LOG + " \"Hello 3\"\n\n" ) );
+		builder.add( UpdateTask.LOG, "Hello 1" );
+		builder.add( UpdateTask.LOG, "Hello 2" );
+		builder.add( UpdateTask.LOG, "Hello 3" );
+		assertThat( builder.toString(), is( UpdateTask.LOG + " \"Hello 1\"\n" + UpdateTask.LOG + " \"Hello 2\"\n" + UpdateTask.LOG + " \"Hello 3\"\n" ) );
 	}
 
 }
