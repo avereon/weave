@@ -116,8 +116,7 @@ public class Program implements Product {
 		parameters = Parameters.parse( commands );
 
 		// Configure logging
-		Log.configureLogging( this, parameters, null, "update.%u.log" );
-		Log.setPackageLogLevel( "com.avereon", parameters.get( LogFlag.LOG_LEVEL, LogFlag.INFO ) );
+		configureLogging();
 
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
@@ -151,6 +150,12 @@ public class Program implements Product {
 		executeThread = new Thread( new Runner() );
 		executeThread.setName( "Zenna " + (isElevated() ? "elevated" : "execute") + " thread" );
 		executeThread.start();
+	}
+
+	private void configureLogging() {
+		Log.configureLogging( this, parameters, null, "update.%u.log" );
+		Log.setPackageLogLevel( "com.avereon", parameters.get( LogFlag.LOG_LEVEL, LogFlag.INFO ) );
+		//Log.setPackageLogLevel( "javafx", parameters.get( LogFlag.LOG_LEVEL, LogFlag.WARN ) );
 	}
 
 	@SuppressWarnings( "SameParameterValue" )
