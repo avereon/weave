@@ -130,21 +130,23 @@ public class Program implements Product {
 		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
 		boolean string = parameters.isSet( InternalFlag.STRING );
 		boolean callback = parameters.isSet( ElevatedFlag.CALLBACK_SECRET );
+		boolean update = parameters.isSet( UpdateFlag.UPDATE );
 
 		if( callback ) {
 			inputSource = InputSource.SOCKET;
 		} else if( string ) {
 			inputSource = InputSource.STRING;
 		} else {
-			if( stdin & file ) {
-				log.log( Log.ERROR, "Cannot use both --" + InputSource.STDIN + " and --" + InputSource.FILE + " parameters at the same time" );
-				return;
-			} else if( !(stdin | file) ) {
-				log.log( Log.ERROR, "Must use either --" + InputSource.STDIN + " or --" + InputSource.FILE + " to provide update commands" );
-				return;
-			}
+//			if( stdin & file ) {
+//				log.log( Log.ERROR, "Cannot use both --" + InputSource.STDIN + " and --" + InputSource.FILE + " parameters at the same time" );
+//				return;
+//			} else if( !(stdin | file) ) {
+//				log.log( Log.ERROR, "Must use either --" + InputSource.STDIN + " or --" + InputSource.FILE + " to provide update commands" );
+//				return;
+//			}
 			if( stdin ) inputSource = InputSource.STDIN;
 			if( file ) inputSource = InputSource.FILE;
+			if( update ) inputSource = InputSource.UPDATE;
 		}
 
 		executeThread = new Thread( new Runner() );
@@ -239,6 +241,10 @@ public class Program implements Product {
 						waitLock.wait( 1000 );
 					}
 				}
+				break;
+			}
+			case UPDATE: {
+				runTasksFromFile( new File( parameters.get( UpdateFlag.UPDATE ) ) );
 				break;
 			}
 		}

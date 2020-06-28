@@ -31,4 +31,13 @@ public interface UpdateFlag extends LogFlag {
 	 */
 	String TITLE = "--title";
 
+	/**
+	 * The update flag indicates the program should read commands from the
+	 * specified file. Example:
+	 * {@code
+	 * updater.jar --update "foo/bar.txt"
+	 * }
+	 */
+	String UPDATE = "--update";
+
 }

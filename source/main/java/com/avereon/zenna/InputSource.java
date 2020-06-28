@@ -5,6 +5,7 @@ public enum InputSource {
 	FILE,
 	STDIN,
 	SOCKET,
-	STRING
+	STRING,
+	UPDATE
 
 }
