@@ -113,10 +113,10 @@ public class Program implements Product {
 		}
 
 		// Parse parameters
-		parameters = Parameters.parse( commands );
+		this.parameters = Parameters.parse( commands );
 
 		// Configure logging
-		configureLogging();
+		configureLogging( parameters );
 
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
@@ -137,13 +137,18 @@ public class Program implements Product {
 		} else if( string ) {
 			inputSource = InputSource.STRING;
 		} else {
-//			if( stdin & file ) {
-//				log.log( Log.ERROR, "Cannot use both --" + InputSource.STDIN + " and --" + InputSource.FILE + " parameters at the same time" );
-//				return;
-//			} else if( !(stdin | file) ) {
-//				log.log( Log.ERROR, "Must use either --" + InputSource.STDIN + " or --" + InputSource.FILE + " to provide update commands" );
-//				return;
-//			}
+			int count = 0;
+			if( stdin ) count++;
+			if( file ) count++;
+			if( update ) count++;
+
+			if( count < 1 ) {
+				log.log( Log.ERROR, "Missing input source" );
+			} else if( count > 1 ) {
+				log.log( Log.ERROR, "Cannot only use one input source" );
+				return;
+			}
+
 			if( stdin ) inputSource = InputSource.STDIN;
 			if( file ) inputSource = InputSource.FILE;
 			if( update ) inputSource = InputSource.UPDATE;
@@ -154,10 +159,9 @@ public class Program implements Product {
 		executeThread.start();
 	}
 
-	private void configureLogging() {
+	private void configureLogging( Parameters parameters ) {
 		Log.configureLogging( this, parameters, null, "update.%u.log" );
 		Log.setPackageLogLevel( "com.avereon", parameters.get( LogFlag.LOG_LEVEL, LogFlag.INFO ) );
-		//Log.setPackageLogLevel( "javafx", parameters.get( LogFlag.LOG_LEVEL, LogFlag.WARN ) );
 	}
 
 	@SuppressWarnings( "SameParameterValue" )
