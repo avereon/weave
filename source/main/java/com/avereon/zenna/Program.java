@@ -64,11 +64,7 @@ public class Program implements Product {
 		this.execute = true;
 		this.status = Status.STOPPED;
 		this.waitLock = new Object();
-		try {
-			this.card = new ProductCard().init( getClass() );
-		} catch( IOException exception ) {
-			throw new RuntimeException( "Error loading product card", exception );
-		}
+		this.card = new ProductCard().card( this );
 		this.title = card.getName();
 		this.resourceBundle = new ProductBundle( this );
 		this.programDataFolder = OperatingSystem.getUserProgramDataFolder( card.getArtifact(), card.getName() );
