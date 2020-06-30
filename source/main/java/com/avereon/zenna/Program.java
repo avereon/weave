@@ -388,10 +388,7 @@ public class Program implements Product {
 		if( results.size() > 0 ) return results;
 
 		// Check if any tasks need elevation
-		if( anyTasksNeedElevation( tasks ) ) {
-			elevatedHandler = new ElevatedHandler( this ).start();
-			elevatedHandler.waitForConnect();
-		}
+		if( anyTasksNeedElevation( tasks ) ) elevatedHandler = new ElevatedHandler( this ).startAndWait();
 
 		// Execute the tasks
 		TaskResult result;

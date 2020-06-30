@@ -52,6 +52,11 @@ class ElevatedHandler {
 		return this;
 	}
 
+	public ElevatedHandler startAndWait() throws IOException, InterruptedException, TimeoutException {
+		waitForConnect();
+		return this;
+	}
+
 	public ElevatedHandler stop() throws IOException {
 		if( socket != null ) socket.close();
 		if( server != null ) server.close();
