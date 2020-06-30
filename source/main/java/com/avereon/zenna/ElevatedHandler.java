@@ -59,7 +59,7 @@ class ElevatedHandler {
 	}
 
 	public synchronized TaskResult execute( Task task ) throws IOException, InterruptedException, TimeoutException {
-		waitForSocket();
+		waitForConnect();
 
 		task.setElevated();
 		sendTask( task );
@@ -119,17 +119,22 @@ class ElevatedHandler {
 		return null;
 	}
 
-	private synchronized void waitForSocket() throws IOException, InterruptedException, TimeoutException {
-		// Wait for the elevated process to get started
-		int index = 0;
-		int attemptCount = 0;
+	synchronized void waitForConnect() throws IOException, InterruptedException, TimeoutException {
+		// Number of attempts
 		int attemptLimit = 20;
+		int attemptDuration = 1000;
+		int cyclesPerAttempt = 5;
+		int cycleDuration = attemptDuration / cyclesPerAttempt;
+
+		// Wait for the elevated process to get started
+		int cycle = 0;
+		int attemptCount = 0;
 		while( socket == null && attemptCount < attemptLimit && throwable == null ) {
-			if( index++ % 10 == 0 ) {
+			if( cycle++ % cyclesPerAttempt == 0 ) {
 				if( attemptCount > 0 ) log.log( Log.TRACE, "Waiting for elevated process: " + attemptCount + " of " + attemptLimit + " seconds" );
 				attemptCount++;
 			}
-			wait( 100 );
+			wait( cycleDuration );
 		}
 
 		if( attemptCount >= attemptLimit ) throw new TimeoutException( "Timeout waiting for elevated updater to start" );
@@ -158,6 +163,7 @@ class ElevatedHandler {
 
 	private synchronized void setSocket( Socket socket ) {
 		this.socket = socket;
+		clientConnect = System.currentTimeMillis();
 		notifyAll();
 	}
 
@@ -176,7 +182,6 @@ class ElevatedHandler {
 					reader = new NonBlockingReader( peer.getInputStream() );
 					if( reader.readLine( 100, TimeUnit.MILLISECONDS ).equals( secret ) ) {
 						log.log( Log.DEBUG, "Elevated client connected to normal client: " + server.getLocalPort() );
-						clientConnect = System.currentTimeMillis();
 						setSocket( peer );
 						server.close();
 					}

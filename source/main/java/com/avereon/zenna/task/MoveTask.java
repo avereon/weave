@@ -1,5 +1,6 @@
 package com.avereon.zenna.task;
 
+import com.avereon.util.FileUtil;
 import com.avereon.util.Log;
 import com.avereon.zenna.Task;
 import com.avereon.zenna.TaskResult;
@@ -43,13 +44,14 @@ public class MoveTask extends Task {
 	public boolean needsElevation() {
 		if( !Files.exists( source ) ) return false;
 
-		// Find an existing parent
-		Path parent = target.getParent();
-		while( !Files.exists( parent ) ) {
-			parent = parent.getParent();
-		}
-		boolean sourceOk = Files.isReadable( source ) && Files.isWritable( source );
-		boolean targetOk = !Files.exists( target ) && Files.isWritable( parent );
+		// Find the source parent
+		Path sourceParent = FileUtil.findValidParent( source );
+
+		// Find the existing target parent
+		Path targetParent = FileUtil.findValidParent( target );
+
+		boolean sourceOk = Files.isReadable( source ) && Files.isWritable( sourceParent );
+		boolean targetOk = !Files.exists( target ) && Files.isWritable( targetParent );
 
 		return !(sourceOk & targetOk);
 	}

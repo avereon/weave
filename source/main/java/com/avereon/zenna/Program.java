@@ -300,14 +300,14 @@ public class Program implements Product {
 		if( alert != null ) Platform.runLater( () -> alert.close() );
 	}
 
-	public List<TaskResult> runTasksFromString( String commands ) throws IOException, InterruptedException {
+	public List<TaskResult> runTasksFromString( String commands ) throws IOException, InterruptedException, TimeoutException {
 		StringReader reader = new StringReader( commands );
 		StringWriter writer = new StringWriter();
 		return runTasksFromReader( reader, writer );
 	}
 
 	@SuppressWarnings( "UnusedReturnValue" )
-	private List<TaskResult> runTasksFromSocket() throws IOException, InterruptedException {
+	private List<TaskResult> runTasksFromSocket() throws IOException, InterruptedException, TimeoutException {
 		String secret = parameters.get( ElevatedFlag.CALLBACK_SECRET );
 		int port = Integer.parseInt( parameters.get( ElevatedFlag.CALLBACK_PORT ) );
 		if( port < 1 ) return null;
@@ -320,26 +320,26 @@ public class Program implements Product {
 	}
 
 	@SuppressWarnings( "UnusedReturnValue" )
-	private List<TaskResult> runTasksFromStdIn() throws IOException, InterruptedException {
+	private List<TaskResult> runTasksFromStdIn() throws IOException, InterruptedException, TimeoutException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		System.in.transferTo( buffer );
 		return runTasksFromStream( new ByteArrayInputStream( buffer.toByteArray() ), System.out );
 	}
 
 	@SuppressWarnings( "UnusedReturnValue" )
-	private List<TaskResult> runTasksFromFile( File file ) throws IOException, InterruptedException {
+	private List<TaskResult> runTasksFromFile( File file ) throws IOException, InterruptedException, TimeoutException {
 		return runTasksFromStream( new FileInputStream( file ), new ByteArrayOutputStream() );
 	}
 
-	private List<TaskResult> runTasksFromStream( InputStream input, OutputStream output ) throws IOException, InterruptedException {
+	private List<TaskResult> runTasksFromStream( InputStream input, OutputStream output ) throws IOException, InterruptedException, TimeoutException {
 		return runTasksFromReader( new InputStreamReader( input, TextUtil.CHARSET ), new OutputStreamWriter( output, TextUtil.CHARSET ) );
 	}
 
-	List<TaskResult> runTasksFromReader( Reader reader, Writer writer ) throws IOException, InterruptedException {
+	List<TaskResult> runTasksFromReader( Reader reader, Writer writer ) throws IOException, InterruptedException, TimeoutException {
 		return runTasks( reader, writer );
 	}
 
-	private List<TaskResult> runTasks( Reader reader, Writer writer ) throws IOException, InterruptedException {
+	private List<TaskResult> runTasks( Reader reader, Writer writer ) throws IOException, InterruptedException, TimeoutException {
 		return isElevated() ? runTasksElevated( reader, writer ) : runTasksNormally( reader, writer );
 	}
 
@@ -363,7 +363,7 @@ public class Program implements Product {
 		return results;
 	}
 
-	private List<TaskResult> runTasksNormally( Reader reader, Writer writer ) throws IOException, InterruptedException {
+	private List<TaskResult> runTasksNormally( Reader reader, Writer writer ) throws IOException, InterruptedException, TimeoutException {
 		String line;
 		NonBlockingReader buffer = new NonBlockingReader( reader );
 		List<Task> tasks = new ArrayList<>();
@@ -388,11 +388,10 @@ public class Program implements Product {
 		if( results.size() > 0 ) return results;
 
 		// Check if any tasks need elevation
-		boolean needsElevation = false;
-		for( Task task : tasks ) {
-			needsElevation = needsElevation || task.needsElevation();
+		if( anyTasksNeedElevation( tasks ) ) {
+			elevatedHandler = new ElevatedHandler( this ).start();
+			elevatedHandler.waitForConnect();
 		}
-		if( needsElevation ) elevatedHandler = new ElevatedHandler( this ).start();
 
 		// Execute the tasks
 		TaskResult result;
@@ -431,6 +430,14 @@ public class Program implements Product {
 
 	private String elevatedKey() {
 		return isElevated() ? "*" : "";
+	}
+
+	private boolean anyTasksNeedElevation( Collection<Task> tasks ) {
+		boolean needsElevation = false;
+		for( Task task : tasks ) {
+			needsElevation = needsElevation || task.needsElevation();
+		}
+		return needsElevation;
 	}
 
 	private TaskResult executeTask( Task task, PrintWriter printWriter ) {
