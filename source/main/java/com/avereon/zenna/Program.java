@@ -6,6 +6,7 @@ import com.avereon.product.ProductCard;
 import com.avereon.rossa.icon.UpdateIcon;
 import com.avereon.util.*;
 import com.avereon.venza.image.Images;
+import com.avereon.venza.javafx.FxUtil;
 import com.avereon.zenna.task.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -294,6 +295,11 @@ public class Program implements Product {
 
 			alert.show();
 		} );
+		try {
+			FxUtil.fxWait( 1000 );
+		} catch( InterruptedException exception ) {
+			log.log( Log.WARN, "Interrupted waiting for progress dialog" );
+		}
 	}
 
 	private void hideProgressDialog() {
@@ -312,11 +318,12 @@ public class Program implements Product {
 		int port = Integer.parseInt( parameters.get( ElevatedFlag.CALLBACK_PORT ) );
 		if( port < 1 ) return null;
 
-		Socket socket = SocketFactory.getDefault().createSocket( InetAddress.getLoopbackAddress(), port );
-		socket.getOutputStream().write( secret.getBytes( TextUtil.CHARSET ) );
-		socket.getOutputStream().write( '\n' );
-		socket.getOutputStream().flush();
-		return runTasksFromStream( socket.getInputStream(), socket.getOutputStream() );
+		try( Socket socket = SocketFactory.getDefault().createSocket( InetAddress.getLoopbackAddress(), port ) ) {
+			socket.getOutputStream().write( secret.getBytes( TextUtil.CHARSET ) );
+			socket.getOutputStream().write( '\n' );
+			socket.getOutputStream().flush();
+			return runTasksFromStream( socket.getInputStream(), socket.getOutputStream() );
+		}
 	}
 
 	@SuppressWarnings( "UnusedReturnValue" )
@@ -346,13 +353,18 @@ public class Program implements Product {
 	private List<TaskResult> runTasksElevated( Reader reader, Writer writer ) throws IOException {
 		String line;
 		List<TaskResult> results = new ArrayList<>();
+		PrintWriter printWriter = new PrintWriter( writer );
 		NonBlockingReader buffer = new NonBlockingReader( reader );
-		while( !TextUtil.isEmpty( line = buffer.readLine( 1, TimeUnit.SECONDS ) ) ) {
+
+		// How long to sit around, without receiving any tasks, before giving up
+		int hungTimeout = 60;
+
+		// If the elevated process gives up waiting for its next task too soon
+		// it exits...closing the socket and causing a broken pipe
+		while( !TextUtil.isEmpty( line = buffer.readLine( hungTimeout, TimeUnit.SECONDS ) ) ) {
 			Task task = parseTask( line.trim() );
 			try {
-				int totalSteps = task.getStepCount();
-				PrintWriter printWriter = new PrintWriter( writer );
-				TaskHandler handler = new TaskHandler( totalSteps, printWriter );
+				TaskHandler handler = new TaskHandler( task.getStepCount(), printWriter );
 				task.addTaskListener( handler );
 				results.add( executeTask( task, printWriter ) );
 				task.removeTaskListener( handler );
@@ -388,7 +400,7 @@ public class Program implements Product {
 		if( results.size() > 0 ) return results;
 
 		// Check if any tasks need elevation
-		if( anyTasksNeedElevation( tasks ) ) elevatedHandler = new ElevatedHandler( this ).startAndWait();
+		if( anyTaskNeedsElevation( tasks ) ) startElevatedHandler();
 
 		// Execute the tasks
 		TaskResult result;
@@ -426,15 +438,20 @@ public class Program implements Product {
 	}
 
 	private String elevatedKey() {
-		return isElevated() ? "*" : "";
+		return isElevated() ? "+" : "";
 	}
 
-	private boolean anyTasksNeedElevation( Collection<Task> tasks ) {
+	private boolean anyTaskNeedsElevation( Collection<Task> tasks ) {
 		boolean needsElevation = false;
 		for( Task task : tasks ) {
 			needsElevation = needsElevation || task.needsElevation();
 		}
 		return needsElevation;
+	}
+
+	private ElevatedHandler startElevatedHandler() throws InterruptedException, TimeoutException, IOException {
+		if( elevatedHandler == null && !isElevated() ) elevatedHandler = new ElevatedHandler( this ).startAndWait();
+		return elevatedHandler;
 	}
 
 	private TaskResult executeTask( Task task, PrintWriter printWriter ) {
@@ -446,11 +463,8 @@ public class Program implements Product {
 		try {
 			task.validate();
 
-			boolean needsElevation = task.needsElevation();
-			log.log( Log.TRACE, elevatedKey() + "Task needs elevation?: " + needsElevation );
-			if( needsElevation && !isElevated() ) {
-				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
-				result = elevatedHandler.execute( task );
+			if( !isElevated() && task.needsElevation() ) {
+				result = startElevatedHandler().execute( task );
 			} else {
 				result = task.execute();
 			}
@@ -554,7 +568,7 @@ public class Program implements Product {
 			}
 			if( progressPane != null ) {
 				Platform.runLater( () -> {
-					if( elevatedHandler != null ) progressPane.setElevatedStartDelay( elevatedHandler.getElevatedHandlerStartDuration() );
+					progressPane.setElevatedStartDelay( Optional.ofNullable( elevatedHandler ).map( ElevatedHandler::getElevatedHandlerStartDuration ).orElse( 0L ) );
 					progressPane.setProgress( progress );
 				} );
 			}

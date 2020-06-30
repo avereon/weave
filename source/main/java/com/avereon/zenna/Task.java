@@ -79,8 +79,9 @@ public abstract class Task {
 		return elevated;
 	}
 
-	void setElevated() {
+	Task setElevated() {
 		elevated = true;
+		return this;
 	}
 
 	public abstract TaskResult execute() throws Exception;

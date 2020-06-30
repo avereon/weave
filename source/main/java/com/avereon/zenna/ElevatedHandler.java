@@ -48,11 +48,12 @@ class ElevatedHandler {
 		serverStart = System.currentTimeMillis();
 		secret = UUID.randomUUID().toString();
 		startServerSocket();
-		startElevatedUpdater();
+		startProcess();
 		return this;
 	}
 
 	public ElevatedHandler startAndWait() throws IOException, InterruptedException, TimeoutException {
+		start();
 		waitForConnect();
 		return this;
 	}
@@ -65,11 +66,7 @@ class ElevatedHandler {
 
 	public synchronized TaskResult execute( Task task ) throws IOException, InterruptedException, TimeoutException {
 		waitForConnect();
-
-		task.setElevated();
-		sendTask( task );
-
-		return getTaskResult( task );
+		return getTaskResult( sendTask( task.setElevated() ) );
 	}
 
 	public long getElevatedHandlerStartDuration() {
@@ -77,13 +74,14 @@ class ElevatedHandler {
 		return clientConnect - serverStart;
 	}
 
-	private void sendTask( Task task ) throws IOException {
+	private Task sendTask( Task task ) throws IOException {
 		log.log( Log.DEBUG, "Sending task commands to elevated process..." );
 		log.log( Log.DEBUG, "  commands: " + task.getOriginalLine() );
 		socket.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
 		socket.getOutputStream().write( '\n' );
 		socket.getOutputStream().flush();
 		log.log( Log.TRACE, "send > " + task.getOriginalLine() );
+		return task;
 	}
 
 	private TaskResult getTaskResult( Task task ) throws IOException {
@@ -125,6 +123,8 @@ class ElevatedHandler {
 	}
 
 	synchronized void waitForConnect() throws IOException, InterruptedException, TimeoutException {
+		if( socket != null ) return;
+
 		// Number of attempts
 		int attemptLimit = 20;
 		int attemptDuration = 1000;
@@ -151,7 +151,7 @@ class ElevatedHandler {
 		new ClientAcceptThread().start();
 	}
 
-	private void startElevatedUpdater() throws IOException {
+	private void startProcess() throws IOException {
 		// Send the callback port and secret
 		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forLauncher() );
 		processBuilder.command().add( ElevatedFlag.CALLBACK_SECRET );
@@ -167,8 +167,8 @@ class ElevatedHandler {
 	}
 
 	private synchronized void setSocket( Socket socket ) {
-		this.socket = socket;
 		clientConnect = System.currentTimeMillis();
+		this.socket = socket;
 		notifyAll();
 	}
 
