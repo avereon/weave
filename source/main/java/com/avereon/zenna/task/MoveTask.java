@@ -37,7 +37,7 @@ public class MoveTask extends Task {
 	@Override
 	public boolean needsElevation() {
 		boolean sourceOk = Files.isReadable( source ) && Files.isWritable( source );
-		boolean targetOk = !Files.exists( target );
+		boolean targetOk = !Files.exists( target ) && Files.isWritable( target.getParent() );
 		return !(sourceOk & targetOk);
 	}
 
