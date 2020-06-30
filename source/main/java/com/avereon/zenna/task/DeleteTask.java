@@ -1,10 +1,11 @@
 package com.avereon.zenna.task;
 
+import com.avereon.util.FileUtil;
+import com.avereon.util.Log;
 import com.avereon.zenna.Task;
 import com.avereon.zenna.TaskResult;
 import com.avereon.zenna.TaskStatus;
 import com.avereon.zenna.UpdateTask;
-import com.avereon.util.FileUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,7 +14,9 @@ import java.util.List;
 
 public class DeleteTask extends Task {
 
-	private Path target;
+	private static final System.Logger log = Log.get();
+
+	private final Path target;
 
 	public DeleteTask( List<String> parameters ) {
 		super( UpdateTask.DELETE, parameters );
@@ -23,6 +26,11 @@ public class DeleteTask extends Task {
 	@Override
 	public int getStepCount() {
 		return 1;
+	}
+
+	@Override
+	public void validate() {
+		if( !Files.exists( target ) ) log.log( Log.WARN, "Target does not exist: {0}", target );
 	}
 
 	@Override

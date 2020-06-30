@@ -17,9 +17,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -33,6 +31,8 @@ public class Program implements Product {
 	}
 
 	private static final System.Logger log = Log.get();
+
+	private static final Map<String, Class<? extends Task>> taskNameMap;
 
 	private Status status;
 
@@ -59,6 +59,25 @@ public class Program implements Product {
 	private Alert alert;
 
 	private ProgressPane progressPane;
+
+	static {
+		Map<String, Class<? extends Task>> map = new HashMap<>();
+		map.put( UpdateTask.DELETE, DeleteTask.class );
+		map.put( UpdateTask.ELEVATED_LOG, ElevatedLogTask.class );
+		map.put( UpdateTask.ELEVATED_PAUSE, ElevatedPauseTask.class );
+		map.put( UpdateTask.EXECUTE, ExecuteTask.class );
+		map.put( UpdateTask.HEADER, HeaderTask.class );
+		map.put( UpdateTask.LAUNCH, LaunchTask.class );
+		map.put( UpdateTask.LOG, LogTask.class );
+		map.put( UpdateTask.MOVE, MoveTask.class );
+		map.put( UpdateTask.PAUSE, PauseTask.class );
+		map.put( UpdateTask.PERMISSIONS, PermissionsTask.class );
+		map.put( UpdateTask.RENAME, MoveTask.class );
+		map.put( UpdateTask.UNPACK, UnpackTask.class );
+
+		//noinspection Java9CollectionFactory
+		taskNameMap = Collections.unmodifiableMap( map );
+	}
 
 	public Program() {
 		this.execute = true;
@@ -426,7 +445,7 @@ public class Program implements Product {
 			}
 		} catch( Exception exception ) {
 			result = getTaskResult( task, exception );
-			log.log( Log.WARN, "", exception );
+			//log.log( Log.WARN, "", exception );
 		}
 
 		if( result == null ) {
@@ -460,55 +479,12 @@ public class Program implements Product {
 		List<String> parameterList = commands.subList( 1, commands.size() );
 
 		Task task;
-		switch( command ) {
-			case UpdateTask.DELETE: {
-				task = new DeleteTask( parameterList );
-				break;
-			}
-			case UpdateTask.LOG: {
-				task = new LogTask( parameterList );
-				break;
-			}
-			case UpdateTask.ELEVATED_LOG: {
-				task = new ElevatedLogTask( parameterList );
-				break;
-			}
-			case UpdateTask.EXECUTE: {
-				task = new ExecuteTask( parameterList );
-				break;
-			}
-			case UpdateTask.HEADER: {
-				task = new HeaderTask( parameterList );
-				break;
-			}
-			case UpdateTask.LAUNCH: {
-				task = new LaunchTask( parameterList );
-				break;
-			}
-			case UpdateTask.MOVE:
-			case UpdateTask.RENAME: {
-				task = new MoveTask( parameterList );
-				break;
-			}
-			case UpdateTask.PERMISSIONS: {
-				task = new PermissionsTask( parameterList );
-				break;
-			}
-			case UpdateTask.PAUSE: {
-				task = new PauseTask( parameterList );
-				break;
-			}
-			case UpdateTask.ELEVATED_PAUSE: {
-				task = new ElevatedPauseTask( parameterList );
-				break;
-			}
-			case UpdateTask.UNPACK: {
-				task = new UnpackTask( parameterList );
-				break;
-			}
-			default: {
-				throw new IllegalArgumentException( "Unknown command: " + command );
-			}
+		try {
+			Class<? extends Task> taskClass = taskNameMap.get( command );
+			if( taskClass == null ) throw new IllegalArgumentException( "Unknown command: " + command );
+			task = taskClass.getConstructor( List.class ).newInstance( parameterList );
+		} catch( Exception exception ) {
+			throw new RuntimeException( exception );
 		}
 
 		task.setOriginalLine( line );
