@@ -41,18 +41,33 @@ public class MoveTask extends Task {
 
 	@Override
 	public boolean needsElevation() {
+		if( !Files.exists( source ) ) return false;
+
+		// Find an existing parent
+		Path parent = target.getParent();
+		while( !Files.exists( parent ) ) {
+			parent = parent.getParent();
+		}
 		boolean sourceOk = Files.isReadable( source ) && Files.isWritable( source );
-		boolean targetOk = !Files.exists( target ) && Files.isWritable( target.getParent() );
+		boolean targetOk = !Files.exists( target ) && Files.isWritable( parent );
+
 		return !(sourceOk & targetOk);
 	}
 
 	@Override
 	public TaskResult execute() throws Exception {
+		System.err.println( "Executing move task: " + message );
 		setMessage( message );
-		Files.createDirectories( target.getParent() );
-		Files.move( source, target );
+		TaskResult result;
+		if( Files.exists( source ) ) {
+			Files.createDirectories( target.getParent() );
+			Files.move( source, target );
+			result = new TaskResult( this, TaskStatus.SUCCESS, "Moved: " + source + " to " + target );
+		} else {
+			result = new TaskResult( this, TaskStatus.SUCCESS, "Source does not exist: " + source );
+		}
 		incrementProgress();
-		return new TaskResult( this, TaskStatus.SUCCESS, "Moved: " + source + " to " + target );
+		return result;
 	}
 
 }

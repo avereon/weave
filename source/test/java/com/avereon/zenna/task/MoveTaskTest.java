@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MoveTaskTest extends TaskTest {
@@ -34,7 +35,7 @@ public class MoveTaskTest extends TaskTest {
 		FileUtil.delete( targetRoot );
 
 		assertTrue( Files.exists( sourceRoot ) );
-		assertTrue( !Files.exists( targetRoot ) );
+		assertFalse( Files.exists( targetRoot ) );
 
 		try {
 			String sourcePath = sourceRoot.toString();
@@ -45,7 +46,7 @@ public class MoveTaskTest extends TaskTest {
 			assertThat( results.get( 0 ).getMessage(), startsWith( "Moved:" ) );
 			assertThat( results.get( 0 ).getMessage(), endsWith( targetRoot.getFileName().toString() ) );
 
-			assertTrue( !Files.exists( sourceRoot ) );
+			assertFalse( Files.exists( sourceRoot ) );
 			assertTrue( Files.exists( targetRoot ) );
 		} finally {
 			FileUtil.delete( targetRoot );
@@ -55,10 +56,11 @@ public class MoveTaskTest extends TaskTest {
 
 	@Test
 	public void testInvalidSource() throws Exception {
-		String source = "invalidsource";
-		String target = "invalidtarget";
+		String source = "missing-source";
+		String target = "not-a-real-target";
 		List<TaskResult> results = program.runTasksFromString( UpdateTask.MOVE + " " + source + " " + target );
-		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE, "IllegalArgumentException: Source does not exist: invalidsource" );
+		assertTaskResult( results.get( 0 ), TaskStatus.SUCCESS );
+		assertThat( results.get(0).getMessage(), startsWith( "Source does not exist:" ) );
 	}
 
 }
