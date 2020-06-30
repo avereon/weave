@@ -419,9 +419,7 @@ public class Program implements Product {
 			boolean needsElevation = task.needsElevation();
 			log.log( Log.TRACE, elevatedKey() + "Task needs elevation?: " + needsElevation );
 			if( needsElevation && !isElevated() ) {
-				long elevatedHandlerStart = System.currentTimeMillis();
 				if( elevatedHandler == null ) elevatedHandler = new ElevatedHandler( this ).start();
-				if( progressPane != null ) progressPane.setElevatedStartDelay( System.currentTimeMillis() - elevatedHandlerStart );
 				result = elevatedHandler.execute( task );
 			} else {
 				result = task.execute();
@@ -567,7 +565,12 @@ public class Program implements Product {
 				printWriter.println( ElevatedHandler.PROGRESS );
 				printWriter.flush();
 			}
-			if( progressPane != null ) Platform.runLater( () -> progressPane.setProgress( progress ) );
+			if( progressPane != null ) {
+				Platform.runLater( () -> {
+					if( elevatedHandler != null ) progressPane.setElevatedStartDelay( elevatedHandler.getElevatedHandlerStartDuration() );
+					progressPane.setProgress( progress );
+				} );
+			}
 		}
 
 	}

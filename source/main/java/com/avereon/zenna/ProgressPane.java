@@ -38,7 +38,7 @@ public class ProgressPane extends VBox {
 	}
 
 	public void setProgress( double progress ) {
-		long duration = System.currentTimeMillis() - startTimestamp - elevatedStartDelay;
+		long duration = (System.currentTimeMillis() - startTimestamp ) - elevatedStartDelay;
 		double rate = progress / duration;
 		long remaining = (long)((1 - progress) / rate);
 		showRemaining = showRemaining || (duration > 5000);

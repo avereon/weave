@@ -36,11 +36,16 @@ class ElevatedHandler {
 
 	private Throwable throwable;
 
+	private long serverStart;
+
+	private long clientConnect;
+
 	ElevatedHandler( Program program ) {
 		this.program = program;
 	}
 
 	public ElevatedHandler start() throws IOException {
+		serverStart = System.currentTimeMillis();
 		secret = UUID.randomUUID().toString();
 		startServerSocket();
 		startElevatedUpdater();
@@ -60,6 +65,11 @@ class ElevatedHandler {
 		sendTask( task );
 
 		return getTaskResult( task );
+	}
+
+	public long getElevatedHandlerStartDuration() {
+		if( clientConnect == 0 ) return 0;
+		return clientConnect - serverStart;
 	}
 
 	private void sendTask( Task task ) throws IOException {
@@ -132,23 +142,12 @@ class ElevatedHandler {
 	}
 
 	private void startElevatedUpdater() throws IOException {
-		Parameters parameters = program.getParameters();
-
-		//String logFolder = PathUtil.getParent( Log.getLogFile() );
-		//String logFile = PathUtil.resolve( logFolder, "elevated.%u.log" );
-
 		// Send the callback port and secret
-		ProcessBuilder processBuilder = new ProcessBuilder( OperatingSystem.getJavaLauncherPath() );
+		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forLauncher() );
 		processBuilder.command().add( ElevatedFlag.CALLBACK_SECRET );
 		processBuilder.command().add( secret );
 		processBuilder.command().add( ElevatedFlag.CALLBACK_PORT );
 		processBuilder.command().add( String.valueOf( server.getLocalPort() ) );
-		//processBuilder.command().add( LogFlag.LOG_FILE );
-		//processBuilder.command().add( logFile );
-//		if( parameters.isSet( LogFlag.LOG_LEVEL ) ) {
-//			processBuilder.command().add( LogFlag.LOG_LEVEL );
-//			processBuilder.command().add( "none");
-//		}
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
 		log.log( Log.DEBUG, "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
@@ -177,6 +176,7 @@ class ElevatedHandler {
 					reader = new NonBlockingReader( peer.getInputStream() );
 					if( reader.readLine( 100, TimeUnit.MILLISECONDS ).equals( secret ) ) {
 						log.log( Log.DEBUG, "Elevated client connected to normal client: " + server.getLocalPort() );
+						clientConnect = System.currentTimeMillis();
 						setSocket( peer );
 						server.close();
 					}

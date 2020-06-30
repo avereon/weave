@@ -3,7 +3,7 @@ package com.avereon.zenna.check;
 import com.avereon.util.LogFlag;
 import com.avereon.util.ProcessCommands;
 import com.avereon.util.TextUtil;
-import com.avereon.zenna.Program;
+import com.avereon.zenna.Launcher;
 import com.avereon.zenna.UpdateFlag;
 import com.avereon.zenna.UpdateTask;
 
@@ -82,11 +82,7 @@ public class CommandCheck {
 	}
 
 	public final void run() {
-		String modulePath = System.getProperty( "jdk.module.path" );
-		String mainModule = Program.class.getModule().getName();
-		String mainClass = Program.class.getName();
-
-		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forModule( null, modulePath, mainModule, mainClass ) );
+		ProcessBuilder processBuilder = new ProcessBuilder( ProcessCommands.forLauncher( Launcher.class ) );
 		processBuilder.command().addAll( getProgramCommands() );
 
 		try {
@@ -112,8 +108,9 @@ public class CommandCheck {
 			try {
 				BufferedReader reader = new BufferedReader( new InputStreamReader( process.getErrorStream(), TextUtil.CHARSET ) );
 				while( (line = reader.readLine()) != null ) {
-					System.err.println( line );
+					System.err.println( "> " + line );
 				}
+				System.err.println("> eof");
 			} catch( IOException exception ) {
 				exception.printStackTrace( System.err );
 			}
