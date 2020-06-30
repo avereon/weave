@@ -33,9 +33,9 @@ public class UnpackTask extends Task {
 
 	private static final String ADD_SUFFIX = ".add";
 
-	private Path source;
+	private final Path source;
 
-	private Path target;
+	private final Path target;
 
 	private ZipFile zip;
 
@@ -68,7 +68,7 @@ public class UnpackTask extends Task {
 	public TaskResult execute() throws Exception {
 		Files.createDirectories( target );
 
-		log.log( Log.DEBUG, "Staging: {}", source );
+		log.log( Log.DEBUG, "Staging: {0}", source );
 
 		try {
 			stage( source, target );
@@ -80,7 +80,7 @@ public class UnpackTask extends Task {
 			throw throwable;
 		}
 
-		log.log( Log.DEBUG, "Committing: {}", target );
+		log.log( Log.DEBUG, "Committing: {0}", target );
 		setMessage( "Committing " + target );
 		commit( target );
 		incrementProgress();
@@ -94,7 +94,7 @@ public class UnpackTask extends Task {
 	}
 
 	private void stage( Path source, Path target ) throws IOException {
-		log.log( Log.TRACE, "Staging: {} to {}...", source.getFileName(), target );
+		log.log( Log.TRACE, "Staging: {0} to {1}...", source.getFileName(), target );
 
 		final ZipFile zip = getZipFile();
 		try( zip ) {
@@ -108,7 +108,7 @@ public class UnpackTask extends Task {
 			}
 		}
 
-		log.log( Log.DEBUG, "Staged: {} to {}", source.getFileName(), target );
+		log.log( Log.DEBUG, "Staged: {0} to {1}", source.getFileName(), target );
 	}
 
 	private boolean stage( InputStream input, Path target, String entry ) throws IOException {
@@ -127,7 +127,7 @@ public class UnpackTask extends Task {
 			}
 		}
 
-		log.log( Log.DEBUG, "Staging: {}", entry );
+		log.log( Log.DEBUG, "Unpack: {0}", entry );
 		return true;
 	}
 
@@ -135,6 +135,7 @@ public class UnpackTask extends Task {
 		revert( target, target );
 	}
 
+	@SuppressWarnings( "unused" )
 	private void revert( Path root, Path target ) throws IOException {
 		// Revert staged changes.
 		if( Files.isDirectory( target ) ) {
@@ -167,15 +168,16 @@ public class UnpackTask extends Task {
 				Files.move( target, file, StandardCopyOption.REPLACE_EXISTING );
 				String targetHash = HashUtil.hash( file );
 				if( !targetHash.equals( sourceHash ) ) throw new RuntimeException( "Hash code mismatch committing file: " + file );
-				log.log( Log.TRACE, "Commit: {}", root.relativize( file ) );
+				log.log( Log.TRACE, "Commit: {0}", root.relativize( file ) );
 			} else if( target.getFileName().toString().endsWith( DEL_SUFFIX ) ) {
 				Path file = removeSuffix( target, DEL_SUFFIX );
-				if( !Files.exists( file ) ) log.log( Log.TRACE, "Remove: {}", root.relativize( file ) );
+				if( !Files.exists( file ) ) log.log( Log.TRACE, "Remove: {0}", root.relativize( file ) );
 				Files.delete( target );
 			}
 		}
 	}
 
+	@SuppressWarnings( "SameParameterValue" )
 	private Path removeSuffix( Path path, String suffix ) {
 		String name = path.getFileName().toString();
 		int index = name.indexOf( suffix );
