@@ -7,6 +7,14 @@ import javafx.scene.layout.VBox;
 
 public class ProgressPane extends VBox {
 
+	/**
+	 * How long to wait before showing the user how long the remainder of the
+	 * process will take. A rule of thumb is to wait only as long as the average
+	 * user is willing to wait before knowing how much longer they have to wait.
+	 * This is usually between zero and five seconds.
+	 */
+	private static final int SHOW_REMAINING_DELAY = 3000;
+
 	private final Label message;
 
 	private final ProgressBar indicator;
@@ -15,15 +23,26 @@ public class ProgressPane extends VBox {
 
 	private final long startTimestamp;
 
+	/**
+	 * This is how long it took to start the elevated updater process. This delay
+	 * can be relatively long due to the need for user interaction (usually to
+	 * authorize elevated privileges).
+	 */
 	private long elevatedStartDelay;
 
+	/**
+	 * The internal flag to show the remaining time to the user. This usually
+	 * starts off false (not showing) until a certain amount of time has passed
+	 * ({@link #SHOW_REMAINING_DELAY}), then it is set to true for the remainder
+	 * of the process.
+	 */
 	private boolean showRemaining;
 
 	public ProgressPane() {
 		setSpacing( 5 );
 		message = new Label();
 		message.prefWidthProperty().bind( this.widthProperty() );
-		indicator = new ProgressBar(0);
+		indicator = new ProgressBar( 0 );
 		indicator.prefWidthProperty().bind( this.widthProperty() );
 		throughput = new Label();
 		throughput.prefWidthProperty().bind( this.widthProperty() );
@@ -38,10 +57,10 @@ public class ProgressPane extends VBox {
 	}
 
 	public void setProgress( double progress ) {
-		long duration = (System.currentTimeMillis() - startTimestamp ) - elevatedStartDelay;
+		long duration = (System.currentTimeMillis() - startTimestamp) - elevatedStartDelay;
 		double rate = progress / duration;
 		long remaining = (long)((1 - progress) / rate);
-		showRemaining = showRemaining || (duration > 5000);
+		showRemaining = showRemaining || (duration > SHOW_REMAINING_DELAY);
 
 		Platform.runLater( () -> {
 			indicator.setProgress( progress );
