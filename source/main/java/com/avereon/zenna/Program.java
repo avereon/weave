@@ -387,6 +387,13 @@ public class Program implements Product {
 		}
 		if( results.size() > 0 ) return results;
 
+		// Check if any tasks need elevation
+		boolean needsElevation = false;
+		for( Task task : tasks ) {
+			needsElevation = needsElevation || task.needsElevation();
+		}
+		if( needsElevation ) elevatedHandler = new ElevatedHandler( this ).start();
+
 		// Execute the tasks
 		TaskResult result;
 		int taskCompletedCount = 0;
