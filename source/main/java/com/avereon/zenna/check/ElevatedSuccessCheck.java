@@ -6,15 +6,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElevatedCommandCheck extends CommandCheck {
+public class ElevatedSuccessCheck extends SuccessCheck {
 
 	public static void main( String[] commands ) {
-		new ElevatedCommandCheck().run();
+		new ElevatedSuccessCheck().run();
 	}
 
 	@Override
 	protected String getLogFile() {
-		return "target/privilege-check.log";
+		return "target/elevated-success-check.log";
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class ElevatedCommandCheck extends CommandCheck {
 	}
 
 	@Override
-	public void check( Process process ) throws IOException {
+	public void check( Process process, boolean verifyLast ) throws IOException {
 		check( "SUCCESS pause 500 \"Preparing update\"", readLine( process.getInputStream() ) );
 		check( "SUCCESS log \"hello1\"", readLine( process.getInputStream() ) );
 		check( "SUCCESS pause 2000 \"Simulating update\"", readLine( process.getInputStream() ) );

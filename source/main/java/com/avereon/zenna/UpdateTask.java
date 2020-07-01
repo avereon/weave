@@ -23,6 +23,12 @@ public interface UpdateTask {
 	String EXECUTE = "execute";
 
 	/**
+	 * The fail command indicated that the task should intentionally fail. This
+	 * is primarily used for testing.
+	 */
+	String FAIL = "fail";
+
+	/**
 	 * The header command sets the UI header, not the progress message. The header
 	 * should be set for every significant group of tasks.
 	 */
@@ -30,8 +36,8 @@ public interface UpdateTask {
 
 	/**
 	 * The launch command indicates that a new process should be launched. This
-	 * typically used at the end of an update process to start the updated
-	 * application.
+	 * typically used near the end of an update process to restart the updated
+	 * program.
 	 */
 	String LAUNCH = "launch";
 

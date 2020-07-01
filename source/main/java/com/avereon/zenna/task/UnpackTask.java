@@ -184,4 +184,11 @@ public class UnpackTask extends Task {
 		return index < 0 ? path : path.getParent().resolve( name.substring( 0, index ) );
 	}
 
+	@Override
+	public TaskResult rollback() throws Exception {
+		revert( target );
+		decrementProgress();
+		return new TaskResult( this, TaskStatus.SUCCESS, "Rollback unpack to: " + target );
+	}
+
 }

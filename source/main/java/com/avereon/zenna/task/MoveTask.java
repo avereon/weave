@@ -7,6 +7,7 @@ import com.avereon.zenna.TaskResult;
 import com.avereon.zenna.TaskStatus;
 import com.avereon.zenna.UpdateTask;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,8 +17,6 @@ public class MoveTask extends Task {
 
 	private static final System.Logger log = Log.get();
 
-	private final String message;
-
 	private final Path source;
 
 	private final Path target;
@@ -26,7 +25,6 @@ public class MoveTask extends Task {
 		super( UpdateTask.MOVE, parameters );
 		this.source = Paths.get( getParameters().get( 0 ) );
 		this.target = Paths.get( getParameters().get( 1 ) );
-		this.message = "Move " + this.source;
 	}
 
 	@Override
@@ -58,8 +56,22 @@ public class MoveTask extends Task {
 
 	@Override
 	public TaskResult execute() throws Exception {
-		System.err.println( "Executing move task: " + message );
-		setMessage( message );
+		System.err.println( "Executing move task: " + source );
+		TaskResult result = move(	source, target );
+		incrementProgress();
+		return result;
+	}
+
+	@Override
+	public TaskResult rollback() throws Exception {
+		System.err.println( "Rollback move task: " + source );
+		TaskResult result = move( target, source );
+		decrementProgress();
+		return result;
+	}
+
+	private TaskResult move( Path source, Path target ) throws IOException {
+		setMessage( "Move " + source );
 		TaskResult result;
 		if( Files.exists( source ) ) {
 			Files.createDirectories( target.getParent() );
@@ -68,7 +80,6 @@ public class MoveTask extends Task {
 		} else {
 			result = new TaskResult( this, TaskStatus.SUCCESS, "Source does not exist: " + source );
 		}
-		incrementProgress();
 		return result;
 	}
 

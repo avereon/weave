@@ -5,21 +5,21 @@ import com.avereon.zenna.UpdateFlag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandCheckWithUi extends CommandCheck {
+public class SuccessCheckUi extends SuccessCheck {
 
 	public static void main( String[] commands ) {
-		new CommandCheckWithUi().run();
+		new SuccessCheckUi().run();
 	}
 
 	@Override
 	protected String getLogFile() {
-		return "target/check-ui.log";
+		return "target/success-check-ui.log";
 	}
 
 	@Override
 	public List<String> getProgramCommands() {
 		List<String> commands = new ArrayList<>( super.getProgramCommands() );
-		commands.addAll( List.of( UpdateFlag.TITLE, "CommandCheck" ) );
+		commands.addAll( List.of( UpdateFlag.TITLE, "Success Check" ) );
 		return commands;
 	}
 

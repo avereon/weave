@@ -27,4 +27,10 @@ public class HeaderTask extends Task {
 		return new TaskResult( this, TaskStatus.SUCCESS, header == null ? "" : "\"" + header + "\"" );
 	}
 
+	@Override
+	public TaskResult rollback() throws Exception {
+		decrementProgress();
+		return new TaskResult( this, TaskStatus.SUCCESS, header == null ? "Rollback" : "\"Rollback " + header + "\"" );
+	}
+
 }

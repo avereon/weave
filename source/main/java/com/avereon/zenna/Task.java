@@ -75,6 +75,13 @@ public abstract class Task {
 		}
 	}
 
+	protected void decrementProgress() {
+		currentStep--;
+		for( TaskListener listener : listeners ) {
+			listener.updateProgress( currentStep );
+		}
+	}
+
 	boolean isElevated() {
 		return elevated;
 	}
@@ -85,6 +92,11 @@ public abstract class Task {
 	}
 
 	public abstract TaskResult execute() throws Exception;
+
+	public TaskResult rollback() throws Exception {
+		decrementProgress();
+		return new TaskResult( this, TaskStatus.SUCCESS, "Rollback " + getCommand() );
+	}
 
 	@Override
 	public String toString() {
