@@ -66,7 +66,12 @@ class ElevatedHandler {
 
 	public synchronized TaskResult execute( Task task ) throws IOException, InterruptedException, TimeoutException {
 		waitForConnect();
-		return getTaskResult( sendTask( task.setElevated() ) );
+		return getTaskResult( sendTask( task.setElevated(), false ) );
+	}
+
+	public synchronized TaskResult rollback( Task task ) throws IOException, InterruptedException, TimeoutException {
+		waitForConnect();
+		return getTaskResult( sendTask( task.setElevated(), true ) );
 	}
 
 	public long getElevatedHandlerStartDuration() {
@@ -74,9 +79,10 @@ class ElevatedHandler {
 		return clientConnect - serverStart;
 	}
 
-	private Task sendTask( Task task ) throws IOException {
+	private Task sendTask( Task task, boolean rollback ) throws IOException {
 		log.log( Log.DEBUG, "Sending task commands to elevated process..." );
 		log.log( Log.DEBUG, "  commands: " + task.getOriginalLine() );
+		if( rollback ) socket.getOutputStream().write( '-' );
 		socket.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
 		socket.getOutputStream().write( '\n' );
 		socket.getOutputStream().flush();

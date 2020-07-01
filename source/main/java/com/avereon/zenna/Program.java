@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 public class Program implements Product {
 
@@ -61,12 +62,17 @@ public class Program implements Product {
 
 	private ProgressPane progressPane;
 
+	private boolean overallFailure;
+
+	private boolean relaunched;
+
 	static {
 		Map<String, Class<? extends Task>> map = new HashMap<>();
 		map.put( UpdateTask.DELETE, DeleteTask.class );
 		map.put( UpdateTask.ELEVATED_LOG, ElevatedLogTask.class );
 		map.put( UpdateTask.ELEVATED_PAUSE, ElevatedPauseTask.class );
 		map.put( UpdateTask.EXECUTE, ExecuteTask.class );
+		map.put( UpdateTask.FAIL, FailTask.class );
 		map.put( UpdateTask.HEADER, HeaderTask.class );
 		map.put( UpdateTask.LAUNCH, LaunchTask.class );
 		map.put( UpdateTask.LOG, LogTask.class );
@@ -230,10 +236,13 @@ public class Program implements Product {
 				log.log( Log.INFO, elevatedKey() + card.getName() + " finished" );
 			}
 
-			// WORKAROUND Until I figure out why the thread doesn't exit
-			if( !TestUtil.isTest() ) System.exit( 0 );
+			if( !TestUtil.isTest() && shouldClose() ) System.exit( 0 );
 		}
 
+	}
+
+	private boolean shouldClose() {
+		return !overallFailure || relaunched;
 	}
 
 	private boolean isUi() {
@@ -303,7 +312,7 @@ public class Program implements Product {
 	}
 
 	private void hideProgressDialog() {
-		if( alert != null ) Platform.runLater( () -> alert.close() );
+		if( alert != null && shouldClose() ) Platform.runLater( () -> alert.close() );
 	}
 
 	public List<TaskResult> runTasksFromString( String commands ) throws IOException, InterruptedException, TimeoutException {
@@ -362,11 +371,21 @@ public class Program implements Product {
 		// If the elevated process gives up waiting for its next task too soon
 		// it exits...closing the socket and causing a broken pipe
 		while( !TextUtil.isEmpty( line = buffer.readLine( hungTimeout, TimeUnit.SECONDS ) ) ) {
+			line = line.trim();
+			boolean rollback = false;
+			if( line.startsWith( "-" ) ) {
+				rollback = true;
+				line = line.substring( 1 );
+			}
 			Task task = parseTask( line.trim() );
 			try {
 				TaskHandler handler = new TaskHandler( task.getStepCount(), printWriter );
 				task.addTaskListener( handler );
-				results.add( executeTask( task, printWriter ) );
+				if( rollback ) {
+					results.add( rollbackTask( task, printWriter ) );
+				} else {
+					results.add( executeTask( task, printWriter ) );
+				}
 				task.removeTaskListener( handler );
 			} catch( Exception exception ) {
 				results.add( getTaskResult( task, exception ) );
@@ -405,27 +424,34 @@ public class Program implements Product {
 		// Execute the tasks
 		TaskResult result;
 		int taskCompletedCount = 0;
-		PrintWriter printWriter = new PrintWriter( writer );
-		TaskHandler handler = new TaskHandler( totalSteps, printWriter );
+		PrintWriter printer = new PrintWriter( writer );
+		TaskHandler handler = new TaskHandler( totalSteps, printer );
 		for( Task task : tasks ) {
 			if( !execute ) break;
 
 			if( isUi() ) task.addTaskListener( handler );
-			results.add( result = executeTask( task, printWriter ) );
+			results.add( result = executeTask( task, printer ) );
 			if( isUi() ) task.removeTaskListener( handler );
 
-			if( result.getStatus() == TaskStatus.FAILURE ) break;
+			if( result.getStatus() == TaskStatus.FAILURE ) {
+				overallFailure = true;
+				rollback( results, printer );
+				relaunch( tasks, results, printer );
+				break;
+			}
 			taskCompletedCount++;
 		}
-		printWriter.close();
+		printer.close();
 
 		// Closing the elevated process output stream should cause it to exit
 		if( elevatedHandler != null ) elevatedHandler.stop();
 
 		if( isUi() ) {
-			if( progressPane != null ) progressPane.setMessage( "Update complete" );
-			if( progressPane != null ) progressPane.setProgress( 1.0 );
-			Thread.sleep( 1000 );
+			if( overallFailure ) {
+				showFailureState();
+			} else {
+				showSuccessState();
+			}
 		}
 
 		synchronized( waitLock ) {
@@ -437,8 +463,59 @@ public class Program implements Product {
 		return results;
 	}
 
+	private void showSuccessState() throws InterruptedException {
+		if( progressPane != null ) {
+			progressPane.setMessage( "Update complete" );
+			progressPane.setProgress( 1.0 );
+		}
+		Thread.sleep( 1000 );
+	}
+
+	private void showFailureState() throws InterruptedException {
+		if( progressPane != null ) {
+			progressPane.setMessage( "Update failed" );
+			progressPane.setProgress( -1.0 );
+		}
+		if( alert != null ) {
+			Platform.runLater( () -> {
+				alert.getButtonTypes().clear();
+				alert.getButtonTypes().addAll( ButtonType.CLOSE );
+			} );
+		}
+		if( relaunched ) Thread.sleep( 1000 );
+	}
+
 	private String elevatedKey() {
 		return isElevated() ? "+" : "";
+	}
+
+	private boolean isElevated() {
+		return OperatingSystem.isProcessElevated();
+	}
+
+	private void printHeader( ProductCard card ) {
+		// These use System.err because System.out is used for communication
+		System.err.println( card.getName() + " " + card.getVersion() );
+		System.err.println( "Java " + System.getProperty( "java.runtime.version" ) );
+	}
+
+	private Task parseTask( String line ) {
+		List<String> commands = TextUtil.split( line );
+		String command = commands.get( 0 );
+		List<String> parameterList = commands.subList( 1, commands.size() );
+
+		Task task;
+		try {
+			Class<? extends Task> taskClass = taskNameMap.get( command );
+			if( taskClass == null ) throw new IllegalArgumentException( "Unknown command: " + command );
+			task = taskClass.getConstructor( List.class ).newInstance( parameterList );
+		} catch( Exception exception ) {
+			throw new RuntimeException( exception );
+		}
+
+		task.setOriginalLine( line );
+
+		return task;
 	}
 
 	private boolean anyTaskNeedsElevation( Collection<Task> tasks ) {
@@ -486,6 +563,36 @@ public class Program implements Product {
 		return result;
 	}
 
+	private TaskResult rollbackTask( Task task, PrintWriter printWriter ) {
+		TaskResult result;
+
+		// Try to keep the prompt the same size as the result prompt below
+		log.log( Log.DEBUG, elevatedKey() + "Rollback task:  " + task.getOriginalLine() );
+
+		try {
+			if( !isElevated() && task.needsElevation() ) {
+				result = startElevatedHandler().rollback( task );
+			} else {
+				result = task.rollback();
+			}
+		} catch( Exception exception ) {
+			result = getTaskResult( task, exception );
+			//log.log( Log.WARN, "", exception );
+		}
+
+		if( result == null ) {
+			log.log( Log.ERROR, "Null result rolling back " + task );
+		} else {
+			printWriter.println( result.format() );
+			printWriter.flush();
+		}
+
+		// Try to keep the prompt the same size as the running prompt above
+		log.log( Log.INFO, elevatedKey() + "Result: " + result );
+
+		return result;
+	}
+
 	private TaskResult getTaskResult( Task task, Exception exception ) {
 		TaskResult result;
 		if( execute ) {
@@ -498,33 +605,18 @@ public class Program implements Product {
 		return result;
 	}
 
-	private Task parseTask( String line ) {
-		List<String> commands = TextUtil.split( line );
-		String command = commands.get( 0 );
-		List<String> parameterList = commands.subList( 1, commands.size() );
-
-		Task task;
-		try {
-			Class<? extends Task> taskClass = taskNameMap.get( command );
-			if( taskClass == null ) throw new IllegalArgumentException( "Unknown command: " + command );
-			task = taskClass.getConstructor( List.class ).newInstance( parameterList );
-		} catch( Exception exception ) {
-			throw new RuntimeException( exception );
-		}
-
-		task.setOriginalLine( line );
-
-		return task;
+	private void rollback( List<TaskResult> results, PrintWriter printer ) {
+		List<Task> undoTasks = results.stream().map( TaskResult::getTask ).collect( Collectors.toList() );
+		undoTasks = undoTasks.subList( 0, undoTasks.size() - 1 );
+		Collections.reverse( undoTasks );
+		undoTasks.forEach( t -> results.add( rollbackTask( t, printer ) ) );
 	}
 
-	private void printHeader( ProductCard card ) {
-		// These use System.err because System.out is used for communication
-		System.err.println( card.getName() + " " + card.getVersion() );
-		System.err.println( "Java " + System.getProperty( "java.runtime.version" ) );
-	}
-
-	private boolean isElevated() {
-		return OperatingSystem.isProcessElevated();
+	private void relaunch( List<Task> tasks, List<TaskResult> results, PrintWriter printer ) {
+		tasks.stream().filter( t -> UpdateTask.LAUNCH.equals( t.getCommand() ) ).findFirst().ifPresent( t -> {
+			results.add( executeTask( t, printer ) );
+			relaunched = true;
+		} );
 	}
 
 	private class TaskHandler implements TaskListener {

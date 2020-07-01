@@ -47,4 +47,10 @@ public class PauseTask extends Task {
 		return new TaskResult( this, TaskStatus.SUCCESS, time + (message == null ? "" : " \"" + message + "\"") );
 	}
 
+	@Override
+	public TaskResult rollback() throws Exception {
+		decrementProgress();
+		return new TaskResult( this, TaskStatus.SUCCESS, message == null ? "Rollback" : "\"Rollback " + message + "\"" );
+	}
+
 }

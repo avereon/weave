@@ -13,21 +13,21 @@ import java.util.List;
  * IntelliJ keys off the folder whether to run this as a module or a class. It
  * needs to be run from the java folder, not the test folder.
  */
-public class ElevatedCommandCheckWithUi extends ElevatedCommandCheck {
+public class ElevatedSuccessCheckUi extends ElevatedSuccessCheck {
 
 	public static void main( String[] commands ) {
-		new ElevatedCommandCheckWithUi().run();
+		new ElevatedSuccessCheckUi().run();
 	}
 
 	@Override
 	protected String getLogFile() {
-		return "target/privilege-check-ui.log";
+		return "target/elevated-success-check-ui.log";
 	}
 
 	@Override
 	public List<String> getProgramCommands() {
 		List<String> commands = new ArrayList<>( super.getProgramCommands() );
-		commands.addAll( List.of( UpdateFlag.TITLE, "ElevatedCommandCheck" ) );
+		commands.addAll( List.of( UpdateFlag.TITLE, "Elevated Success Check" ) );
 		return commands;
 	}
 

@@ -61,15 +61,18 @@ public class ProgressPane extends VBox {
 		double rate = progress / duration;
 		long remaining = (long)((1 - progress) / rate);
 		showRemaining = showRemaining || (duration > SHOW_REMAINING_DELAY);
+		if( progress == -1.0 ) showRemaining = false;
 
 		Platform.runLater( () -> {
-			indicator.setProgress( progress );
+			indicator.setProgress( Math.max( 0.0, progress ) );
 			if( showRemaining ) {
 				if( progress == 1.0 ) {
 					throughput.setText( "Completed: " + formatDuration( duration ) );
 				} else {
 					throughput.setText( "Remaining: " + formatDuration( remaining ) );
 				}
+			} else {
+				throughput.setText( "" );
 			}
 		} );
 	}
