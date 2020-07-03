@@ -7,12 +7,12 @@
 	<parent>
 		<groupId>com.avereon.pom</groupId>
 		<artifactId>prd</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.0.0</version>
 	</parent>
 
 	<groupId>com.avereon</groupId>
 	<artifactId>zenna</artifactId>
-	<version>0.4-SNAPSHOT</version>
+	<version>0.4</version>
 	<packaging>jar</packaging>
 
 	<name>Zenna</name>
@@ -45,12 +45,13 @@
 
 	<properties>
 		<images-folder>target/main/images</images-folder>
-		<!-- Runtime dependencies -->
 
-		<!-- Version numbers updated 02 Oct 2019 -->
+		<!-- Version numbers updated 02 Jul 2020 -->
 		<!-- Runtime dependencies -->
-		<!--java.version defined in parent pom -->
-		<openjfx.version>14.0.1</openjfx.version>
+		<rossa.version>0.3</rossa.version>
+		<zevra.version>0.4</zevra.version>
+
+		<cameo.version>2.6</cameo.version>
 	</properties>
 
 	<dependencies>
@@ -58,14 +59,14 @@
 		<dependency>
 			<groupId>com.avereon</groupId>
 			<artifactId>rossa</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>${rossa.version}</version>
 			<optional>true</optional>
 		</dependency>
 
 		<dependency>
 			<groupId>com.avereon</groupId>
 			<artifactId>zevra</artifactId>
-			<version>0.4-SNAPSHOT</version>
+			<version>${zevra.version}</version>
 			<optional>true</optional>
 		</dependency>
 
@@ -88,7 +89,7 @@
 			<plugin>
 				<groupId>com.avereon</groupId>
 				<artifactId>cameo</artifactId>
-				<version>2.6-SNAPSHOT</version>
+				<version>${cameo.version}</version>
 				<executions>
 					<execution>
 						<id>render-images</id>
