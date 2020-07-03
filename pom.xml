@@ -7,12 +7,12 @@
 	<parent>
 		<groupId>com.avereon.pom</groupId>
 		<artifactId>prd</artifactId>
-		<version>3.0.0</version>
+		<version>3.1.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.avereon</groupId>
 	<artifactId>zenna</artifactId>
-	<version>0.4</version>
+	<version>0.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Zenna</name>
@@ -48,10 +48,10 @@
 
 		<!-- Version numbers updated 02 Jul 2020 -->
 		<!-- Runtime dependencies -->
-		<rossa.version>0.3</rossa.version>
-		<zevra.version>0.4</zevra.version>
+		<rossa.version>0.4-SNAPSHOT</rossa.version>
+		<zevra.version>0.5-SNAPSHOT</zevra.version>
 
-		<cameo.version>2.6</cameo.version>
+		<cameo.version>2.7-SNAPSHOT</cameo.version>
 	</properties>
 
 	<dependencies>
