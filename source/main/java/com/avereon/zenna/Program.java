@@ -4,6 +4,8 @@ import com.avereon.product.Product;
 import com.avereon.product.ProductBundle;
 import com.avereon.product.ProductCard;
 import com.avereon.rossa.icon.UpdateIcon;
+import com.avereon.settings.MapSettings;
+import com.avereon.settings.Settings;
 import com.avereon.util.*;
 import com.avereon.venza.image.Images;
 import com.avereon.venza.javafx.FxUtil;
@@ -109,6 +111,11 @@ public class Program implements Product {
 	@Override
 	public ProductBundle rb() {
 		return resourceBundle;
+	}
+
+	@Override
+	public Settings getSettings() {
+		return new MapSettings();
 	}
 
 	@Override
