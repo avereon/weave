@@ -48,7 +48,7 @@
 
 		<!-- Version numbers updated 02 Jul 2020 -->
 		<!-- Runtime dependencies -->
-		<rossa.version>0.4-SNAPSHOT</rossa.version>
+		<zenna.version>0.4-SNAPSHOT</zenna.version>
 		<zevra.version>0.5-SNAPSHOT</zevra.version>
 
 		<cameo.version>2.7-SNAPSHOT</cameo.version>
@@ -58,8 +58,8 @@
 
 		<dependency>
 			<groupId>com.avereon</groupId>
-			<artifactId>rossa</artifactId>
-			<version>${rossa.version}</version>
+			<artifactId>zenna</artifactId>
+			<version>${zenna.version}</version>
 			<optional>true</optional>
 		</dependency>
 
