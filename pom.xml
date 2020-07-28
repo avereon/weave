@@ -100,7 +100,7 @@
 						<configuration>
 							<images>
 								<image>
-									<class>com.avereon.rossa.icon.ZinniaIcon</class>
+									<class>com.avereon.zenna.icon.ZinniaIcon</class>
 									<target>${images-folder}/weave.png</target>
 									<theme>light</theme>
 								</image>
@@ -111,31 +111,31 @@
 									<theme>light</theme>
 									<images>
 										<image>
-											<class>com.avereon.rossa.icon.ZinniaIcon</class>
+											<class>com.avereon.zenna.icon.ZinniaIcon</class>
 											<size>16</size>
 										</image>
 										<image>
-											<class>com.avereon.rossa.icon.ZinniaIcon</class>
+											<class>com.avereon.zenna.icon.ZinniaIcon</class>
 											<size>24</size>
 										</image>
 										<image>
-											<class>com.avereon.rossa.icon.ZinniaIcon</class>
+											<class>com.avereon.zenna.icon.ZinniaIcon</class>
 											<size>32</size>
 										</image>
 										<image>
-											<class>com.avereon.rossa.icon.ZinniaIcon</class>
+											<class>com.avereon.zenna.icon.ZinniaIcon</class>
 											<size>48</size>
 										</image>
 										<image>
-											<class>com.avereon.rossa.icon.ZinniaIcon</class>
+											<class>com.avereon.zenna.icon.ZinniaIcon</class>
 											<size>64</size>
 										</image>
 										<image>
-											<class>com.avereon.rossa.icon.ZinniaIcon</class>
+											<class>com.avereon.zenna.icon.ZinniaIcon</class>
 											<size>96</size>
 										</image>
 										<image>
-											<class>com.avereon.rossa.icon.ZinniaIcon</class>
+											<class>com.avereon.zenna.icon.ZinniaIcon</class>
 											<size>128</size>
 										</image>
 									</images>

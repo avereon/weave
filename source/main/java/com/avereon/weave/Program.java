@@ -3,7 +3,7 @@ package com.avereon.weave;
 import com.avereon.product.Product;
 import com.avereon.product.ProductBundle;
 import com.avereon.product.ProductCard;
-import com.avereon.rossa.icon.UpdateIcon;
+import com.avereon.zenna.icon.UpdateIcon;
 import com.avereon.settings.MapSettings;
 import com.avereon.settings.Settings;
 import com.avereon.util.*;
