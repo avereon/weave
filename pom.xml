@@ -11,11 +11,11 @@
 	</parent>
 
 	<groupId>com.avereon</groupId>
-	<artifactId>zenna</artifactId>
-	<version>0.5-SNAPSHOT</version>
+	<artifactId>weave</artifactId>
+	<version>0.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Zenna</name>
+	<name>Weave</name>
 	<description>Update utility</description>
 	<inceptionYear>2018</inceptionYear>
 
@@ -80,8 +80,8 @@
 				<!-- This configuration allows the JUnit test runner to find the unit tests -->
 				<configuration>
 					<argLine>
-						--add-opens=com.avereon.zenna/com.avereon.zenna=ALL-UNNAMED
-						--add-opens=com.avereon.zenna/com.avereon.zenna.task=ALL-UNNAMED
+						--add-opens=com.avereon.weave/com.avereon.weave=ALL-UNNAMED
+						--add-opens=com.avereon.weave/com.avereon.weave.task=ALL-UNNAMED
 					</argLine>
 				</configuration>
 			</plugin>
@@ -101,13 +101,13 @@
 							<images>
 								<image>
 									<class>com.avereon.rossa.icon.ZinniaIcon</class>
-									<target>${images-folder}/zenna.png</target>
+									<target>${images-folder}/weave.png</target>
 									<theme>light</theme>
 								</image>
 							</images>
 							<icons>
 								<icon>
-									<target>${images-folder}/zenna.ico</target>
+									<target>${images-folder}/weave.ico</target>
 									<theme>light</theme>
 									<images>
 										<image>

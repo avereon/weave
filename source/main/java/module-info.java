@@ -1,13 +1,11 @@
-import com.avereon.zenna.Program;
-
-module com.avereon.zenna {
+module com.avereon.weave {
 
 	requires javafx.controls;
 	requires com.avereon.zevra;
 	requires com.avereon.rossa;
 
-	exports com.avereon.zenna;
+	exports com.avereon.weave;
 
-	provides com.avereon.product.Product with Program;
+	provides com.avereon.product.Product with com.avereon.weave.Program;
 
 }

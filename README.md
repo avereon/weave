@@ -1,6 +1,6 @@
-[build-status]: https://github.com/avereon/zenna/workflows/Avereon%20Zenna%20Continuous/badge.svg "Build status"
+[build-status]: https://github.com/avereon/weave/workflows/Avereon%20Weave%20Continuous/badge.svg "Build status"
 
-# Zenna [![][build-status]](https://github.com/avereon/zenna/actions)
+# Weave [![][build-status]](https://github.com/avereon/weave/actions)
 
 A Java program to apply updates. This program is commonly used with other 
 programs to automate the update process. It has pre-defined tasks that can be 
@@ -25,5 +25,5 @@ There are several pre-defined tasks that can be specified.
 # Demonstration
 To run a demonstration of the program use the following command line parameters:
     
-    java -jar zenna.jar --title "Zenna Test" --file source/test/resources/commands.txt
+    java -jar weave.jar --title "Weave Test" --file source/test/resources/commands.txt
 

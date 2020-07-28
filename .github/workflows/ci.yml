@@ -1,4 +1,4 @@
-name: Avereon Zenna Continuous
+name: Avereon Weave Continuous
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - stable
 
 env:
-  AVN_PRODUCT: "zenna"
+  AVN_PRODUCT: "weave"
   # The default release, should be overridden in config.sh
   AVN_RELEASE: "latest"
   # The default platform, should be overridden in the platform binaries jobs below

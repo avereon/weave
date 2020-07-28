@@ -13,7 +13,7 @@
   "licenseSummary" : "${project.name} comes with ABSOLUTELY NO WARRANTY. This is open software, and you are welcome to redistribute it under certain conditions.",
   "cardUri" : "http://avereon.com/download/${project.artifactId}/product/card/{0}",
   "packUri" : "http://avereon.com/download/${project.artifactId}/product/pack/{0}",
-  "mainClass" : "com.avereon.xevra.Program",
+  "mainClass" : "com.avereon.weave.Program",
   "javaVersion" : "11",
   "maintainers" : [ {
     "name" : "Mark Soderquist",

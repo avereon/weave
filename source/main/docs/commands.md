@@ -1,4 +1,4 @@
-# Annex Commands
+# Weave Commands
 
 Commands are be given to ${project.name} using this format. The commands can be
 provided through stdin or a file. Either way, the format is the same.
