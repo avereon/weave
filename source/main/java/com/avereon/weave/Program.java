@@ -312,7 +312,7 @@ public class Program implements Product {
 			alert.show();
 		} );
 		try {
-			FxUtil.fxWait( 1000 );
+			FxUtil.fxWaitWithInterrupt( 1000 );
 		} catch( InterruptedException exception ) {
 			log.log( Log.WARN, "Interrupted waiting for progress dialog" );
 		}
