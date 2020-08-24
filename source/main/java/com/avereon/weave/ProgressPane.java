@@ -1,6 +1,6 @@
 package com.avereon.weave;
 
-import javafx.application.Platform;
+import com.avereon.zerra.javafx.Fx;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
@@ -53,7 +53,7 @@ public class ProgressPane extends VBox {
 	}
 
 	public void setMessage( String text ) {
-		Platform.runLater( () -> this.message.setText( text ) );
+		Fx.run( () -> this.message.setText( text ) );
 	}
 
 	public void setProgress( double progress ) {
@@ -63,7 +63,7 @@ public class ProgressPane extends VBox {
 		showRemaining = showRemaining || (duration > SHOW_REMAINING_DELAY);
 		if( progress == -1.0 ) showRemaining = false;
 
-		Platform.runLater( () -> {
+		Fx.run( () -> {
 			indicator.setProgress( Math.max( 0.0, progress ) );
 			if( showRemaining ) {
 				if( progress == 1.0 ) {

@@ -8,7 +8,7 @@ import com.avereon.settings.MapSettings;
 import com.avereon.settings.Settings;
 import com.avereon.util.*;
 import com.avereon.zerra.image.Images;
-import com.avereon.zerra.javafx.FxUtil;
+import com.avereon.zerra.javafx.Fx;
 import com.avereon.weave.task.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -312,14 +312,14 @@ public class Program implements Product {
 			alert.show();
 		} );
 		try {
-			FxUtil.fxWaitWithInterrupt( 1000 );
+			Fx.waitForWithInterrupt( 1000 );
 		} catch( InterruptedException exception ) {
 			log.log( Log.WARN, "Interrupted waiting for progress dialog" );
 		}
 	}
 
 	private void hideProgressDialog() {
-		if( alert != null && shouldClose() ) Platform.runLater( () -> alert.close() );
+		if( alert != null && shouldClose() ) Fx.run( () -> alert.close() );
 	}
 
 	public List<TaskResult> runTasksFromString( String commands ) throws IOException, InterruptedException, TimeoutException {
@@ -484,7 +484,7 @@ public class Program implements Product {
 			progressPane.setProgress( -1.0 );
 		}
 		if( alert != null ) {
-			Platform.runLater( () -> {
+			Fx.run( () -> {
 				alert.getButtonTypes().clear();
 				alert.getButtonTypes().addAll( ButtonType.CLOSE );
 			} );
@@ -645,7 +645,7 @@ public class Program implements Product {
 			// Don't flush the stream here...not sure why this is a problem but,
 			// there is always a following progress event to flush the stream
 			//printWriter.flush();
-			if( alert != null ) Platform.runLater( () -> alert.setHeaderText( header ) );
+			if( alert != null ) Fx.run( () -> alert.setHeaderText( header ) );
 		}
 
 		@Override
@@ -654,7 +654,7 @@ public class Program implements Product {
 			// Don't flush the stream here...not sure why this is a problem but,
 			// there is always a following progress event to flush the stream
 			//printWriter.flush();
-			if( progressPane != null ) Platform.runLater( () -> progressPane.setMessage( message ) );
+			if( progressPane != null ) Fx.run( () -> progressPane.setMessage( message ) );
 		}
 
 		@Override
@@ -666,7 +666,7 @@ public class Program implements Product {
 				printWriter.flush();
 			}
 			if( progressPane != null ) {
-				Platform.runLater( () -> {
+				Fx.run( () -> {
 					progressPane.setElevatedStartDelay( Optional.ofNullable( elevatedHandler ).map( ElevatedHandler::getElevatedHandlerStartDuration ).orElse( 0L ) );
 					progressPane.setProgress( progress );
 				} );
