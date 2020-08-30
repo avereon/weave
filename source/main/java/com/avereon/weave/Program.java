@@ -546,15 +546,14 @@ public class Program implements Product {
 
 		try {
 			task.validate();
-
-			if( !isElevated() && task.needsElevation() ) {
+			task.prerequisites();
+			if( task.needsElevation() && !isElevated() ) {
 				result = startElevatedHandler().execute( task );
 			} else {
 				result = task.execute();
 			}
 		} catch( Exception exception ) {
 			result = getTaskResult( task, exception );
-			//log.log( Log.WARN, "", exception );
 		}
 
 		if( result == null ) {

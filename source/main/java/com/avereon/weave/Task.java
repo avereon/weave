@@ -36,6 +36,8 @@ public abstract class Task {
 
 	public void validate() {}
 
+	public void prerequisites() throws Exception {}
+
 	public boolean needsElevation() {
 		return false;
 	}

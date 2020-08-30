@@ -39,6 +39,18 @@ public class MoveTask extends Task {
 	}
 
 	@Override
+	public void prerequisites() throws Exception {
+		// Try to create missing folders without elevation
+		if( target != null ) {
+			Path parent = target.getParent();
+			if( parent != null ) {
+				Path existingParent = FileUtil.findValidParent( target );
+				if( parent != existingParent ) Files.createDirectories( parent );
+			}
+		}
+	}
+
+	@Override
 	public boolean needsElevation() {
 		if( !Files.exists( source ) ) return false;
 
@@ -57,7 +69,7 @@ public class MoveTask extends Task {
 	@Override
 	public TaskResult execute() throws Exception {
 		System.err.println( "Executing move task: " + source );
-		TaskResult result = move(	source, target );
+		TaskResult result = move( source, target );
 		incrementProgress();
 		return result;
 	}
@@ -74,6 +86,7 @@ public class MoveTask extends Task {
 		setMessage( "Move " + source );
 		TaskResult result;
 		if( Files.exists( source ) ) {
+			// FIXME creating the folders here can cause some problems when running elevated
 			Files.createDirectories( target.getParent() );
 			Files.move( source, target );
 			result = new TaskResult( this, TaskStatus.SUCCESS, "Moved: " + source + " to " + target );
