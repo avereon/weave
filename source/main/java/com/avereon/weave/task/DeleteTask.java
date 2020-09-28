@@ -30,7 +30,7 @@ public class DeleteTask extends Task {
 
 	@Override
 	public void validate() {
-		if( !Files.exists( target ) ) log.log( Log.WARN, "Target does not exist: {0}", target );
+		if( !Files.exists( target ) ) log.log( Log.DEBUG, "Target does not exist: {0}", target );
 	}
 
 	@Override

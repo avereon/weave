@@ -526,11 +526,13 @@ public class Program implements Product {
 	}
 
 	private boolean anyTaskNeedsElevation( Collection<Task> tasks ) {
-		boolean needsElevation = false;
+		boolean anyTaskNeedsElevation = false;
 		for( Task task : tasks ) {
-			needsElevation = needsElevation || task.needsElevation();
+			boolean taskNeedsElevation = task.needsElevation();
+			if( taskNeedsElevation ) log.log( Log.DEBUG, "Task requested elevation: " + task );
+			anyTaskNeedsElevation = anyTaskNeedsElevation || taskNeedsElevation;
 		}
-		return needsElevation;
+		return anyTaskNeedsElevation;
 	}
 
 	private ElevatedHandler startElevatedHandler() throws InterruptedException, TimeoutException, IOException {
