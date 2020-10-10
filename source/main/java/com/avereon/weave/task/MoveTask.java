@@ -61,7 +61,7 @@ public class MoveTask extends Task {
 		Path targetParent = FileUtil.findValidParent( target );
 
 		boolean sourceOk = Files.isReadable( source ) && Files.isWritable( sourceParent );
-		boolean targetOk = !Files.exists( target ) && Files.isWritable( targetParent );
+		boolean targetOk = !Files.exists( target ) || Files.isWritable( targetParent );
 
 		return !(sourceOk & targetOk);
 	}
