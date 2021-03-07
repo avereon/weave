@@ -1,15 +1,15 @@
 package com.avereon.weave;
 
 import com.avereon.product.Product;
-import com.avereon.product.ProductBundle;
 import com.avereon.product.ProductCard;
-import com.avereon.zenna.icon.UpdateIcon;
+import com.avereon.product.Rb;
 import com.avereon.settings.MapSettings;
 import com.avereon.settings.Settings;
 import com.avereon.util.*;
+import com.avereon.weave.task.*;
+import com.avereon.zenna.icon.UpdateIcon;
 import com.avereon.zerra.image.Images;
 import com.avereon.zerra.javafx.Fx;
-import com.avereon.weave.task.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -47,8 +47,6 @@ public class Program implements Product {
 	private final Object waitLock;
 
 	private final ProductCard card;
-
-	private final ProductBundle resourceBundle;
 
 	private final Path programDataFolder;
 
@@ -94,23 +92,14 @@ public class Program implements Product {
 		this.waitLock = new Object();
 		this.card = new ProductCard().card( this );
 		this.title = card.getName();
-		this.resourceBundle = new ProductBundle( this );
 		this.programDataFolder = OperatingSystem.getUserProgramDataFolder( card.getArtifact(), card.getName() );
+
+		Rb.init( this );
 	}
 
 	@Override
 	public ProductCard getCard() {
 		return card;
-	}
-
-	@Override
-	public ClassLoader getClassLoader() {
-		return super.getClass().getClassLoader();
-	}
-
-	@Override
-	public ProductBundle rb() {
-		return resourceBundle;
 	}
 
 	@Override
