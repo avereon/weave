@@ -7,12 +7,12 @@
 	<parent>
 		<groupId>com.avereon.pom</groupId>
 		<artifactId>prd</artifactId>
-		<version>3.1.0</version>
+		<version>3.2.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.avereon</groupId>
 	<artifactId>weave</artifactId>
-	<version>0.4</version>
+	<version>0.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Weave</name>
@@ -48,10 +48,10 @@
 
 		<!-- Version numbers updated 02 Jul 2020 -->
 		<!-- Runtime dependencies -->
-		<zenna.version>0.4</zenna.version>
-		<zevra.version>0.5</zevra.version>
+		<zenna.version>0.5-SNAPSHOT</zenna.version>
+		<zevra.version>0.6-SNAPSHOT</zevra.version>
 
-		<cameo.version>2.7</cameo.version>
+		<cameo.version>2.8-SNAPSHOT</cameo.version>
 	</properties>
 
 	<dependencies>
