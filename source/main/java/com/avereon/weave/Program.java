@@ -90,7 +90,7 @@ public class Program implements Product {
 		this.execute = true;
 		this.status = Status.STOPPED;
 		this.waitLock = new Object();
-		this.card = new ProductCard().card( this );
+		this.card = ProductCard.card( this );
 		this.title = card.getName();
 		this.programDataFolder = OperatingSystem.getUserProgramDataFolder( card.getArtifact(), card.getName() );
 
