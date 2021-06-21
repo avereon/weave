@@ -301,7 +301,9 @@ public class Program implements Product {
 			alert.show();
 		} );
 		try {
-			Fx.waitForWithInterrupt( 1000 );
+			Fx.waitForWithExceptions( 1000 );
+		} catch( TimeoutException exception ) {
+			log.log( Log.WARN, "Timeout waiting for progress dialog" );
 		} catch( InterruptedException exception ) {
 			log.log( Log.WARN, "Interrupted waiting for progress dialog" );
 		}
