@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.startsWith;
 
 public class LaunchTaskTest extends TaskTest {
 
-	private String workingFolder = System.getProperty( "user.dir" );
+	private final String workingFolder = System.getProperty( "user.dir" );
 
 	@Test
 	public void testExecute() throws Exception {

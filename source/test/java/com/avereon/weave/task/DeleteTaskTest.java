@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DeleteTaskTest extends TaskTest {
 
-	private String filePath = "target/deleteme";
+	private final String filePath = "target/deleteme";
 
 	@Test
 	public void testNeedsElevation() throws Exception {

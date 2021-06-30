@@ -23,7 +23,9 @@ import static org.hamcrest.Matchers.*;
 
 public class ElevatedProcessTest {
 
-	private long wait = 100;
+	private static final String workingFolder = System.getProperty( "user.dir" );
+
+	private static final long wait = 100;
 
 	private Program elevated;
 
@@ -32,8 +34,6 @@ public class ElevatedProcessTest {
 	private PrintWriter writer;
 
 	private NonBlockingReader reader;
-
-	private String workingFolder = System.getProperty( "user.dir" );
 
 	@BeforeEach
 	public void setup() throws Exception {
