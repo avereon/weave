@@ -1,11 +1,11 @@
 package com.avereon.weave.task;
 
 import com.avereon.util.FileUtil;
-import com.avereon.util.Log;
 import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
+import lombok.extern.flogger.Flogger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,9 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+@Flogger
 public class MoveTask extends Task {
-
-	private static final System.Logger log = Log.get();
 
 	private final Path source;
 
@@ -34,7 +33,7 @@ public class MoveTask extends Task {
 
 	@Override
 	public void validate() {
-		if( !Files.exists( source ) ) log.log( Log.WARN, "Source does not exist: {0}", source );
+		if( !Files.exists( source ) ) log.atWarning().log( "Source does not exist: %s", source );
 		if( Files.exists( target ) ) throw new IllegalArgumentException( "Target already exists: " + target );
 	}
 
@@ -60,7 +59,7 @@ public class MoveTask extends Task {
 		// Find the existing target parent
 		Path targetParent = FileUtil.findValidParent( target );
 
-		boolean sourceOk = (Files.isReadable( source ) && Files.isWritable( source ) ) && Files.isWritable( sourceParent );
+		boolean sourceOk = (Files.isReadable( source ) && Files.isWritable( source )) && Files.isWritable( sourceParent );
 		boolean targetOk = (!Files.exists( target ) || Files.isWritable( target )) && Files.isWritable( targetParent );
 
 		return !(sourceOk & targetOk);

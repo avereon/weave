@@ -6,15 +6,15 @@ import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
+import lombok.extern.flogger.Flogger;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+@Flogger
 public class DeleteTask extends Task {
-
-	private static final System.Logger log = Log.get();
 
 	private final Path target;
 
@@ -30,7 +30,7 @@ public class DeleteTask extends Task {
 
 	@Override
 	public void validate() {
-		if( !Files.exists( target ) ) log.log( Log.DEBUG, "Target does not exist: {0}", target );
+		if( !Files.exists( target ) ) log.atFine().log( "Target does not exist: %s", target );
 	}
 
 	@Override

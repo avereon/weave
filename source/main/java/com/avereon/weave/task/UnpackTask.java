@@ -3,16 +3,15 @@ package com.avereon.weave.task;
 import com.avereon.util.FileUtil;
 import com.avereon.util.HashUtil;
 import com.avereon.util.IoUtil;
-import com.avereon.util.Log;
 import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
+import lombok.extern.flogger.Flogger;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.System.Logger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,9 +24,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+@Flogger
 public class UnpackTask extends Task {
-
-	private static final Logger log = Log.get();
 
 	private static final String DEL_SUFFIX = ".del";
 
@@ -68,19 +66,19 @@ public class UnpackTask extends Task {
 	public TaskResult execute() throws Exception {
 		Files.createDirectories( target );
 
-		log.log( Log.DEBUG, "Staging: {0}", source );
+		log.atFine().log( "Staging: %s", source );
 
 		try {
 			stage( source, target );
 		} catch( ZipException exception ) {
 			throw new IOException( "Source not a valid zip file: " + source );
 		} catch( Throwable throwable ) {
-			log.log( Log.WARN, "Unpack failed: " + target, throwable.getMessage() );
+			log.atWarning().withCause( throwable ).log( "Unpack failed: %s", target );
 			revert( target );
 			throw throwable;
 		}
 
-		log.log( Log.DEBUG, "Committing: {0}", target );
+		log.atFine().log( "Committing: %s", target );
 		setMessage( "Committing " + target );
 		commit( target );
 		incrementProgress();
@@ -94,7 +92,7 @@ public class UnpackTask extends Task {
 	}
 
 	private void stage( Path source, Path target ) throws IOException {
-		log.log( Log.TRACE, "Staging: {0} to {1}...", source.getFileName(), target );
+		log.atFiner().log( "Staging: %s to %s...", source.getFileName(), target );
 
 		final ZipFile zip = getZipFile();
 		try( zip ) {
@@ -108,7 +106,7 @@ public class UnpackTask extends Task {
 			}
 		}
 
-		log.log( Log.DEBUG, "Staged: {0} to {1}", source.getFileName(), target );
+		log.atFiner().log( "Staged: %s to %s...", source.getFileName(), target );
 	}
 
 	private boolean stage( InputStream input, Path target, String entry ) throws IOException {
@@ -127,7 +125,7 @@ public class UnpackTask extends Task {
 			}
 		}
 
-		log.log( Log.DEBUG, "Unpack: {0}", entry );
+		log.atFiner().log( "Unpack: %s", entry );
 		return true;
 	}
 
@@ -168,10 +166,10 @@ public class UnpackTask extends Task {
 				Files.move( target, file, StandardCopyOption.REPLACE_EXISTING );
 				String targetHash = HashUtil.hash( file );
 				if( !targetHash.equals( sourceHash ) ) throw new RuntimeException( "Hash code mismatch committing file: " + file );
-				log.log( Log.TRACE, "Commit: {0}", root.relativize( file ) );
+				log.atFiner().log( "Commit: %s", root.relativize( file ) );
 			} else if( target.getFileName().toString().endsWith( DEL_SUFFIX ) ) {
 				Path file = removeSuffix( target, DEL_SUFFIX );
-				if( !Files.exists( file ) ) log.log( Log.TRACE, "Remove: {0}", root.relativize( file ) );
+				if( !Files.exists( file ) ) log.atFiner().log( "Remove: %s", root.relativize( file ) );
 				Files.delete( target );
 			}
 		}

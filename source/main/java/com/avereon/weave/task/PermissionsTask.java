@@ -1,13 +1,12 @@
 package com.avereon.weave.task;
 
-import com.avereon.util.Log;
 import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
+import lombok.extern.flogger.Flogger;
 
 import java.io.File;
-import java.lang.System.Logger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,9 +18,8 @@ import java.util.List;
  * <p>
  * Parameter 0: The permissions bitmask. Example: 755
  */
+@Flogger
 public class PermissionsTask extends Task {
-
-	private static final Logger log = Log.get();
 
 	public PermissionsTask( List<String> parameters ) {
 		super( UpdateTask.PERMISSIONS, parameters );
@@ -73,7 +71,7 @@ public class PermissionsTask extends Task {
 			// Skip missing files
 			if( !Files.exists( path ) ) continue;
 
-			log.log( Log.DEBUG, "Setting permission on: " + path );
+			log.atFine().log( "Setting permission on: %s", path );
 
 			File file = path.toFile();
 			boolean read = file.setReadable( userRead, userReadOnly );

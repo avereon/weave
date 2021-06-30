@@ -1,18 +1,15 @@
 package com.avereon.weave.task;
 
-import com.avereon.util.Log;
 import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
+import lombok.extern.flogger.Flogger;
 
-import java.lang.System.Logger;
 import java.util.List;
 
+@Flogger
 public class PauseTask extends Task {
-
-	@SuppressWarnings( "unused" )
-	private static final Logger log = Log.get();
 
 	// The number of milliseconds per increment
 	private static final long increment = 10;
