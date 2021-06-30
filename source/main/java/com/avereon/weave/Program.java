@@ -557,7 +557,7 @@ public class Program implements Product {
 		}
 
 		// Try to keep the prompt the same size as the running prompt above
-		log.log( Log.INFO, elevatedKey() + "Result: " + result );
+		log.atInfo().log( "%sResult: %s", elevatedKey(), result );
 
 		return result;
 	}
@@ -566,7 +566,7 @@ public class Program implements Product {
 		TaskResult result;
 
 		// Try to keep the prompt the same size as the result prompt below
-		log.log( Log.DEBUG, elevatedKey() + "Rollback task:  " + task.getOriginalLine() );
+		log.atFine().log( "%sRollback task:  %s", elevatedKey(), task.getOriginalLine() );
 
 		try {
 			if( !isElevated() && task.needsElevation() ) {
@@ -580,14 +580,14 @@ public class Program implements Product {
 		}
 
 		if( result == null ) {
-			log.log( Log.ERROR, "Null result rolling back " + task );
+			log.atSevere().log( "Null result rolling back %s", task );
 		} else {
 			printWriter.println( result.format() );
 			printWriter.flush();
 		}
 
 		// Try to keep the prompt the same size as the running prompt above
-		log.log( Log.INFO, elevatedKey() + "Result: " + result );
+		log.atInfo().log( "%sResult: %s", elevatedKey(), result );
 
 		return result;
 	}
@@ -595,7 +595,7 @@ public class Program implements Product {
 	private TaskResult getTaskResult( Task task, Exception exception ) {
 		TaskResult result;
 		if( execute ) {
-			if( !TestUtil.isTest() ) log.log( Log.ERROR, elevatedKey() + "Error executing task", exception );
+			if( !TestUtil.isTest() ) log.atSevere().withCause( exception ).log( "%sError executing task", elevatedKey() );
 			String message = String.format( "%s: %s", exception.getClass().getSimpleName(), exception.getMessage() );
 			result = new TaskResult( task, TaskStatus.FAILURE, message );
 		} else {
