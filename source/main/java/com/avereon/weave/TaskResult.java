@@ -1,13 +1,9 @@
 package com.avereon.weave;
 
-import com.avereon.util.Log;
+import lombok.extern.flogger.Flogger;
 
-import java.lang.System.Logger;
-
+@Flogger
 public class TaskResult {
-
-	@SuppressWarnings( "unused" )
-	private static final Logger log = Log.get();
 
 	private final Task task;
 

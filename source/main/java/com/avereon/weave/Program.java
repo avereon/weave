@@ -14,6 +14,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import lombok.extern.flogger.Flogger;
 
 import javax.net.SocketFactory;
 import java.io.*;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+@Flogger
 public class Program implements Product {
 
 	public enum Status {
@@ -33,8 +35,6 @@ public class Program implements Product {
 		STARTED,
 		STOPPING
 	}
-
-	private static final System.Logger log = Log.get();
 
 	private static final Map<String, Class<? extends Task>> taskNameMap;
 
@@ -139,10 +139,10 @@ public class Program implements Product {
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
 
-		log.log( Log.INFO, elevatedKey() + card.getName() + " started " + (isElevated() ? "[ELEVATED]" : "[NORMAL]") );
-		log.log( Log.DEBUG, elevatedKey() + "Command line: " + ProcessCommands.getCommandLineAsString() );
-		log.log( Log.DEBUG, elevatedKey() + "Parameters:   " + parameters );
-		log.log( Log.DEBUG, elevatedKey() + "Log: " + Log.getLogFile() );
+		log.atInfo().log( "%s%s started %s", elevatedKey(), card.getName(), isElevated() ? "[ELEVATED]" : "[NORMAL]" );
+		log.atFine().log( "%sCommand line: ", ProcessCommands.getCommandLineAsString() );
+		log.atFine().log( "%sParameters:   %s", elevatedKey(), parameters );
+		log.atFine().log( "%sLog: %s", elevatedKey(), Log.getLogFile() );
 
 		boolean file = parameters.isSet( UpdateFlag.FILE );
 		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
@@ -161,9 +161,9 @@ public class Program implements Product {
 			if( update ) count++;
 
 			if( count < 1 ) {
-				log.log( Log.ERROR, "Missing input source" );
+				log.atSevere().log( "Missing input source" );
 			} else if( count > 1 ) {
-				log.log( Log.ERROR, "Cannot only use one input source" );
+				log.atSevere().log( "Cannot only use one input source" );
 				return;
 			}
 
@@ -210,7 +210,7 @@ public class Program implements Product {
 		@Override
 		public void run() {
 			try {
-				log.log( Log.DEBUG, "Show progress UI=" + isUi() );
+				log.atFine().log( "Show progress UI=%s", isUi() );
 				if( isUi() ) {
 					showProgressDialog();
 					Thread.sleep( 500 );
@@ -221,7 +221,7 @@ public class Program implements Product {
 				}
 				execute();
 			} catch( Throwable throwable ) {
-				log.log( Log.ERROR, elevatedKey() + "Execution error", throwable );
+				log.atSevere().withCause( throwable ).log( "%sExecution error", elevatedKey() );
 				throwable.printStackTrace( System.err );
 			} finally {
 				if( isUi() ) hideProgressDialog();
@@ -229,7 +229,7 @@ public class Program implements Product {
 					status = Status.STOPPED;
 					Program.this.notifyAll();
 				}
-				log.log( Log.INFO, elevatedKey() + card.getName() + " finished" );
+				log.atInfo().log( "%s%s finished", elevatedKey(), card.getName() );
 			}
 
 			if( !TestUtil.isTest() && shouldClose() ) System.exit( 0 );
@@ -303,9 +303,9 @@ public class Program implements Product {
 		try {
 			Fx.waitForWithExceptions( 1000 );
 		} catch( TimeoutException exception ) {
-			log.log( Log.WARN, "Timeout waiting for progress dialog" );
+			log.atWarning().log( "Timeout waiting for progress dialog" );
 		} catch( InterruptedException exception ) {
-			log.log( Log.WARN, "Interrupted waiting for progress dialog" );
+			log.atWarning().log( "Interrupted waiting for progress dialog" );
 		}
 	}
 
@@ -397,11 +397,11 @@ public class Program implements Product {
 		NonBlockingReader buffer = new NonBlockingReader( reader );
 		List<Task> tasks = new ArrayList<>();
 		while( !TextUtil.isEmpty( line = buffer.readLine( 1, TimeUnit.SECONDS ) ) ) {
-			log.log( Log.TRACE, elevatedKey() + "parsed: " + line.trim() );
+			log.atFiner().log( "%sparsed: %s", elevatedKey(), line.trim() );
 			tasks.add( parseTask( line.trim() ) );
 		}
 
-		log.log( Log.INFO, "Task count=" + tasks.size() );
+		log.atInfo().log( "Task count=%s", tasks.size() );
 
 		List<TaskResult> results = new ArrayList<>();
 
@@ -453,7 +453,7 @@ public class Program implements Product {
 		}
 
 		synchronized( waitLock ) {
-			log.log( Log.DEBUG, elevatedKey() + "Tasks completed: " + taskCompletedCount );
+			log.atFine().log( "%sTasks completed: %s", elevatedKey(), taskCompletedCount );
 			execute = false;
 			waitLock.notifyAll();
 		}
@@ -520,7 +520,7 @@ public class Program implements Product {
 		boolean anyTaskNeedsElevation = false;
 		for( Task task : tasks ) {
 			boolean taskNeedsElevation = task.needsElevation();
-			if( taskNeedsElevation ) log.log( Log.DEBUG, "Task requested elevation: " + task );
+			if( taskNeedsElevation ) log.atFine().log( "Task requested elevation: %s", task );
 			anyTaskNeedsElevation = anyTaskNeedsElevation || taskNeedsElevation;
 		}
 		return anyTaskNeedsElevation;
@@ -535,7 +535,7 @@ public class Program implements Product {
 		TaskResult result;
 
 		// Try to keep the prompt the same size as the result prompt below
-		log.log( Log.DEBUG, elevatedKey() + "Running task:   " + task.getOriginalLine() );
+		log.atFine().log( "%sRunning task:   %s", elevatedKey(), task.getOriginalLine() );
 
 		try {
 			task.validate();
@@ -550,7 +550,7 @@ public class Program implements Product {
 		}
 
 		if( result == null ) {
-			log.log( Log.ERROR, "Null result executing " + task );
+			log.atSevere().log( "Null result executing %s", task );
 		} else {
 			printWriter.println( result.format() );
 			printWriter.flush();
