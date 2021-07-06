@@ -1,19 +1,18 @@
 package com.avereon.weave.task;
 
 import com.avereon.util.FileUtil;
-import com.avereon.util.Log;
 import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
-import lombok.extern.flogger.Flogger;
+import lombok.CustomLog;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-@Flogger
+@CustomLog
 public class DeleteTask extends Task {
 
 	private final Path target;

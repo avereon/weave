@@ -5,7 +5,7 @@ import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
-import lombok.extern.flogger.Flogger;
+import lombok.CustomLog;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-@Flogger
+@CustomLog
 public class MoveTask extends Task {
 
 	private final Path source;

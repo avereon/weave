@@ -4,11 +4,11 @@ import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
-import lombok.extern.flogger.Flogger;
+import lombok.CustomLog;
 
 import java.util.List;
 
-@Flogger
+@CustomLog
 public class PauseTask extends Task {
 
 	// The number of milliseconds per increment

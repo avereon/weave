@@ -4,7 +4,7 @@ import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
-import lombok.extern.flogger.Flogger;
+import lombok.CustomLog;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -18,7 +18,7 @@ import java.util.List;
  * <p>
  * Parameter 0: The permissions bitmask. Example: 755
  */
-@Flogger
+@CustomLog
 public class PermissionsTask extends Task {
 
 	public PermissionsTask( List<String> parameters ) {

@@ -1,8 +1,8 @@
 package com.avereon.weave;
 
-import lombok.extern.flogger.Flogger;
+import lombok.CustomLog;
 
-@Flogger
+@CustomLog
 public class TaskResult {
 
 	private final Task task;

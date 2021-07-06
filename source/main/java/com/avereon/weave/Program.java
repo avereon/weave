@@ -14,7 +14,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
-import lombok.extern.flogger.Flogger;
+import lombok.CustomLog;
 
 import javax.net.SocketFactory;
 import java.io.*;
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-@Flogger
+@CustomLog
 public class Program implements Product {
 
 	public enum Status {

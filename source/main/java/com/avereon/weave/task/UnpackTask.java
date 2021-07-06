@@ -7,7 +7,7 @@ import com.avereon.weave.Task;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
-import lombok.extern.flogger.Flogger;
+import lombok.CustomLog;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-@Flogger
+@CustomLog
 public class UnpackTask extends Task {
 
 	private static final String DEL_SUFFIX = ".del";
