@@ -1,5 +1,6 @@
 package com.avereon.weave.task;
 
+import com.avereon.log.Log;
 import com.avereon.util.*;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;

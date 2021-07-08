@@ -1,10 +1,14 @@
 package com.avereon.weave;
 
-import com.avereon.util.*;
+import com.avereon.log.LazyEval;
+import com.avereon.util.NonBlockingReader;
+import com.avereon.util.OperatingSystem;
+import com.avereon.util.ProcessCommands;
+import com.avereon.util.TextUtil;
+import lombok.CustomLog;
 
 import javax.net.ServerSocketFactory;
 import java.io.IOException;
-import java.lang.System.Logger;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,9 +16,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+@CustomLog
 class ElevatedHandler {
-
-	private static final Logger log = Log.get();
 
 	static final String HEADER = "HEADER";
 
@@ -80,46 +83,35 @@ class ElevatedHandler {
 	}
 
 	private Task sendTask( Task task, boolean rollback ) throws IOException {
-		log.log( Log.DEBUG, "Sending task commands to elevated process..." );
-		log.log( Log.DEBUG, "  commands: " + task.getOriginalLine() );
+		log.atDebug().log( "Sending task commands to elevated process..." );
+		log.atDebug().log( "  commands: %s", task.getOriginalLine() );
 		if( rollback ) socket.getOutputStream().write( '-' );
 		socket.getOutputStream().write( task.getOriginalLine().getBytes( TextUtil.CHARSET ) );
 		socket.getOutputStream().write( '\n' );
 		socket.getOutputStream().flush();
-		log.log( Log.TRACE, "send > " + task.getOriginalLine() );
+		log.atDebug().log( "send > %s", task.getOriginalLine() );
 		return task;
 	}
 
 	private TaskResult getTaskResult( Task task ) throws IOException {
-		log.log( Log.DEBUG, "Reading task result from elevated process..." );
+		log.atDebug().log( "Reading task result from elevated process..." );
 
-		String line;
-
-		while( (line = reader.readLine( 5, TimeUnit.SECONDS )) != null ) {
-			log.log( Log.TRACE, "recv < " + line );
-			String[] commands = line.split( " " );
+		String commandLine;
+		while( (commandLine = reader.readLine( 5, TimeUnit.SECONDS )) != null ) {
+			log.atTrace().log( "recv < " + commandLine );
+			String[] commands = commandLine.split( " " );
 			String command = commands[ 0 ];
 
+			final String line = commandLine;
+
 			switch( command ) {
-				case HEADER: {
-					task.setHeader( line.substring( HEADER.length() + 1 ) );
-					break;
-				}
-				case MESSAGE: {
-					task.setMessage( line.substring( MESSAGE.length() + 1 ) );
-					break;
-				}
-				case PROGRESS: {
-					task.incrementProgress();
-					break;
-				}
-				case LOG: {
-					log.log( Log.INFO, line.substring( LOG.length() + 1 ) );
-					break;
-				}
-				default: {
+				case HEADER -> task.setHeader( line.substring( HEADER.length() + 1 ) );
+				case MESSAGE -> task.setMessage( line.substring( MESSAGE.length() + 1 ) );
+				case PROGRESS -> task.incrementProgress();
+				case LOG -> log.atInfo().log( "%s", LazyEval.of( () -> line.substring( LOG.length() + 1 ) ) );
+				default -> {
 					TaskResult result = TaskResult.parse( task, line );
-					log.log( Log.DEBUG, "  result: " + result );
+					log.atDebug().log( "  result: %s", result );
 					return result;
 				}
 			}
@@ -142,7 +134,7 @@ class ElevatedHandler {
 		int attemptCount = 0;
 		while( socket == null && attemptCount < attemptLimit && throwable == null ) {
 			if( cycle++ % cyclesPerAttempt == 0 ) {
-				if( attemptCount > 0 ) log.log( Log.TRACE, "Waiting for elevated process: " + attemptCount + " of " + attemptLimit + " seconds" );
+				if( attemptCount > 0 ) log.atTrace().log( "Waiting for elevated process: %s of %s seconds", attemptCount, attemptLimit );
 				attemptCount++;
 			}
 			wait( cycleDuration );
@@ -166,7 +158,7 @@ class ElevatedHandler {
 		processBuilder.command().add( String.valueOf( server.getLocalPort() ) );
 
 		OperatingSystem.elevateProcessBuilder( program.getTitle(), processBuilder );
-		log.log( Log.DEBUG, "Elevated commands: " + TextUtil.toString( processBuilder.command(), " " ) );
+		log.atDebug().log( "Elevated commands: %s", LazyEval.of( () -> TextUtil.toString( processBuilder.command(), " " ) ) );
 
 		Process process = processBuilder.inheritIO().start();
 		new ProcessWatcherThread( process ).start();
@@ -192,7 +184,7 @@ class ElevatedHandler {
 					peer = server.accept();
 					reader = new NonBlockingReader( peer.getInputStream() );
 					if( reader.readLine( 100, TimeUnit.MILLISECONDS ).equals( secret ) ) {
-						log.log( Log.DEBUG, "Elevated client connected to normal client: " + server.getLocalPort() );
+						log.atDebug().log( "Elevated client connected to normal client: %s", LazyEval.of( () -> server.getLocalPort() ) );
 						setSocket( peer );
 						server.close();
 					}
@@ -217,7 +209,7 @@ class ElevatedHandler {
 			try {
 				process.waitFor();
 				int exitValue = process.exitValue();
-				log.log( Log.DEBUG, "Elevated process finished" );
+				log.atDebug().log( "Elevated process finished" );
 				if( exitValue != 0 ) throw new IllegalStateException( "Elevated process failed: " + exitValue );
 			} catch( Exception exception ) {
 				throwable = exception;

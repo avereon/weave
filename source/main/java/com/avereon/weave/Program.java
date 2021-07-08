@@ -1,5 +1,6 @@
 package com.avereon.weave;
 
+import com.avereon.log.Log;
 import com.avereon.product.Product;
 import com.avereon.product.ProductCard;
 import com.avereon.product.Rb;

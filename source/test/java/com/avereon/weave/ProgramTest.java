@@ -2,7 +2,7 @@ package com.avereon.weave;
 
 import com.avereon.product.ProductCard;
 import com.avereon.util.LogFlag;
-import com.avereon.util.Log;
+import com.avereon.log.Log;
 import com.avereon.util.Parameters;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;

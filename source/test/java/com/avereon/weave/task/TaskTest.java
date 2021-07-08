@@ -1,7 +1,7 @@
 package com.avereon.weave.task;
 
 import com.avereon.util.LogFlag;
-import com.avereon.util.Log;
+import com.avereon.log.Log;
 import com.avereon.util.Parameters;
 import com.avereon.weave.Program;
 import com.avereon.weave.TaskResult;
