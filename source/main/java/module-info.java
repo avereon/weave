@@ -4,7 +4,6 @@ module com.avereon.weave {
 	requires static lombok;
 
 	// Both compile-time and run-time
-	requires flogger;
 	requires javafx.controls;
 	requires com.avereon.zevra;
 	requires com.avereon.zenna;
