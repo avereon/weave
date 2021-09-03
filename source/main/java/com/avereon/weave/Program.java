@@ -88,14 +88,14 @@ public class Program implements Product {
 	}
 
 	public Program() {
+		Rb.init( this );
+
 		this.execute = true;
 		this.status = Status.STOPPED;
 		this.waitLock = new Object();
 		this.card = ProductCard.info( this );
 		this.title = card.getName();
 		this.programDataFolder = OperatingSystem.getUserProgramDataFolder( card.getArtifact(), card.getName() );
-
-		Rb.init( this );
 	}
 
 	@Override
