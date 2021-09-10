@@ -85,6 +85,10 @@ jobs:
         run: |
           mvn ${{env.MAVEN_PARMS}} deploy -Dmaven.test.skip=true
 
+      - name: Trigger Dependent Builds
+        run: |
+          curl -XPOST -u "${{secrets.AVN_REPO_USERNAME}}:${{secrets.AVN_REPO_PASSWORD}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/avereon/xenon/dispatches --data '{"event_type": "build_trigger"}'
+
       - name: Deploy JavaDoc
         run: |
           ssh -t ${{env.AVN_REPO_USERNAME}}@avereon.com "mkdir -p ${{env.JAVADOC_DEPLOY_PATH}};"
