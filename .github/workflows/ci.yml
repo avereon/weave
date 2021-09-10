@@ -87,7 +87,7 @@ jobs:
 
       - name: Trigger Dependent Builds
         run: |
-          curl -XPOST -u "${{secrets.AVN_REPO_USERNAME}}:${{secrets.AVN_REPO_PASSWORD}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/avereon/xenon/actions/workflows/ci.yml/dispatches --data '{"event_type": "build-trigger"}'
+          curl -XPOST -u "${{secrets.AVN_CI_USERNAME}}:${{secrets.AVN_CI_PASSWORD}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/avereon/xenon/actions/workflows/ci.yml/dispatches --data '{"event_type": "build-trigger"}'
 
       - name: Deploy JavaDoc
         run: |
