@@ -9,7 +9,7 @@ import com.avereon.settings.Settings;
 import com.avereon.util.*;
 import com.avereon.weave.task.*;
 import com.avereon.zenna.icon.UpdateIcon;
-import com.avereon.zerra.image.Images;
+import com.avereon.zarra.image.Images;
 import com.avereon.zerra.javafx.Fx;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;

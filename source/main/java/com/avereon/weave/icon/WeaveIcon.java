@@ -1,6 +1,6 @@
 package com.avereon.weave.icon;
 
-import com.avereon.zerra.image.SvgIcon;
+import com.avereon.zarra.image.SvgIcon;
 
 public class WeaveIcon extends SvgIcon {
 
