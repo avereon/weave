@@ -19,6 +19,8 @@ import java.util.concurrent.TimeoutException;
 @CustomLog
 class ElevatedHandler {
 
+	static final int ELEVATED_PROCESS_WAIT_TIME_SECONDS = 300;
+
 	static final String HEADER = "HEADER";
 
 	static final String MESSAGE = "MESSAGE";
@@ -124,20 +126,14 @@ class ElevatedHandler {
 		if( socket != null ) return;
 
 		// Number of attempts
-		int attemptLimit = 20;
-		int attemptDuration = 1000;
-		int cyclesPerAttempt = 5;
-		int cycleDuration = attemptDuration / cyclesPerAttempt;
+		int attemptLimit = ELEVATED_PROCESS_WAIT_TIME_SECONDS;
 
 		// Wait for the elevated process to get started
-		int cycle = 0;
 		int attemptCount = 0;
 		while( socket == null && attemptCount < attemptLimit && throwable == null ) {
-			if( cycle++ % cyclesPerAttempt == 0 ) {
-				if( attemptCount > 0 ) log.atTrace().log( "Waiting for elevated process: %s of %s seconds", attemptCount, attemptLimit );
-				attemptCount++;
-			}
-			wait( cycleDuration );
+			if( attemptCount > 0 ) log.atTrace().log( "Waiting for elevated process: %s of %s seconds", attemptCount, attemptLimit );
+			attemptCount++;
+			wait( 1000 );
 		}
 
 		if( attemptCount >= attemptLimit ) throw new TimeoutException( "Timeout waiting for elevated updater to start" );
