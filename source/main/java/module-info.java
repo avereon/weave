@@ -7,6 +7,7 @@ module com.avereon.weave {
 	requires javafx.controls;
 	requires com.avereon.zevra;
 	requires com.avereon.zenna;
+	requires com.avereon.zarra;
 
 	exports com.avereon.weave;
 	exports com.avereon.weave.icon;

@@ -11,7 +11,6 @@ public class WeaveIcon extends SvgIcon {
 	private static final double SPACE = 12;
 
 	public WeaveIcon() {
-
 		draw( weave1() );
 	}
 

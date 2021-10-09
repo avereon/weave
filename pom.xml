@@ -48,11 +48,11 @@
 
 		<!-- Version numbers updated 02 Jul 2020 -->
 		<!-- Runtime dependencies -->
-		<zenna.version>0.6</zenna.version>
-		<zevra.version>0.6</zevra.version>
+		<zenna.version>0.7</zenna.version>
+		<zevra.version>0.7</zevra.version>
 
 		<!-- Build dependencies -->
-		<cameo.version>2.8</cameo.version>
+		<cameo.version>2.9</cameo.version>
 	</properties>
 
 	<dependencies>
