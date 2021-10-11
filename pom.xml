@@ -46,7 +46,7 @@
 	<properties>
 		<images-folder>target/main/images</images-folder>
 
-		<!-- Version numbers updated 02 Jul 2020 -->
+		<!-- Version numbers updated 11 Oct 2021 -->
 		<!-- Runtime dependencies -->
 		<zenna.version>0.7</zenna.version>
 		<zevra.version>0.7</zevra.version>
