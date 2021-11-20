@@ -1,15 +1,14 @@
 package com.avereon.weave.task;
 
-import com.avereon.util.LogFlag;
 import com.avereon.log.Log;
+import com.avereon.util.LogFlag;
 import com.avereon.util.Parameters;
 import com.avereon.weave.Program;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 abstract class TaskTest {
 
@@ -26,8 +25,8 @@ abstract class TaskTest {
 	}
 
 	void assertTaskResult( TaskResult result, TaskStatus status, String message ) {
-		assertThat( result.getMessage(), result.getStatus(), is( status ) );
-		if( message != null ) assertThat( result.getMessage(), is( message ) );
+		assertThat( result.getStatus() ).withFailMessage( result.getMessage() ).isEqualTo( status );
+		if( message != null ) assertThat( result.getMessage() ).isEqualTo( message );
 	}
 
 }

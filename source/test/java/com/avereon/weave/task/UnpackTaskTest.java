@@ -1,7 +1,10 @@
 package com.avereon.weave.task;
 
 import com.avereon.log.Log;
-import com.avereon.util.*;
+import com.avereon.util.FileUtil;
+import com.avereon.util.IdGenerator;
+import com.avereon.util.LogFlag;
+import com.avereon.util.Parameters;
 import com.avereon.weave.TaskResult;
 import com.avereon.weave.TaskStatus;
 import com.avereon.weave.UpdateTask;
@@ -13,8 +16,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class UnpackTaskTest extends TaskTest {
 
@@ -23,9 +25,9 @@ public class UnpackTaskTest extends TaskTest {
 		String source = "source";
 		String target = "target";
 		UnpackTask task = new UnpackTask( Arrays.asList( source, target ) );
-		assertThat( task.getParameters().get( 0 ), is( source ) );
-		assertThat( task.getParameters().get( 1 ), is( target ) );
-		assertThat( task.getParameters().size(), is( 2 ) );
+		assertThat( task.getParameters().get( 0 ) ).isEqualTo( source );
+		assertThat( task.getParameters().get( 1 ) ).isEqualTo( target );
+		assertThat( task.getParameters().size() ).isEqualTo( 2 );
 	}
 
 	@Test
@@ -73,10 +75,10 @@ public class UnpackTaskTest extends TaskTest {
 			FileUtil.zip( sourceRoot, sourceZip );
 
 			// Verify the target values before executing the task
-			assertThat( FileUtil.load( targetFile1 ), is( targetData1 ) );
-			assertThat( FileUtil.load( targetFile2 ), is( targetData2 ) );
-			assertThat( Files.exists( targetFile3 ), is( false ) );
-			assertThat( Files.exists( targetFile4 ), is( false ) );
+			assertThat( FileUtil.load( targetFile1 ) ).isEqualTo( targetData1 );
+			assertThat( FileUtil.load( targetFile2 ) ).isEqualTo( targetData2 );
+			assertThat( Files.exists( targetFile3 ) ).isEqualTo( false );
+			assertThat( Files.exists( targetFile4 ) ).isEqualTo( false );
 
 			// Execute the overlay task
 			String sourceZipPath = sourceZip.toAbsolutePath().toString();
@@ -85,14 +87,14 @@ public class UnpackTaskTest extends TaskTest {
 
 			// Verify the result
 			assertTaskResult( results.get( 0 ), TaskStatus.SUCCESS );
-			assertThat( results.get( 0 ).getMessage(), startsWith( "Unpacked:" ) );
-			assertThat( results.get( 0 ).getMessage(), endsWith( targetRoot.getFileName().toString() ) );
+			assertThat( results.get( 0 ).getMessage() ).startsWith( "Unpacked:" );
+			assertThat( results.get( 0 ).getMessage() ).endsWith( targetRoot.getFileName().toString() );
 
 			// Verify the target values after executing the task
-			assertThat( FileUtil.load( targetFile1 ), is( sourceData1 ) );
-			assertThat( FileUtil.load( targetFile2 ), is( sourceData3 ) );
-			assertThat( FileUtil.load( targetFile3 ), is( sourceData2 ) );
-			assertThat( FileUtil.load( targetFile4 ), is( sourceData4 ) );
+			assertThat( FileUtil.load( targetFile1 ) ).isEqualTo( sourceData1 );
+			assertThat( FileUtil.load( targetFile2 ) ).isEqualTo( sourceData3 );
+			assertThat( FileUtil.load( targetFile3 ) ).isEqualTo( sourceData2 );
+			assertThat( FileUtil.load( targetFile4 ) ).isEqualTo( sourceData4 );
 		} finally {
 			FileUtil.delete( targetRoot );
 			FileUtil.delete( sourceRoot );
@@ -105,8 +107,8 @@ public class UnpackTaskTest extends TaskTest {
 		Log.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "info" ) );
 		String source = "invalidsource";
 		String target = "invalidtarget";
-		List<TaskResult> results =  program.runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );
-		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE , "IllegalArgumentException: Source not found: invalidsource" );
+		List<TaskResult> results = program.runTasksFromString( UpdateTask.UNPACK + " " + source + " " + target );
+		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE, "IllegalArgumentException: Source not found: invalidsource" );
 	}
 
 }

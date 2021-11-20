@@ -1,16 +1,15 @@
 package com.avereon.weave;
 
+import com.avereon.log.Log;
 import com.avereon.product.ProductCard;
 import com.avereon.util.LogFlag;
-import com.avereon.log.Log;
 import com.avereon.util.Parameters;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 import java.io.*;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProgramTest {
 
@@ -19,7 +18,7 @@ public class ProgramTest {
 	@Test
 	public void testProductCard() {
 		ProductCard card = new Program().getCard();
-		assertThat( card, not( is( nullValue() ) ) );
+		assertThat( card ).isNotNull();
 	}
 
 	@Test
@@ -48,9 +47,9 @@ public class ProgramTest {
 			inputPipe.close();
 
 			String result1 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
-			assertThat( result1, is( "SUCCESS pause 130" ) );
+			assertThat( result1 ).isEqualTo( "SUCCESS pause 130" );
 			String result2 = new BufferedReader( new InputStreamReader( outputPipe, CHARSET ) ).readLine();
-			assertThat( result2, is( "SUCCESS pause 170" ) );
+			assertThat( result2 ).isEqualTo( "SUCCESS pause 170" );
 		} finally {
 			// Restore the original streams
 			System.setOut( originalOutput );
@@ -82,9 +81,9 @@ public class ProgramTest {
 		inputPipe.close();
 
 		String result1 = new BufferedReader( outputPipe ).readLine();
-		assertThat( result1, is( "SUCCESS pause 170" ) );
+		assertThat( result1 ).isEqualTo( "SUCCESS pause 170" );
 		String result2 = new BufferedReader( outputPipe ).readLine();
-		assertThat( result2, is( "SUCCESS pause 190" ) );
+		assertThat( result2 ).isEqualTo( "SUCCESS pause 190" );
 	}
 
 }

@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.startsWith;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class LaunchTaskTest extends TaskTest {
 
@@ -24,7 +23,7 @@ public class LaunchTaskTest extends TaskTest {
 	public void testExecuteFailure() throws Exception {
 		List<TaskResult> results = program.runTasksFromString( UpdateTask.LAUNCH + " " + workingFolder + " invalid" );
 		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE );
-		assertThat( results.get(0).getMessage(), startsWith( "IOException: Cannot run program \"invalid\"" ) );
+		assertThat( results.get( 0 ).getMessage() ).startsWith( "IOException: Cannot run program \"invalid\"" );
 	}
 
 }

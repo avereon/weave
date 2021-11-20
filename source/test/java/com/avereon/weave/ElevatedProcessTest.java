@@ -18,8 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ElevatedProcessTest {
 
@@ -57,17 +56,17 @@ public class ElevatedProcessTest {
 		Socket socket = server.accept();
 		writer = new PrintWriter( socket.getOutputStream(), false, StandardCharsets.UTF_8 );
 		reader = new NonBlockingReader( new InputStreamReader( socket.getInputStream(), StandardCharsets.UTF_8 ) );
-		assertThat( secret, is( reader.readLine( wait, TimeUnit.MILLISECONDS ) ) );
+		assertThat( secret ).isEqualTo( reader.readLine( wait, TimeUnit.MILLISECONDS ) );
 
 		// The elevated updater should be running and validated at this point
-		assertThat( elevated.getStatus(), is( Program.Status.STARTED ) );
+		assertThat( elevated.getStatus() ).isEqualTo( Program.Status.STARTED );
 	}
 
 	@AfterEach
 	public void shutdown() throws Exception {
 		elevated.stop();
 		elevated.waitForStop( 1, TimeUnit.SECONDS );
-		assertThat( elevated.getStatus(), is( Program.Status.STOPPED ) );
+		assertThat( elevated.getStatus() ).isEqualTo( Program.Status.STOPPED );
 		server.close();
 		System.setProperty( OperatingSystem.PROCESS_PRIVILEGE_KEY, OperatingSystem.NORMAL_PRIVILEGE_VALUE );
 	}
@@ -81,31 +80,30 @@ public class ElevatedProcessTest {
 	public void testElevatedLog() throws Exception {
 		writer.println( "elevated-log \"Hello Updater!\"" );
 		writer.flush();
-		//assertThat( readNext(), is( "MESSAGE Hello Updater!" ) );
-		assertThat( readNext(), is( "PROGRESS" ) );
-		assertThat( readNext(), is( "SUCCESS log \"Hello Updater!\"" ) );
+		assertThat( readNext() ).isEqualTo( "PROGRESS" );
+		assertThat( readNext() ).isEqualTo( "SUCCESS log \"Hello Updater!\"" );
 		// There really is no further communication at this point,
 		// any more reads will timeout and return a null
-		assertThat( readNext(), is( nullValue() ) );
+		assertThat( readNext() ).isNull();
 	}
 
 	@Test
 	public void testLaunchSuccess() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " java" );
 		writer.flush();
-		assertThat( readNext(), is( "MESSAGE Launching java" ) );
-		assertThat( readNext(), is( "PROGRESS" ) );
-		assertThat( readNext(), is( "SUCCESS launch java" ) );
-		assertThat( readNext(), is( nullValue() ) );
+		assertThat( readNext() ).isEqualTo( "MESSAGE Launching java" );
+		assertThat( readNext() ).isEqualTo( "PROGRESS" );
+		assertThat( readNext() ).isEqualTo( "SUCCESS launch java" );
+		assertThat( readNext() ).isNull();
 	}
 
 	@Test
 	public void testLaunchFailure() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " invalid" );
 		writer.flush();
-		assertThat( readNext(), is( "MESSAGE Launching invalid" ) );
-		assertThat( readNext(), startsWith( "FAILURE launch IOException: Cannot run program \"invalid\"" ) );
-		assertThat( readNext(), is( nullValue() ) );
+		assertThat( readNext() ).isEqualTo( "MESSAGE Launching invalid" );
+		assertThat( readNext() ).startsWith( "FAILURE launch IOException: Cannot run program \"invalid\"" );
+		assertThat( readNext() ).isNull();
 	}
 
 	private String readNext() throws IOException {
