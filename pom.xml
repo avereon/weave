@@ -78,17 +78,6 @@
 		<plugins>
 
 			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<!-- This configuration allows the JUnit test runner to find the unit tests -->
-				<configuration>
-					<argLine>
-						--add-opens=com.avereon.weave/com.avereon.weave=ALL-UNNAMED
-						--add-opens=com.avereon.weave/com.avereon.weave.task=ALL-UNNAMED
-					</argLine>
-				</configuration>
-			</plugin>
-
-			<plugin>
 				<groupId>com.avereon</groupId>
 				<artifactId>cameo</artifactId>
 				<version>${cameo.version}</version>
