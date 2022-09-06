@@ -87,7 +87,7 @@ public class MoveTask extends Task {
 		if( Files.exists( source ) ) {
 			// FIXME creating the folders here can cause some problems when running elevated
 			Files.createDirectories( target.getParent() );
-			Files.move( source, target );
+			FileUtil.move( source, target );
 			result = new TaskResult( this, rollback ? TaskStatus.ROLLBACK : TaskStatus.SUCCESS, source + " to " + target );
 		} else {
 			result = new TaskResult( this, rollback ? TaskStatus.ROLLBACK : TaskStatus.SUCCESS, "Source does not exist: " + source );
