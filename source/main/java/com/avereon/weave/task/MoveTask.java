@@ -82,7 +82,7 @@ public class MoveTask extends Task {
 	}
 
 	private TaskResult move( Path source, Path target, boolean rollback ) throws IOException {
-		setMessage( "Move " + source );
+		setMessage( String.valueOf( source ) );
 		TaskResult result;
 		if( Files.exists( source ) ) {
 			// FIXME creating the folders here can cause some problems when running elevated

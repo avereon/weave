@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -138,7 +137,7 @@ public class UnpackTask extends Task {
 		// Revert staged changes.
 		if( Files.isDirectory( target ) ) {
 			try( Stream<Path> paths = Files.list( target ) ) {
-				for( Path file : paths.collect( Collectors.toList() ) ) revert( root, file );
+				for( Path file : paths.toList() ) revert( root, file );
 			}
 		} else {
 			if( target.getFileName().toString().endsWith( DEL_SUFFIX ) ) {
@@ -157,7 +156,7 @@ public class UnpackTask extends Task {
 		// Commit staged changes.
 		if( Files.isDirectory( target ) ) {
 			try( Stream<Path> paths = Files.list( target ) ) {
-				for( Path file : paths.collect( Collectors.toList() ) ) commit( root, file );
+				for( Path file : paths.toList() ) commit( root, file );
 			}
 		} else {
 			if( target.getFileName().toString().endsWith( ADD_SUFFIX ) ) {
