@@ -68,7 +68,7 @@ public class MoveTask extends Task {
 	@Override
 	public TaskResult execute() throws Exception {
 		System.err.println( "Executing move task: " + source );
-		TaskResult result = move( source, target );
+		TaskResult result = move( source, target, false );
 		incrementProgress();
 		return result;
 	}
@@ -76,21 +76,21 @@ public class MoveTask extends Task {
 	@Override
 	public TaskResult rollback() throws Exception {
 		System.err.println( "Rollback move task: " + source );
-		TaskResult result = move( target, source );
+		TaskResult result = move( target, source, true );
 		decrementProgress();
 		return result;
 	}
 
-	private TaskResult move( Path source, Path target ) throws IOException {
+	private TaskResult move( Path source, Path target, boolean rollback ) throws IOException {
 		setMessage( "Move " + source );
 		TaskResult result;
 		if( Files.exists( source ) ) {
 			// FIXME creating the folders here can cause some problems when running elevated
 			Files.createDirectories( target.getParent() );
 			Files.move( source, target );
-			result = new TaskResult( this, TaskStatus.SUCCESS, "Moved: " + source + " to " + target );
+			result = new TaskResult( this, rollback ? TaskStatus.ROLLBACK : TaskStatus.SUCCESS, source + " to " + target );
 		} else {
-			result = new TaskResult( this, TaskStatus.SUCCESS, "Source does not exist: " + source );
+			result = new TaskResult( this, rollback ? TaskStatus.ROLLBACK : TaskStatus.SUCCESS, "Source does not exist: " + source );
 		}
 		return result;
 	}

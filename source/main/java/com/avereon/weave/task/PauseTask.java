@@ -47,7 +47,7 @@ public class PauseTask extends Task {
 	@Override
 	public TaskResult rollback() throws Exception {
 		decrementProgress();
-		return new TaskResult( this, TaskStatus.SUCCESS, message == null ? "Rollback" : "\"Rollback " + message + "\"" );
+		return new TaskResult( this, TaskStatus.ROLLBACK, message == null ? "Rollback" : "\"" + message + "\"" );
 	}
 
 }

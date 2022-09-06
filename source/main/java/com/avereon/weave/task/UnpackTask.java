@@ -83,7 +83,7 @@ public class UnpackTask extends Task {
 		commit( target );
 		incrementProgress();
 
-		return new TaskResult( this, TaskStatus.SUCCESS, "Unpacked: " + source + " to " + target );
+		return new TaskResult( this, TaskStatus.SUCCESS, source + " to " + target );
 	}
 
 	private ZipFile getZipFile() throws IOException {
@@ -186,7 +186,7 @@ public class UnpackTask extends Task {
 	public TaskResult rollback() throws Exception {
 		revert( target );
 		decrementProgress();
-		return new TaskResult( this, TaskStatus.SUCCESS, "Rollback unpack to: " + target );
+		return new TaskResult( this, TaskStatus.ROLLBACK, String.valueOf( target ) );
 	}
 
 }

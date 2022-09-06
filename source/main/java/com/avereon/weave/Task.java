@@ -97,7 +97,7 @@ public abstract class Task {
 
 	public TaskResult rollback() throws Exception {
 		decrementProgress();
-		return new TaskResult( this, TaskStatus.SUCCESS, "Rollback " + getCommand() );
+		return new TaskResult( this, TaskStatus.ROLLBACK );
 	}
 
 	@Override
