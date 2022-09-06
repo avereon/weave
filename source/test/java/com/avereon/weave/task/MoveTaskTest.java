@@ -153,8 +153,8 @@ public class MoveTaskTest extends TaskTest {
 			List<TaskResult> results = program.runTasksFromString( UpdateTask.MOVE + " " + sourcePath + " " + targetPath );
 
 			assertTaskResult( results.get( 0 ), TaskStatus.SUCCESS );
-			assertThat( results.get( 0 ).getMessage() ).startsWith( "Moved:" );
-			assertThat( results.get( 0 ).getMessage() ).endsWith( target.getFileName().toString() );
+			assertThat( results.get( 0 ).getMessage() ).startsWith( sourcePath );
+			assertThat( results.get( 0 ).getMessage() ).endsWith( targetPath );
 
 			assertThat( Files.exists( source ) ).isFalse();
 			assertThat( Files.exists( target ) ).isTrue();

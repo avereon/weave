@@ -87,8 +87,8 @@ public class UnpackTaskTest extends TaskTest {
 
 			// Verify the result
 			assertTaskResult( results.get( 0 ), TaskStatus.SUCCESS );
-			assertThat( results.get( 0 ).getMessage() ).startsWith( "Unpacked:" );
-			assertThat( results.get( 0 ).getMessage() ).endsWith( targetRoot.getFileName().toString() );
+			assertThat( results.get( 0 ).getMessage() ).startsWith( sourceZipPath );
+			assertThat( results.get( 0 ).getMessage() ).endsWith( targetRootPath );
 
 			// Verify the target values after executing the task
 			assertThat( FileUtil.load( targetFile1 ) ).isEqualTo( sourceData1 );
