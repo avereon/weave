@@ -140,8 +140,9 @@ public class Program implements Product {
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
 
-		log.atInfo().log( "%s%s started %s", elevatedKey(), card.getName(), isElevated() ? "[ELEVATED]" : "[NORMAL]" );
-		log.atFine().log( "%sCommand line: ", ProcessCommands.getCommandLineAsString() );
+		log.atInfo().log( "%s %s", card.getName(), card.getRelease() );
+		log.atInfo().log( "%s started in %s mode", card.getName(), isElevated() ? "[ELEVATED]" : "[NORMAL]" );
+		log.atFine().log( "%sCommand line: %s", elevatedKey(),ProcessCommands.getCommandLineAsString() );
 		log.atFine().log( "%sParameters:   %s", elevatedKey(), parameters );
 		log.atFine().log( "%sLog: %s", elevatedKey(), Log.getLogFile() );
 
