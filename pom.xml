@@ -12,7 +12,7 @@
 
 	<groupId>com.avereon</groupId>
 	<artifactId>weave</artifactId>
-	<version>1.3-SNAPSHOT</version>
+	<version>1.3</version>
 	<packaging>jar</packaging>
 
 	<name>Weave</name>
@@ -48,8 +48,8 @@
 
 		<!-- Version numbers updated 11 Oct 2021 -->
 		<!-- Runtime dependencies -->
-		<zenna.version>[0.7,)</zenna.version>
-		<zevra.version>[0.7,)</zevra.version>
+		<zenna.version>[0.8,)</zenna.version>
+		<zevra.version>[0.8,)</zevra.version>
 		<openjfx.version>[17.0,)</openjfx.version>
 
 		<!-- Plugin versions -->
