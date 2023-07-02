@@ -50,7 +50,7 @@
 		<!-- Runtime dependencies -->
 		<zenna.version>[0.8,)</zenna.version>
 		<zevra.version>[0.8,)</zevra.version>
-		<openjfx.version>[17.0,)</openjfx.version>
+		<openjfx.version>20.0.1</openjfx.version>
 
 		<!-- Plugin versions -->
 		<cameo.version>2.10</cameo.version>
