@@ -1,3 +1,5 @@
+import com.avereon.weave.Weave;
+
 module com.avereon.weave {
 
 	// Compile-time only
@@ -12,6 +14,6 @@ module com.avereon.weave {
 	exports com.avereon.weave;
 	exports com.avereon.weave.icon;
 
-	provides com.avereon.product.Product with com.avereon.weave.Program;
+	provides com.avereon.product.Product with Weave;
 
 }

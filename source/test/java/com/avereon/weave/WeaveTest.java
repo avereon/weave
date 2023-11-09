@@ -11,13 +11,13 @@ import java.io.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ProgramTest {
+public class WeaveTest {
 
 	private static final String CHARSET = "utf-8";
 
 	@Test
 	public void testProductCard() {
-		ProductCard card = new Program().getCard();
+		ProductCard card = new Weave().getCard();
 		assertThat( card ).isNotNull();
 	}
 
@@ -36,7 +36,7 @@ public class ProgramTest {
 		try {
 			new Thread( () -> {
 				try {
-					new Program().start( UpdateFlag.STDIN, LogFlag.LOG_LEVEL, "none" );
+					new Weave().start( UpdateFlag.STDIN, LogFlag.LOG_LEVEL, "none" );
 				} catch( Exception exception ) {
 					exception.printStackTrace( System.err );
 				}
@@ -68,7 +68,7 @@ public class ProgramTest {
 
 		new Thread( () -> {
 			try {
-				Program program = new Program();
+				Weave program = new Weave();
 				Log.configureLogging( program, Parameters.parse( LogFlag.LOG_LEVEL, "none" ) );
 				program.runTasksFromReader( reader, writer );
 			} catch( Exception exception ) {

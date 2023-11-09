@@ -26,7 +26,7 @@ public class ElevatedProcessTest {
 
 	private static final long wait = 100;
 
-	private Program elevated;
+	private Weave elevated;
 
 	private ServerSocket server;
 
@@ -49,7 +49,7 @@ public class ElevatedProcessTest {
 		server.setReuseAddress( true );
 		server.bind( new InetSocketAddress( InetAddress.getLoopbackAddress(), port ) );
 
-		elevated = new Program();
+		elevated = new Weave();
 		elevated.start( ElevatedFlag.CALLBACK_SECRET, secret, ElevatedFlag.CALLBACK_PORT, String.valueOf( port ), LogFlag.LOG_LEVEL, "none" );
 		elevated.waitForStart( 1, TimeUnit.SECONDS );
 
@@ -59,14 +59,14 @@ public class ElevatedProcessTest {
 		assertThat( secret ).isEqualTo( reader.readLine( wait, TimeUnit.MILLISECONDS ) );
 
 		// The elevated updater should be running and validated at this point
-		assertThat( elevated.getStatus() ).isEqualTo( Program.Status.STARTED );
+		assertThat( elevated.getStatus() ).isEqualTo( Weave.Status.STARTED );
 	}
 
 	@AfterEach
 	public void shutdown() throws Exception {
 		elevated.stop();
 		elevated.waitForStop( 1, TimeUnit.SECONDS );
-		assertThat( elevated.getStatus() ).isEqualTo( Program.Status.STOPPED );
+		assertThat( elevated.getStatus() ).isEqualTo( Weave.Status.STOPPED );
 		server.close();
 		System.setProperty( OperatingSystem.PROCESS_PRIVILEGE_KEY, OperatingSystem.NORMAL_PRIVILEGE_VALUE );
 	}

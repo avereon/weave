@@ -28,7 +28,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @CustomLog
-public class Program implements Product {
+public class Weave implements Product {
 
 	public enum Status {
 		STOPPED,
@@ -87,7 +87,7 @@ public class Program implements Product {
 		taskNameMap = Collections.unmodifiableMap( map );
 	}
 
-	public Program() {
+	public Weave() {
 		Rb.init( this );
 
 		this.execute = true;
@@ -217,9 +217,9 @@ public class Program implements Product {
 					showProgressDialog();
 					Thread.sleep( 500 );
 				}
-				synchronized( Program.this ) {
+				synchronized( Weave.this ) {
 					status = Status.STARTED;
-					Program.this.notifyAll();
+					Weave.this.notifyAll();
 				}
 				execute();
 			} catch( Throwable throwable ) {
@@ -227,9 +227,9 @@ public class Program implements Product {
 				throwable.printStackTrace( System.err );
 			} finally {
 				if( isUi() ) hideProgressDialog();
-				synchronized( Program.this ) {
+				synchronized( Weave.this ) {
 					status = Status.STOPPED;
-					Program.this.notifyAll();
+					Weave.this.notifyAll();
 				}
 				log.atInfo().log( "%s%s finished", elevatedKey(), card.getName() );
 			}

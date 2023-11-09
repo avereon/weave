@@ -29,7 +29,7 @@ class ElevatedHandler {
 
 	static final String LOG = "LOG";
 
-	private final Program program;
+	private final Weave program;
 
 	private String secret;
 
@@ -45,7 +45,7 @@ class ElevatedHandler {
 
 	private long clientConnect;
 
-	ElevatedHandler( Program program ) {
+	ElevatedHandler( Weave program ) {
 		this.program = program;
 	}
 
