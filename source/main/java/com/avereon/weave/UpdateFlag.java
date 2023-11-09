@@ -5,6 +5,12 @@ import com.avereon.util.LogFlag;
 public interface UpdateFlag extends LogFlag {
 
 	/**
+	 * The dark mode flag indicates that the UI should use dark mode instead of
+	 * the default light mode.
+	 */
+	String DARK = "--dark";
+
+	/**
 	 * The file flag indicates the program should read commands from the
 	 * specified file. Example:
 	 * {@code

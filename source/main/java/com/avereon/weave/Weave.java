@@ -8,10 +8,12 @@ import com.avereon.settings.MapSettings;
 import com.avereon.settings.Settings;
 import com.avereon.util.*;
 import com.avereon.weave.task.*;
-import com.avereon.zenna.icon.UpdateIcon;
 import com.avereon.zarra.image.Images;
 import com.avereon.zarra.javafx.Fx;
+import com.avereon.zenna.icon.UpdateIcon;
+import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
@@ -36,6 +38,10 @@ public class Weave implements Product {
 		STARTED,
 		STOPPING
 	}
+
+	public static final String STYLESHEET_DARK = "weave-dark.css";
+
+	//public static final String STYLESHEET_LIGHT = "weave-light.css";
 
 	private static final Map<String, Class<? extends Task>> taskNameMap;
 
@@ -142,7 +148,7 @@ public class Weave implements Product {
 
 		log.atInfo().log( "%s %s", card.getName(), card.getRelease() );
 		log.atInfo().log( "%s started in %s mode", card.getName(), isElevated() ? "[ELEVATED]" : "[NORMAL]" );
-		log.atFine().log( "%sCommand line: %s", elevatedKey(),ProcessCommands.getCommandLineAsString() );
+		log.atFine().log( "%sCommand line: %s", elevatedKey(), ProcessCommands.getCommandLineAsString() );
 		log.atFine().log( "%sParameters:   %s", elevatedKey(), parameters );
 		log.atFine().log( "%sLog: %s", elevatedKey(), Log.getLogFile() );
 
@@ -288,7 +294,14 @@ public class Weave implements Product {
 			alert.setHeaderText( "Performing update" );
 			alert.getDialogPane().setContent( progressPane );
 
-			Stage stage = (Stage)alert.getDialogPane().getScene().getWindow();
+			Scene scene = alert.getDialogPane().getScene();
+
+			// NOTE Application.setUserAgentStylesheet() must be called in application for this to work properly
+			Application.setUserAgentStylesheet( Application.STYLESHEET_MODENA );
+			boolean useDarkMode = Boolean.parseBoolean( getParameters().get( UpdateFlag.DARK, "false" ) );
+			if( useDarkMode ) scene.getStylesheets().addAll( Weave.STYLESHEET_DARK );
+
+			Stage stage = (Stage)scene.getWindow();
 			stage.getIcons().addAll( Images.getStageIcons( new UpdateIcon() ) );
 
 			// The following line is a workaround to dialogs showing with zero size on Linux
