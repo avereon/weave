@@ -99,8 +99,11 @@ public class UnpackTask extends Task {
 			while( entries.hasMoreElements() ) {
 				ZipEntry entry = entries.nextElement();
 				setMessage( "Unpacking " + entry );
-				boolean staged = stage( zip.getInputStream( entry ), target, entry.getName() );
-				if( !staged ) throw new RuntimeException( "Could not stage: " + target.resolve( entry.getName() ) );
+				String name = entry.getName();
+				if( !name.contains( "../")) {
+					boolean staged = stage( zip.getInputStream( entry ), target, entry.getName() );
+					if( !staged ) throw new IOException( "Could not stage: " + target.resolve( entry.getName() ) );
+				}
 				incrementProgress();
 			}
 		}
