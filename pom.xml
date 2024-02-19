@@ -46,11 +46,11 @@
 	<properties>
 		<images-folder>target/main/images</images-folder>
 
-		<!-- Version numbers updated 11 Oct 2021 -->
 		<!-- Runtime dependencies -->
+		<!-- Version numbers updated 18 Feb 2023 -->
 		<zenna.version>[0.9,)</zenna.version>
 		<zevra.version>[0.9,)</zevra.version>
-		<openjfx.version>20.0.1</openjfx.version>
+		<openjfx.version>21.0.2</openjfx.version>
 
 		<!-- Plugin versions -->
 		<cameo.version>2.10</cameo.version>
