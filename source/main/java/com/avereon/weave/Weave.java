@@ -131,6 +131,10 @@ public class Weave implements Product {
 		return this.status;
 	}
 
+	public static void launch( String... commands ) {
+		Application.launch( commands );
+	}
+
 	public void start( String... commands ) {
 		synchronized( this ) {
 			status = Status.STARTING;
