@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Asynchronously start a process. Unlike the ExecuteTask, this task does not
  * wait for the process to terminate before returning.
- *
+ * <p>
  * Parameter 0 - The process working folder
  * Parameter 1 - The executable name or path
  * Parameter + - Parameters for the executable
@@ -41,7 +41,6 @@ public class LaunchTask extends Task {
 		builder.redirectError( ProcessBuilder.Redirect.DISCARD );
 		builder.redirectInput( ProcessBuilder.Redirect.INHERIT );
 		builder.start();
-		// NOTE This task does not wait for the process to finish, this task is asynchronous
 
 		incrementProgress();
 
