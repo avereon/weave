@@ -30,14 +30,16 @@ public class LaunchTask extends Task {
 
 	@Override
 	public TaskResult execute() throws Exception {
-		if( getParameters().size() < 1 ) throw new Exception( "Missing working folder" );
+		if( getParameters().isEmpty() ) throw new Exception( "Missing working folder" );
 		if( getParameters().size() < 2 ) throw new Exception( "Missing executable" );
 
 		setMessage( "Launching " + getParameters().get( 1 ) );
 
 		ProcessBuilder builder = new ProcessBuilder( getParameters().subList( 1, getParameters().size() ) );
 		builder.directory( Paths.get( getParameters().get( 0 ) ).toFile() );
-		builder.redirectOutput( ProcessBuilder.Redirect.DISCARD ).redirectError( ProcessBuilder.Redirect.DISCARD );
+		builder.redirectOutput( ProcessBuilder.Redirect.DISCARD );
+		builder.redirectError( ProcessBuilder.Redirect.DISCARD );
+		builder.redirectInput( ProcessBuilder.Redirect.DISCARD );
 		builder.start();
 		// NOTE This task does not wait for the process to finish, this task is asynchronous
 
