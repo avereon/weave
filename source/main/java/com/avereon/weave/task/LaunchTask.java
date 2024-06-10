@@ -39,7 +39,7 @@ public class LaunchTask extends Task {
 		builder.directory( Paths.get( getParameters().get( 0 ) ).toFile() );
 		builder.redirectOutput( ProcessBuilder.Redirect.DISCARD );
 		builder.redirectError( ProcessBuilder.Redirect.DISCARD );
-		builder.redirectInput( ProcessBuilder.Redirect.DISCARD );
+		builder.redirectInput( ProcessBuilder.Redirect.INHERIT );
 		builder.start();
 		// NOTE This task does not wait for the process to finish, this task is asynchronous
 
