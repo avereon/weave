@@ -27,6 +27,8 @@ public class ExecuteTask extends Task {
 
 		setMessage( "Executing " + getParameters().get( 1 ) );
 
+		// TODO Should this be in a retry loop?
+
 		ProcessBuilder builder = new ProcessBuilder( getParameters().subList( 1, getParameters().size() ) );
 		builder.directory( Paths.get( getParameters().get( 0 ) ).toFile() );
 		builder.redirectOutput( ProcessBuilder.Redirect.DISCARD ).redirectError( ProcessBuilder.Redirect.DISCARD );
