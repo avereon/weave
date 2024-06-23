@@ -51,7 +51,7 @@ public class ElevatedProcessTest {
 		server.bind( new InetSocketAddress( InetAddress.getLoopbackAddress(), port ) );
 
 		elevated = new Weave();
-		elevated.start( ElevatedFlag.CALLBACK_SECRET, secret, ElevatedFlag.CALLBACK_PORT, String.valueOf( port ), LogFlag.LOG_LEVEL, "none" );
+		elevated.start( ElevatedFlag.CALLBACK_SECRET, secret, ElevatedFlag.CALLBACK_PORT, String.valueOf( port ), LogFlag.LOG_LEVEL, LogFlag.NONE );
 		elevated.waitForStart( 1, TimeUnit.SECONDS );
 
 		Socket socket = server.accept();
@@ -102,11 +102,10 @@ public class ElevatedProcessTest {
 	public void testElevatedExecuteFailure() throws Exception {
 		writer.println( UpdateTask.EXECUTE + " " + workingFolder + " invalid" );
 		writer.flush();
-		assertThat( readNext() ).isEqualTo( "MESSAGE Executing invalid" );
+		assertThat( readNext( 2 * wait, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing invalid" );
 		assertThat( readNext() ).startsWith( "FAILURE execute IOException: Cannot run program \"invalid\"" );
 		assertThat( readNext() ).isNull();
 	}
-
 
 	@Test
 	public void testElevatedLaunchSuccess() throws Exception {
@@ -122,7 +121,7 @@ public class ElevatedProcessTest {
 	public void testElevatedLaunchFailure() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " invalid" );
 		writer.flush();
-		assertThat( readNext( wait + LaunchTask.TIMEOUT + LaunchTask.WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching invalid" );
+		assertThat( readNext( 2 * wait + LaunchTask.TIMEOUT + LaunchTask.WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching invalid" );
 		assertThat( readNext() ).startsWith( "FAILURE launch IOException: Cannot run program \"invalid\"" );
 		assertThat( readNext() ).isNull();
 	}

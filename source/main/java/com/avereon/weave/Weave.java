@@ -206,7 +206,7 @@ public class Weave implements Product {
 		if( status != Status.STOPPED ) status = Status.STOPPING;
 		execute = false;
 		this.notifyAll();
-		executeThread.interrupt();
+		if( executeThread != null ) executeThread.interrupt();
 	}
 
 	@SuppressWarnings( "SameParameterValue" )
