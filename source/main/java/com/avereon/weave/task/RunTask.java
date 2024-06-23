@@ -9,7 +9,7 @@ import com.avereon.weave.UpdateTask;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class RunTask extends Task {
+public abstract class RunTask extends Task {
 
 	protected RunTask( String task, List<String> parameters ) {
 		super( task, parameters );

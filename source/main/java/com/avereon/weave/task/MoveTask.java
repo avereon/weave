@@ -67,7 +67,6 @@ public class MoveTask extends Task {
 
 	@Override
 	public TaskResult execute() throws Exception {
-		System.err.println( "Executing move task: " + source );
 		TaskResult result = move( source, target, false );
 		incrementProgress();
 		return result;
@@ -75,7 +74,6 @@ public class MoveTask extends Task {
 
 	@Override
 	public TaskResult rollback() throws Exception {
-		System.err.println( "Rollback move task: " + source );
 		TaskResult result = move( target, source, true );
 		decrementProgress();
 		return result;

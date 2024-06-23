@@ -37,15 +37,16 @@ public class ElevatedProcessTest {
 
 	@BeforeEach
 	public void setup() throws Exception {
-		// Convince the OperatingSystem class that the process is elevated
-		System.setProperty( OperatingSystem.PROCESS_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
+		// NOTE The term "elevated" in in quotes meaning that the test is emulating an elevated process.
 
-		// The interface to an elevated process is the socket
-		// so to use it a server socket needs to be started
+		// Convince the OperatingSystem class that the process is "elevated"
+		System.setProperty( OperatingSystem.PROCESS_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 
 		String secret = UUID.randomUUID().toString();
 		int port = 4324;
 
+		// The interface to an "elevated" process is the socket
+		// so to use it a server socket needs to be started
 		server = new ServerSocket();
 		server.setReuseAddress( true );
 		server.bind( new InetSocketAddress( InetAddress.getLoopbackAddress(), port ) );
@@ -57,9 +58,11 @@ public class ElevatedProcessTest {
 		Socket socket = server.accept();
 		writer = new PrintWriter( socket.getOutputStream(), false, StandardCharsets.UTF_8 );
 		reader = new NonBlockingReader( new InputStreamReader( socket.getInputStream(), StandardCharsets.UTF_8 ) );
+
+		// Check the "elevated" weave secret
 		assertThat( secret ).isEqualTo( reader.readLine( wait, TimeUnit.MILLISECONDS ) );
 
-		// The elevated updater should be running and validated at this point
+		// The "elevated" updater should be running and validated at this point
 		assertThat( elevated.getStatus() ).isEqualTo( Weave.Status.STARTED );
 	}
 
@@ -84,7 +87,7 @@ public class ElevatedProcessTest {
 		assertThat( readNext() ).isEqualTo( "PROGRESS" );
 		assertThat( readNext() ).isEqualTo( "SUCCESS log \"Hello Updater!\"" );
 		// There really is no further communication at this point,
-		// any more reads will timeout and return a null
+		// any more reads will time out and return a null
 		assertThat( readNext() ).isNull();
 	}
 
@@ -92,7 +95,7 @@ public class ElevatedProcessTest {
 	public void testElevatedExecuteSuccess() throws Exception {
 		writer.println( UpdateTask.EXECUTE + " " + workingFolder + " java" );
 		writer.flush();
-		assertThat( readNext() ).isEqualTo( "MESSAGE Executing java" );
+		assertThat( readNext( 2 * wait, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing java" );
 		assertThat( readNext() ).isEqualTo( "PROGRESS" );
 		assertThat( readNext() ).isEqualTo( "SUCCESS execute java" );
 		assertThat( readNext() ).isNull();
@@ -111,7 +114,7 @@ public class ElevatedProcessTest {
 	public void testElevatedLaunchSuccess() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " java" );
 		writer.flush();
-		assertThat( readNext() ).isEqualTo( "MESSAGE Launching java" );
+		assertThat( readNext( 2 * wait, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching java" );
 		assertThat( readNext() ).isEqualTo( "PROGRESS" );
 		assertThat( readNext() ).isEqualTo( "SUCCESS launch java" );
 		assertThat( readNext() ).isNull();
