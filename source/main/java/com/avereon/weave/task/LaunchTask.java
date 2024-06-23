@@ -1,50 +1,55 @@
 package com.avereon.weave.task;
 
-import com.avereon.util.TextUtil;
-import com.avereon.weave.Task;
-import com.avereon.weave.TaskResult;
-import com.avereon.weave.TaskStatus;
+import com.avereon.util.ThreadUtil;
 import com.avereon.weave.UpdateTask;
+import lombok.CustomLog;
 
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.List;
 
 /**
  * Asynchronously start a process. Unlike the ExecuteTask, this task does not
- * wait for the process to terminate before returning.
+ * wait for the process to terminate before returning. See
+ * {@link UpdateTask#LAUNCH}.
  * <p>
  * Parameter 0 - The process working folder
  * Parameter 1 - The executable name or path
  * Parameter + - Parameters for the executable
  */
-public class LaunchTask extends Task {
+@CustomLog
+public class LaunchTask extends RunTask {
+
+	/**
+	 * How long to wait between launch attempts. Must be smaller than {@link #TIMEOUT}.
+	 */
+	public static final long WAIT  = 200;
+
+	/**
+	 * How long to wait for all launch attempts. Must be larger than {@link #WAIT}.
+	 */
+	public static final long TIMEOUT  = 5000;
 
 	public LaunchTask( List<String> parameters ) {
 		super( UpdateTask.LAUNCH, parameters );
 	}
 
 	@Override
-	public int getStepCount() {
-		return 1;
+	protected void startProcess( ProcessBuilder builder ) throws Exception {
+		Process process = null;
+		IOException lastException = null;
+		long timeLimit = System.currentTimeMillis() + TIMEOUT;
+		do {
+			try {
+				process = builder.start();
+				break;
+			} catch( IOException exception ) {
+				lastException = exception;
+				ThreadUtil.pause( 200 );
+			} finally {
+				if( process == null ) ThreadUtil.pause( WAIT );
+			}
+		} while( System.currentTimeMillis() < timeLimit );
+
+		if( process == null ) throw lastException;
 	}
-
-	@Override
-	public TaskResult execute() throws Exception {
-		if( getParameters().isEmpty() ) throw new Exception( "Missing working folder" );
-		if( getParameters().size() < 2 ) throw new Exception( "Missing executable" );
-
-		setMessage( "Launching " + getParameters().get( 1 ) );
-
-		ProcessBuilder builder = new ProcessBuilder( getParameters().subList( 1, getParameters().size() ) );
-		builder.directory( Paths.get( getParameters().get( 0 ) ).toFile() );
-		builder.redirectOutput( ProcessBuilder.Redirect.DISCARD );
-		builder.redirectError( ProcessBuilder.Redirect.DISCARD );
-		builder.redirectInput( ProcessBuilder.Redirect.INHERIT );
-		builder.start();
-
-		incrementProgress();
-
-		return new TaskResult( this, TaskStatus.SUCCESS, TextUtil.toString( builder.command(), " " ) );
-	}
-
 }

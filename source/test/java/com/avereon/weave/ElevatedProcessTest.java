@@ -3,6 +3,7 @@ package com.avereon.weave;
 import com.avereon.util.LogFlag;
 import com.avereon.util.NonBlockingReader;
 import com.avereon.util.OperatingSystem;
+import com.avereon.weave.task.LaunchTask;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,7 +89,27 @@ public class ElevatedProcessTest {
 	}
 
 	@Test
-	public void testLaunchSuccess() throws Exception {
+	public void testElevatedExecuteSuccess() throws Exception {
+		writer.println( UpdateTask.EXECUTE + " " + workingFolder + " java" );
+		writer.flush();
+		assertThat( readNext() ).isEqualTo( "MESSAGE Executing java" );
+		assertThat( readNext() ).isEqualTo( "PROGRESS" );
+		assertThat( readNext() ).isEqualTo( "SUCCESS execute java" );
+		assertThat( readNext() ).isNull();
+	}
+
+	@Test
+	public void testElevatedExecuteFailure() throws Exception {
+		writer.println( UpdateTask.EXECUTE + " " + workingFolder + " invalid" );
+		writer.flush();
+		assertThat( readNext() ).isEqualTo( "MESSAGE Executing invalid" );
+		assertThat( readNext() ).startsWith( "FAILURE execute IOException: Cannot run program \"invalid\"" );
+		assertThat( readNext() ).isNull();
+	}
+
+
+	@Test
+	public void testElevatedLaunchSuccess() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " java" );
 		writer.flush();
 		assertThat( readNext() ).isEqualTo( "MESSAGE Launching java" );
@@ -98,17 +119,21 @@ public class ElevatedProcessTest {
 	}
 
 	@Test
-	public void testLaunchFailure() throws Exception {
+	public void testElevatedLaunchFailure() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " invalid" );
 		writer.flush();
-		assertThat( readNext() ).isEqualTo( "MESSAGE Launching invalid" );
+		assertThat( readNext( wait + LaunchTask.TIMEOUT + LaunchTask.WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching invalid" );
 		assertThat( readNext() ).startsWith( "FAILURE launch IOException: Cannot run program \"invalid\"" );
 		assertThat( readNext() ).isNull();
 	}
 
 	private String readNext() throws IOException {
+		return readNext( wait, TimeUnit.MILLISECONDS );
+	}
+
+	private String readNext( long duration, TimeUnit unit ) throws IOException {
 		String line;
-		while( (line = reader.readLine( wait, TimeUnit.MILLISECONDS )) != null ) {
+		while( (line = reader.readLine( duration, unit )) != null ) {
 			if( !line.startsWith( ElevatedHandler.LOG ) ) return line;
 		}
 		return null;

@@ -17,8 +17,9 @@ public interface UpdateTask {
 	String ELEVATED_LOG = ELEVATED_PREFIX + LOG;
 
 	/**
-	 * The execute command indicates that a new process should be launched. The
-	 * task will wait for the process to complete.
+	 * The launch command indicates that a new process should be executed. Unlike
+	 * the {@link #LAUNCH} command, this command waits for the executed process to
+	 * complete before proceeding.
 	 */
 	String EXECUTE = "execute";
 
@@ -36,8 +37,13 @@ public interface UpdateTask {
 
 	/**
 	 * The launch command indicates that a new process should be launched. This
-	 * typically used near the end of an update process to restart the updated
-	 * program.
+	 * is typically used near the end of an update process to restart the updated
+	 * program. Unlike the {@link #EXECUTE} command, this command does not wait
+	 * for the process to complete before proceeding.
+	 * <p>
+	 * The launch command will also attempt to start the process until the process
+	 * is started successfully, or a timout is reached. In this way the launch
+	 * command is more robust than the {@link #EXECUTE} command.
 	 */
 	String LAUNCH = "launch";
 
@@ -63,6 +69,17 @@ public interface UpdateTask {
 	 * The rename command indicates that a path be given a different name.
 	 */
 	String RENAME = "rename";
+
+	/**
+	 * The start command indicates that a new process should be started. Unlike
+	 * the {@link #EXECUTE} command, this command does not wait for the process
+	 * to complete before proceeding, it merely waits for the process to start.
+	 * <p>
+	 * If the process fails to start, this command will retry until it does,
+	 * or the timeout is reached. The command will wait for the process to start,
+	 * or fail if it does not.
+	 */
+	String START = "start";
 
 	/**
 	 * The unpack command indicates that a file or directory should be overlaid
