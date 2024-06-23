@@ -37,7 +37,7 @@ public class ElevatedProcessTest {
 
 	@BeforeEach
 	public void setup() throws Exception {
-		// NOTE The term "elevated" in in quotes meaning that the test is emulating an elevated process.
+		// NOTE The term "elevated" is in quotes, meaning that the test is emulating an elevated process.
 
 		// Convince the OperatingSystem class that the process is "elevated"
 		System.setProperty( OperatingSystem.PROCESS_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
