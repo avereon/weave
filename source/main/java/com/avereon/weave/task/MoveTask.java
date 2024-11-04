@@ -83,8 +83,8 @@ public class MoveTask extends Task {
 		setMessage( String.valueOf( source ) );
 		TaskResult result;
 		if( Files.exists( source ) ) {
-			// FIXME creating the folders here can cause some problems when running elevated
-			Files.createDirectories( target.getParent() );
+			// If parent folders are missing, create them, even with elevated permissions
+			if( !Files.exists( target ) ) Files.createDirectories( target.getParent() );
 			FileUtil.move( source, target );
 			result = new TaskResult( this, rollback ? TaskStatus.ROLLBACK : TaskStatus.SUCCESS, source + " to " + target );
 		} else {
