@@ -27,6 +27,8 @@ the program:
     update utility.jar /usr/share/program/utility.jar
     launch /usr/bin/java -jar /usr/share/program/program.jar
 
-The following unpacks the update.zip file into /usr/share/program folder:
+The following unpacks the update.zip file into /usr/share/program folder then
+launches the program:
     
     unpack update.zip /usr/share/program
+    launch java -jar /usr/share/program/program.jar
