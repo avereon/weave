@@ -39,6 +39,8 @@ public class Weave implements Product {
 		STOPPING
 	}
 
+	public static final String DEFAULT_LOG_FILE_PATTERN = "update.%u.log";
+
 	public static final String STYLESHEET_DARK = "weave-dark.css";
 
 	//public static final String STYLESHEET_LIGHT = "weave-light.css";
@@ -190,7 +192,7 @@ public class Weave implements Product {
 	}
 
 	private void configureLogging( Parameters parameters ) {
-		Log.configureLogging( this, parameters, null, "update.%u.log" );
+		Log.configureLogging( this, parameters, null, DEFAULT_LOG_FILE_PATTERN );
 		Log.setPackageLogLevel( "com.avereon", parameters.get( LogFlag.LOG_LEVEL, LogFlag.INFO ) );
 	}
 
