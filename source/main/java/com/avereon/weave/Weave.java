@@ -30,7 +30,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @CustomLog
-public class Weave implements Product {
+public class Weave extends Application implements Product {
 
 	public enum Status {
 		STOPPED,
@@ -65,7 +65,7 @@ public class Weave implements Product {
 
 	private ElevatedHandler elevatedHandler;
 
-	private Parameters parameters;
+	private com.avereon.util.Parameters parameters;
 
 	private Alert alert;
 
@@ -121,9 +121,9 @@ public class Weave implements Product {
 		return programDataFolder;
 	}
 
-	public Parameters getParameters() {
-		return parameters;
-	}
+	//	public Parameters getParameters() {
+	//		return parameters;
+	//	}
 
 	public String getTitle() {
 		return title;
@@ -137,6 +137,10 @@ public class Weave implements Product {
 		Application.launch( commands );
 	}
 
+	public void start( Stage stage ) {
+		start( getParameters().getRaw().toArray( new String[ 0 ] ) );
+	}
+
 	public void start( String... commands ) {
 		synchronized( this ) {
 			status = Status.STARTING;
@@ -144,7 +148,7 @@ public class Weave implements Product {
 		}
 
 		// Parse parameters
-		this.parameters = Parameters.parse( commands );
+		this.parameters = com.avereon.util.Parameters.parse( commands );
 
 		// Configure logging
 		configureLogging( parameters );
@@ -191,7 +195,7 @@ public class Weave implements Product {
 		executeThread.start();
 	}
 
-	private void configureLogging( Parameters parameters ) {
+	private void configureLogging( com.avereon.util.Parameters parameters ) {
 		Log.configureLogging( this, parameters, null, DEFAULT_LOG_FILE_PATTERN );
 		Log.setPackageLogLevel( "com.avereon", parameters.get( LogFlag.LOG_LEVEL, LogFlag.INFO ) );
 	}
@@ -304,7 +308,7 @@ public class Weave implements Product {
 
 			// NOTE Application.setUserAgentStylesheet() must be called in application for this to work properly
 			Application.setUserAgentStylesheet( Application.STYLESHEET_MODENA );
-			boolean useDarkMode = Boolean.parseBoolean( getParameters().get( UpdateFlag.DARK, "false" ) );
+			boolean useDarkMode = Boolean.parseBoolean( parameters.get( UpdateFlag.DARK, "false" ) );
 			if( useDarkMode ) scene.getStylesheets().addAll( Weave.STYLESHEET_DARK );
 
 			Stage stage = (Stage)scene.getWindow();
