@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import lombok.CustomLog;
+import lombok.Getter;
 
 import javax.net.SocketFactory;
 import java.io.*;
@@ -46,6 +47,7 @@ public class Weave extends Application implements Product {
 
 	private static final Map<String, Class<? extends Task>> taskNameMap;
 
+	@Getter
 	private Status status;
 
 	private boolean execute;
@@ -58,6 +60,7 @@ public class Weave extends Application implements Product {
 
 	private final Path programDataFolder;
 
+	@Getter
 	private final String title;
 
 	private InputSource inputSource;
@@ -120,20 +123,8 @@ public class Weave extends Application implements Product {
 		return programDataFolder;
 	}
 
-	//	public Parameters getParameters() {
-	//		return parameters;
-	//	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public Status getStatus() {
-		return this.status;
-	}
-
 	public static void launch( String... commands ) {
-		Application.launch( commands );
+		new Weave().start( commands );
 	}
 
 	public void start( Stage stage ) {
@@ -293,6 +284,10 @@ public class Weave extends Application implements Product {
 	}
 
 	private void showProgressDialog() {
+		// Start JavaFX if necessary
+		Fx.startup();
+
+		// Show the progress dialog
 		Fx.run( () -> {
 			progressPane = new ProgressPane();
 			progressPane.setPrefWidth( 400 );
