@@ -12,7 +12,6 @@ import com.avereon.zarra.image.Images;
 import com.avereon.zarra.javafx.Fx;
 import com.avereon.zenna.icon.UpdateIcon;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -294,7 +293,7 @@ public class Weave extends Application implements Product {
 	}
 
 	private void showProgressDialog() {
-		Platform.startup( () -> {
+		Fx.run( () -> {
 			progressPane = new ProgressPane();
 			progressPane.setPrefWidth( 400 );
 			progressPane.setMessage( "Starting update" );
@@ -325,6 +324,7 @@ public class Weave extends Application implements Product {
 
 			alert.show();
 		} );
+
 		try {
 			Fx.waitForWithExceptions( 1000 );
 		} catch( TimeoutException exception ) {
