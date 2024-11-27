@@ -123,15 +123,31 @@ public class Weave extends Application implements Product {
 		return programDataFolder;
 	}
 
+	/**
+	 * This method is used to launch the program from the Xenon launcher.
+	 *
+	 * @param commands The program commands
+	 */
 	public static void launch( String... commands ) {
 		new Weave().start( commands );
 	}
 
+	/**
+	 * This method is used to launch the program as a JavaFX application.
+	 *
+	 * @param stage the primary stage for this application, onto which
+	 * the application scene can be set.
+	 */
 	public void start( Stage stage ) {
 		start( getParameters().getRaw().toArray( new String[ 0 ] ) );
 	}
 
-	public void start( String... commands ) {
+	/**
+	 * This method is the internal start implementation.
+	 *
+	 * @param commands The program commands
+	 */
+	void start( String... commands ) {
 		synchronized( this ) {
 			status = Status.STARTING;
 			this.notifyAll();
@@ -145,6 +161,11 @@ public class Weave extends Application implements Product {
 
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
+
+		if( parameters.isSet( UpdateFlag.HELP ) ) {
+			printHelp();
+			return;
+		}
 
 		log.atInfo().log( "%s %s", card.getName(), card.getRelease() );
 		log.atInfo().log( "%s started in %s mode", card.getName(), isElevated() ? "[ELEVATED]" : "[NORMAL]" );
@@ -161,7 +182,7 @@ public class Weave extends Application implements Product {
 		if( callback ) {
 			inputSource = InputSource.SOCKET;
 		} else if( string ) {
-			inputSource = InputSource.STRING;
+			inputSource = InputSource.INTERNAL;
 		} else {
 			int count = 0;
 			if( stdin ) count++;
@@ -180,9 +201,11 @@ public class Weave extends Application implements Product {
 			if( update ) inputSource = InputSource.UPDATE;
 		}
 
-		executeThread = new Thread( new Runner() );
-		executeThread.setName( "Zenna " + (isElevated() ? "elevated" : "execute") + " thread" );
-		executeThread.start();
+		if( inputSource != null ) {
+			executeThread = new Thread( new Runner() );
+			executeThread.setName( "Zenna " + (isElevated() ? "elevated" : "execute") + " thread" );
+			executeThread.start();
+		}
 	}
 
 	private void configureLogging( com.avereon.util.Parameters parameters ) {
@@ -267,7 +290,7 @@ public class Weave extends Application implements Product {
 				runTasksFromSocket();
 				break;
 			}
-			case STRING: {
+			case INTERNAL: {
 				// runTasksFromString() is called outside this method
 				synchronized( waitLock ) {
 					while( execute && !Thread.currentThread().isInterrupted() ) {
@@ -515,6 +538,11 @@ public class Weave extends Application implements Product {
 		// These use System.err because System.out is used for communication
 		System.err.println( card.getName() + " " + card.getVersion() );
 		System.err.println( "Java " + System.getProperty( "java.runtime.version" ) );
+	}
+
+	private void printHelp() {
+		System.err.println();
+		System.err.println( "Usage: weave [options]" );
 	}
 
 	private Task parseTask( String line ) {

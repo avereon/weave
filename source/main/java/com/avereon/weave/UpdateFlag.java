@@ -20,6 +20,11 @@ public interface UpdateFlag extends LogFlag {
 	String FILE = "--file";
 
 	/**
+	 * The help flag indicates the program should display the program help.
+	 */
+	String HELP = "--help";
+
+	/**
 	 * The stream flag indicates the program should read commands from STDIN.
 	 * Example:
 	 * {@code

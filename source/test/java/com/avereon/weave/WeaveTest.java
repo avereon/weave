@@ -22,6 +22,16 @@ public class WeaveTest {
 	}
 
 	@Test
+	void launch() {
+		Weave.launch( UpdateFlag.HELP );
+	}
+
+	@Test
+	void start() {
+		new Weave().start( UpdateFlag.HELP );
+	}
+
+	@Test
 	@Timeout( 2 )
 	public void testReadCommandsFromStdin() throws IOException {
 		InputStream originalInput = System.in;
