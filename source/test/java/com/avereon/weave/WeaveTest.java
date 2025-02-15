@@ -23,12 +23,12 @@ public class WeaveTest {
 
 	@Test
 	void launch() {
-		Weave.launch( UpdateFlag.HELP );
+		Weave.launch( WeaveFlag.HELP );
 	}
 
 	@Test
 	void start() {
-		new Weave().start( UpdateFlag.HELP );
+		new Weave().start( WeaveFlag.HELP );
 	}
 
 	@Test
@@ -46,7 +46,7 @@ public class WeaveTest {
 		try {
 			new Thread( () -> {
 				try {
-					new Weave().start( UpdateFlag.STDIN, LogFlag.LOG_LEVEL, "none" );
+					new Weave().start( WeaveFlag.STDIN, LogFlag.LOG_LEVEL, "none" );
 				} catch( Exception exception ) {
 					exception.printStackTrace( System.err );
 				}

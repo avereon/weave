@@ -14,7 +14,7 @@ public class ProgressDialogCheck {
 
 		try {
 			Weave program = new Weave();
-			program.start( UpdateFlag.TITLE, "Program Update Check", LogFlag.LOG_LEVEL, "debug", InternalFlag.STRING );
+			program.start( WeaveFlag.TITLE, "Program Update Check", LogFlag.LOG_LEVEL, "debug", InternalFlag.STRING );
 			program.waitForStart( 2, TimeUnit.SECONDS );
 			new Thread( () -> {
 				try {

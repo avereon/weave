@@ -1,8 +1,8 @@
 package com.avereon.weave;
 
-import com.avereon.util.LogFlag;
+import com.avereon.product.ProgramFlag;
 
-public interface UpdateFlag extends LogFlag {
+public interface WeaveFlag extends ProgramFlag {
 
 	/**
 	 * The dark mode flag indicates that the UI should use dark mode instead of
@@ -18,11 +18,6 @@ public interface UpdateFlag extends LogFlag {
 	 * }
 	 */
 	String FILE = "--file";
-
-	/**
-	 * The help flag indicates the program should display the program help.
-	 */
-	String HELP = "--help";
 
 	/**
 	 * The stream flag indicates the program should read commands from STDIN.

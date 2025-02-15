@@ -162,7 +162,7 @@ public class Weave extends Application implements Product {
 		// Print the program header
 		if( !isElevated() ) printHeader( card );
 
-		if( parameters.isSet( UpdateFlag.HELP ) ) {
+		if( parameters.isSet( WeaveFlag.HELP ) ) {
 			printHelp();
 			return;
 		}
@@ -173,11 +173,11 @@ public class Weave extends Application implements Product {
 		log.atFine().log( "%sParameters:   %s", elevatedKey(), parameters );
 		log.atFine().log( "%sLog: %s", elevatedKey(), Log.getLogFile() );
 
-		boolean file = parameters.isSet( UpdateFlag.FILE );
-		boolean stdin = parameters.isSet( UpdateFlag.STDIN );
+		boolean file = parameters.isSet( WeaveFlag.FILE );
+		boolean stdin = parameters.isSet( WeaveFlag.STDIN );
 		boolean string = parameters.isSet( InternalFlag.STRING );
 		boolean callback = parameters.isSet( ElevatedFlag.CALLBACK_SECRET );
-		boolean update = parameters.isSet( UpdateFlag.UPDATE );
+		boolean update = parameters.isSet( WeaveFlag.UPDATE );
 
 		if( callback ) {
 			inputSource = InputSource.SOCKET;
@@ -273,13 +273,13 @@ public class Weave extends Application implements Product {
 	}
 
 	private boolean isUi() {
-		return alert != null || (parameters != null && parameters.isSet( UpdateFlag.TITLE ));
+		return alert != null || (parameters != null && parameters.isSet( WeaveFlag.TITLE ));
 	}
 
 	private void execute() throws Exception {
 		switch( inputSource ) {
 			case FILE: {
-				runTasksFromFile( new File( parameters.get( UpdateFlag.FILE ) ) );
+				runTasksFromFile( new File( parameters.get( WeaveFlag.FILE ) ) );
 				break;
 			}
 			case STDIN: {
@@ -300,7 +300,7 @@ public class Weave extends Application implements Product {
 				break;
 			}
 			case UPDATE: {
-				runTasksFromFile( new File( parameters.get( UpdateFlag.UPDATE ) ) );
+				runTasksFromFile( new File( parameters.get( WeaveFlag.UPDATE ) ) );
 				break;
 			}
 		}
@@ -317,7 +317,7 @@ public class Weave extends Application implements Product {
 			progressPane.setMessage( "Starting update" );
 
 			alert = new Alert( Alert.AlertType.INFORMATION, "", ButtonType.CANCEL );
-			alert.setTitle( parameters.get( UpdateFlag.TITLE ) );
+			alert.setTitle( parameters.get( WeaveFlag.TITLE ) );
 			alert.setHeaderText( "Performing update" );
 			alert.getDialogPane().setContent( progressPane );
 
@@ -325,7 +325,7 @@ public class Weave extends Application implements Product {
 
 			// NOTE Application.setUserAgentStylesheet() must be called in application for this to work properly
 			Application.setUserAgentStylesheet( Application.STYLESHEET_MODENA );
-			boolean useDarkMode = Boolean.parseBoolean( parameters.get( UpdateFlag.DARK, "false" ) );
+			boolean useDarkMode = Boolean.parseBoolean( parameters.get( WeaveFlag.DARK, "false" ) );
 			if( useDarkMode ) scene.getStylesheets().addAll( Weave.STYLESHEET_DARK );
 
 			Stage stage = (Stage)scene.getWindow();

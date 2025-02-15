@@ -1,6 +1,6 @@
 package com.avereon.weave.check;
 
-import com.avereon.weave.UpdateFlag;
+import com.avereon.weave.WeaveFlag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class SuccessCheckDarkUi extends SuccessCheck {
 	@Override
 	public List<String> getProgramCommands() {
 		List<String> commands = new ArrayList<>( super.getProgramCommands() );
-		commands.addAll( List.of( UpdateFlag.DARK, UpdateFlag.TITLE, "Success Check" ) );
+		commands.addAll( List.of( WeaveFlag.DARK, WeaveFlag.TITLE, "Success Check" ) );
 		return commands;
 	}
 

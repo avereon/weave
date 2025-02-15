@@ -1,6 +1,6 @@
 package com.avereon.weave.check;
 
-import com.avereon.weave.UpdateFlag;
+import com.avereon.weave.WeaveFlag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class ElevatedSuccessCheckUi extends ElevatedSuccessCheck {
 	@Override
 	public List<String> getProgramCommands() {
 		List<String> commands = new ArrayList<>( super.getProgramCommands() );
-		commands.addAll( List.of( UpdateFlag.TITLE, "Elevated Success Check" ) );
+		commands.addAll( List.of( WeaveFlag.TITLE, "Elevated Success Check" ) );
 		return commands;
 	}
 

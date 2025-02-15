@@ -4,7 +4,7 @@ import com.avereon.util.LogFlag;
 import com.avereon.util.ProcessCommands;
 import com.avereon.util.TextUtil;
 import com.avereon.weave.Launcher;
-import com.avereon.weave.UpdateFlag;
+import com.avereon.weave.WeaveFlag;
 
 import java.io.*;
 import java.util.*;
@@ -27,7 +27,7 @@ public abstract class CommandCheck {
 
 	public List<String> getProgramCommands() {
 		List<String> commands = new ArrayList<>();
-		commands.add( UpdateFlag.STDIN );
+		commands.add( WeaveFlag.STDIN );
 		commands.add( LogFlag.LOG_FILE );
 		commands.add( getLogFile() );
 		//commands.add( LogFlag.LOG_LEVEL );
