@@ -12,7 +12,7 @@
 
 	<groupId>com.avereon</groupId>
 	<artifactId>weave</artifactId>
-	<version>1.5-SNAPSHOT</version>
+	<version>1.5</version>
 	<packaging>jar</packaging>
 
 	<name>Weave</name>
@@ -46,14 +46,16 @@
 	<properties>
 		<images-folder>target/main/images</images-folder>
 
+		<java.version>21</java.version>
+
 		<!-- Runtime dependencies -->
 		<!-- Version numbers updated 18 Feb 2023 -->
-		<zenna.version>[0.9,)</zenna.version>
-		<zevra.version>[0.9,)</zevra.version>
-		<openjfx.version>21.0.2</openjfx.version>
+		<zenna.version>0.10</zenna.version>
+		<zevra.version>0.10</zevra.version>
+		<openjfx.version>22.0.2</openjfx.version>
 
 		<!-- Plugin versions -->
-		<cameo.version>2.10</cameo.version>
+		<cameo.version>2.11</cameo.version>
 	</properties>
 
 	<dependencies>
