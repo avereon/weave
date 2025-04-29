@@ -5,8 +5,8 @@ module com.avereon.weave {
 
 	// Both compile-time and run-time
 	requires com.avereon.zevra;
+	requires com.avereon.zerra;
 	requires com.avereon.zenna;
-	requires com.avereon.zarra;
 	requires javafx.controls;
 
 	exports com.avereon.weave;
