@@ -51,7 +51,7 @@
 		<!-- Runtime dependencies -->
 		<!-- Version numbers updated 18 Feb 2023 -->
 		<zenna.version>0.11-SNAPSHOT</zenna.version>
-		<zevra.version>0.1-SNAPSHOT</zevra.version>
+		<zevra.version>0.11-SNAPSHOT</zevra.version>
 		<openjfx.version>22.0.2</openjfx.version>
 
 		<!-- Plugin versions -->
