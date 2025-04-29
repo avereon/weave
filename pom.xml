@@ -55,7 +55,7 @@
 		<openjfx.version>22.0.2</openjfx.version>
 
 		<!-- Plugin versions -->
-		<cameo.version>2.11</cameo.version>
+		<cameo.version>2.12-SNAPSHOT</cameo.version>
 	</properties>
 
 	<dependencies>
