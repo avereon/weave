@@ -46,7 +46,7 @@
 	<properties>
 		<images-folder>target/main/images</images-folder>
 
-		<java.version>21</java.version>
+		<java.version>22</java.version>
 
 		<!-- Runtime dependencies -->
 		<!-- Version numbers updated 18 Feb 2023 -->
