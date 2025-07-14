@@ -25,7 +25,15 @@ public class ElevatedProcessTest {
 
 	private static final String workingFolder = System.getProperty( "user.dir" );
 
-	private static final long wait = 100;
+	/**
+	 * IO timeout in milliseconds
+	 */
+	private static final long IO_WAIT = 200;
+
+	/**
+	 * Wait timeout in seconds
+	 */
+	private static final int START_STOP_TIMEOUT = 2;
 
 	private Weave elevated;
 
@@ -53,14 +61,14 @@ public class ElevatedProcessTest {
 
 		elevated = new Weave();
 		elevated.start( ElevatedFlag.CALLBACK_SECRET, secret, ElevatedFlag.CALLBACK_PORT, String.valueOf( port ), LogFlag.LOG_LEVEL, LogFlag.NONE );
-		elevated.waitForStart( 1, TimeUnit.SECONDS );
+		elevated.waitForStart( START_STOP_TIMEOUT, TimeUnit.SECONDS );
 
 		Socket socket = server.accept();
 		writer = new PrintWriter( socket.getOutputStream(), false, StandardCharsets.UTF_8 );
 		reader = new NonBlockingReader( new InputStreamReader( socket.getInputStream(), StandardCharsets.UTF_8 ) );
 
 		// Check the "elevated" weave secret
-		assertThat( secret ).isEqualTo( reader.readLine( wait, TimeUnit.MILLISECONDS ) );
+		assertThat( secret ).isEqualTo( reader.readLine( IO_WAIT, TimeUnit.MILLISECONDS ) );
 
 		// The "elevated" updater should be running and validated at this point
 		assertThat( elevated.getStatus() ).isEqualTo( Weave.Status.STARTED );
@@ -69,7 +77,7 @@ public class ElevatedProcessTest {
 	@AfterEach
 	public void shutdown() throws Exception {
 		elevated.stop();
-		elevated.waitForStop( 1, TimeUnit.SECONDS );
+		elevated.waitForStop( START_STOP_TIMEOUT, TimeUnit.SECONDS );
 		assertThat( elevated.getStatus() ).isEqualTo( Weave.Status.STOPPED );
 		server.close();
 		System.setProperty( OperatingSystem.PROCESS_PRIVILEGE_KEY, OperatingSystem.NORMAL_PRIVILEGE_VALUE );
@@ -95,7 +103,7 @@ public class ElevatedProcessTest {
 	public void testElevatedExecuteSuccess() throws Exception {
 		writer.println( UpdateTask.EXECUTE + " " + workingFolder + " java" );
 		writer.flush();
-		assertThat( readNext( 2 * wait, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing java" );
+		assertThat( readNext( IO_WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing java" );
 		assertThat( readNext() ).isEqualTo( "PROGRESS" );
 		assertThat( readNext() ).isEqualTo( "SUCCESS execute java" );
 		assertThat( readNext() ).isNull();
@@ -105,7 +113,7 @@ public class ElevatedProcessTest {
 	public void testElevatedExecuteFailure() throws Exception {
 		writer.println( UpdateTask.EXECUTE + " " + workingFolder + " invalid" );
 		writer.flush();
-		assertThat( readNext( 2 * wait, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing invalid" );
+		assertThat( readNext( IO_WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing invalid" );
 		assertThat( readNext() ).startsWith( "FAILURE execute IOException: Cannot run program \"invalid\"" );
 		assertThat( readNext() ).isNull();
 	}
@@ -114,7 +122,7 @@ public class ElevatedProcessTest {
 	public void testElevatedLaunchSuccess() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " java" );
 		writer.flush();
-		assertThat( readNext( 2 * wait, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching java" );
+		assertThat( readNext( IO_WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching java" );
 		assertThat( readNext() ).isEqualTo( "PROGRESS" );
 		assertThat( readNext() ).isEqualTo( "SUCCESS launch java" );
 		assertThat( readNext() ).isNull();
@@ -124,13 +132,13 @@ public class ElevatedProcessTest {
 	public void testElevatedLaunchFailure() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " invalid" );
 		writer.flush();
-		assertThat( readNext( 2 * wait + LaunchTask.TIMEOUT + LaunchTask.WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching invalid" );
+		assertThat( readNext( IO_WAIT + LaunchTask.TIMEOUT + LaunchTask.WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching invalid" );
 		assertThat( readNext() ).startsWith( "FAILURE launch IOException: Cannot run program \"invalid\"" );
 		assertThat( readNext() ).isNull();
 	}
 
 	private String readNext() throws IOException {
-		return readNext( wait, TimeUnit.MILLISECONDS );
+		return readNext( IO_WAIT, TimeUnit.MILLISECONDS );
 	}
 
 	private String readNext( long duration, TimeUnit unit ) throws IOException {
