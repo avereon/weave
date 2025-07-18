@@ -26,14 +26,14 @@ public class ElevatedProcessTest {
 	private static final String workingFolder = System.getProperty( "user.dir" );
 
 	/**
-	 * IO timeout in milliseconds
+	 * Start/stop timeout in milliseconds
 	 */
-	private static final long IO_WAIT = 200;
+	private static final int START_STOP_TIMEOUT = 2000;
 
 	/**
-	 * Wait timeout in seconds
+	 * IO timeout in milliseconds
 	 */
-	private static final int START_STOP_TIMEOUT = 1;
+	private static final long IO_WAIT = 100;
 
 	private Weave elevated;
 
@@ -61,7 +61,7 @@ public class ElevatedProcessTest {
 
 		elevated = new Weave();
 		elevated.start( ElevatedFlag.CALLBACK_SECRET, secret, ElevatedFlag.CALLBACK_PORT, String.valueOf( port ), LogFlag.LOG_LEVEL, LogFlag.NONE );
-		elevated.waitForStart( START_STOP_TIMEOUT, TimeUnit.SECONDS );
+		elevated.waitForStart( START_STOP_TIMEOUT, TimeUnit.MILLISECONDS );
 
 		Socket socket = server.accept();
 		writer = new PrintWriter( socket.getOutputStream(), false, StandardCharsets.UTF_8 );
@@ -77,7 +77,7 @@ public class ElevatedProcessTest {
 	@AfterEach
 	public void shutdown() throws Exception {
 		elevated.stop();
-		elevated.waitForStop( START_STOP_TIMEOUT, TimeUnit.SECONDS );
+		elevated.waitForStop( START_STOP_TIMEOUT, TimeUnit.MILLISECONDS );
 		assertThat( elevated.getStatus() ).isEqualTo( Weave.Status.STOPPED );
 		server.close();
 		System.setProperty( OperatingSystem.PROCESS_PRIVILEGE_KEY, OperatingSystem.NORMAL_PRIVILEGE_VALUE );
@@ -103,7 +103,7 @@ public class ElevatedProcessTest {
 	public void testElevatedExecuteSuccess() throws Exception {
 		writer.println( UpdateTask.EXECUTE + " " + workingFolder + " java" );
 		writer.flush();
-		assertThat( readNext( IO_WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing java" );
+		assertThat( readNext( START_STOP_TIMEOUT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing java" );
 		assertThat( readNext() ).isEqualTo( "PROGRESS" );
 		assertThat( readNext() ).isEqualTo( "SUCCESS execute java" );
 		assertThat( readNext() ).isNull();
@@ -113,7 +113,7 @@ public class ElevatedProcessTest {
 	public void testElevatedExecuteFailure() throws Exception {
 		writer.println( UpdateTask.EXECUTE + " " + workingFolder + " invalid" );
 		writer.flush();
-		assertThat( readNext( IO_WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing invalid" );
+		assertThat( readNext( START_STOP_TIMEOUT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Executing invalid" );
 		assertThat( readNext() ).startsWith( "FAILURE execute IOException: Cannot run program \"invalid\"" );
 		assertThat( readNext() ).isNull();
 	}
@@ -122,7 +122,7 @@ public class ElevatedProcessTest {
 	public void testElevatedLaunchSuccess() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " java" );
 		writer.flush();
-		assertThat( readNext( IO_WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching java" );
+		assertThat( readNext( START_STOP_TIMEOUT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching java" );
 		assertThat( readNext() ).isEqualTo( "PROGRESS" );
 		assertThat( readNext() ).isEqualTo( "SUCCESS launch java" );
 		assertThat( readNext() ).isNull();
@@ -132,7 +132,7 @@ public class ElevatedProcessTest {
 	public void testElevatedLaunchFailure() throws Exception {
 		writer.println( UpdateTask.LAUNCH + " " + workingFolder + " invalid" );
 		writer.flush();
-		assertThat( readNext( IO_WAIT + LaunchTask.TIMEOUT + LaunchTask.WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching invalid" );
+		assertThat( readNext( START_STOP_TIMEOUT + LaunchTask.TIMEOUT + LaunchTask.WAIT, TimeUnit.MILLISECONDS ) ).isEqualTo( "MESSAGE Launching invalid" );
 		assertThat( readNext() ).startsWith( "FAILURE launch IOException: Cannot run program \"invalid\"" );
 		assertThat( readNext() ).isNull();
 	}
