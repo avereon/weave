@@ -27,7 +27,7 @@ public class LaunchTask extends RunTask {
 	/**
 	 * How long to wait for all launch attempts. Must be larger than {@link #WAIT}.
 	 */
-	public static final long TIMEOUT  = 5000;
+	public static final long TIMEOUT  = 2000;
 
 	public LaunchTask( List<String> parameters ) {
 		super( UpdateTask.LAUNCH, parameters );
@@ -37,7 +37,7 @@ public class LaunchTask extends RunTask {
 	protected void startProcess( ProcessBuilder builder ) throws Exception {
 		Process process = null;
 		IOException lastException = null;
-		long timeLimit = System.currentTimeMillis() + TIMEOUT;
+		long timeout = System.currentTimeMillis() + TIMEOUT;
 		do {
 			try {
 				process = builder.start();
@@ -48,7 +48,7 @@ public class LaunchTask extends RunTask {
 			} finally {
 				if( process == null ) ThreadUtil.pause( WAIT );
 			}
-		} while( System.currentTimeMillis() < timeLimit );
+		} while( System.currentTimeMillis() < timeout );
 
 		if( process == null ) throw lastException;
 	}

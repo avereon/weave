@@ -16,14 +16,14 @@ public class LaunchTaskTest extends TaskTest {
 	@Test
 	public void testLaunch() throws Exception {
 		List<TaskResult> results = program.runTasksFromString( UpdateTask.LAUNCH + " " + workingFolder + " java" );
-		assertTaskResult( results.get( 0 ), TaskStatus.SUCCESS, "java" );
+		assertTaskResult( results.getFirst(), TaskStatus.SUCCESS, "java" );
 	}
 
 	@Test
 	public void testLaunchFailure() throws Exception {
 		List<TaskResult> results = program.runTasksFromString( UpdateTask.LAUNCH + " " + workingFolder + " invalid" );
-		assertTaskResult( results.get( 0 ), TaskStatus.FAILURE );
-		assertThat( results.get( 0 ).getMessage() ).startsWith( "IOException: Cannot run program \"invalid\"" );
+		assertTaskResult( results.getFirst(), TaskStatus.FAILURE );
+		assertThat( results.getFirst().getMessage() ).startsWith( "IOException: Cannot run program \"invalid\"" );
 	}
 
 }

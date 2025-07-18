@@ -22,7 +22,7 @@ public abstract class RunTask extends Task {
 
 	@Override
 	public TaskResult execute() throws Exception {
-		if( getParameters().size() < 1 ) throw new Exception( "Missing working folder" );
+		if( getParameters().isEmpty() ) throw new Exception( "Missing working folder" );
 		if( getParameters().size() < 2 ) throw new Exception( "Missing executable" );
 
 		String message = UpdateTask.EXECUTE.equals( getCommand() ) ? "Executing" : "Launching";
@@ -38,7 +38,7 @@ public abstract class RunTask extends Task {
 
 	protected ProcessBuilder createProcessBuilder() {
 		ProcessBuilder builder = new ProcessBuilder( getParameters().subList( 1, getParameters().size() ) );
-		builder.directory( Paths.get( getParameters().get( 0 ) ).toFile() );
+		builder.directory( Paths.get( getParameters().getFirst() ).toFile() );
 		builder.redirectOutput( ProcessBuilder.Redirect.DISCARD );
 		builder.redirectError( ProcessBuilder.Redirect.DISCARD );
 		builder.redirectInput( ProcessBuilder.Redirect.INHERIT );
