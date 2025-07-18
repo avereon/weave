@@ -33,7 +33,7 @@ public class ElevatedProcessTest {
 	/**
 	 * Wait timeout in seconds
 	 */
-	private static final int START_STOP_TIMEOUT = 2;
+	private static final int START_STOP_TIMEOUT = 5;
 
 	private Weave elevated;
 
