@@ -35,7 +35,7 @@ public class UpdateCommandBuilder {
 
 		for( List<String> line : lines ) {
 			int count = line.size();
-			if( count > 0 ) builder.append( line.get( 0 ) );
+			if( count > 0 ) builder.append( line.getFirst() );
 			for( int index = 1; index < count; index++ ) {
 				builder.append( " " );
 				String parameter = line.get( index );

@@ -1,13 +1,17 @@
 package com.avereon.weave;
 
+import lombok.Getter;
+
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public abstract class Task {
 
+	@Getter
 	private final String command;
 
+	@Getter
 	private final List<String> parameters;
 
 	private String originalLine;
@@ -22,14 +26,6 @@ public abstract class Task {
 		this.command = command;
 		this.parameters = parameters;
 		this.listeners = new CopyOnWriteArraySet<>();
-	}
-
-	public String getCommand() {
-		return command;
-	}
-
-	public List<String> getParameters() {
-		return parameters;
 	}
 
 	public abstract int getStepCount() throws Exception;

@@ -8,9 +8,10 @@ import com.avereon.settings.MapSettings;
 import com.avereon.settings.Settings;
 import com.avereon.util.*;
 import com.avereon.weave.task.*;
+import com.avereon.zenna.icon.UpdateIcon;
 import com.avereon.zerra.image.Images;
 import com.avereon.zerra.javafx.Fx;
-import com.avereon.zenna.icon.UpdateIcon;
+import com.avereon.zerra.stage.DialogUtil;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -335,12 +336,13 @@ public class Weave extends Application implements Product {
 			alert.setResizable( true );
 
 			// Set the onHidden handler
-			alert.setOnHidden( ( event ) -> {
+			alert.setOnHidden( ( _ ) -> {
 				Optional<ButtonType> result = Optional.ofNullable( alert.getResult() );
 				if( result.isPresent() && result.get() == ButtonType.CANCEL ) stop();
 			} );
 
-			alert.show();
+
+			DialogUtil.show( null, alert );
 		} );
 
 		try {
@@ -457,7 +459,7 @@ public class Weave extends Application implements Product {
 				results.add( getTaskResult( task, exception ) );
 			}
 		}
-		if( results.size() > 0 ) return results;
+		if( !results.isEmpty() ) return results;
 
 		// Check if any tasks need elevation
 		if( anyTaskNeedsElevation( tasks ) ) startElevatedHandler();

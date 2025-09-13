@@ -1,7 +1,9 @@
 package com.avereon.weave;
 
 import lombok.CustomLog;
+import lombok.Getter;
 
+@Getter
 @CustomLog
 public class TaskResult {
 
@@ -19,18 +21,6 @@ public class TaskResult {
 		this.task = task;
 		this.status = status;
 		this.message = message;
-	}
-
-	public Task getTask() {
-		return task;
-	}
-
-	public TaskStatus getStatus() {
-		return status;
-	}
-
-	public String getMessage() {
-		return message;
 	}
 
 	public String format() {
