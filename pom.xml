@@ -12,7 +12,7 @@
 
 	<groupId>com.avereon</groupId>
 	<artifactId>weave</artifactId>
-	<version>1.6-SNAPSHOT</version>
+	<version>1.6</version>
 	<packaging>jar</packaging>
 
 	<name>Weave</name>
@@ -50,12 +50,12 @@
 
 		<!-- Runtime dependencies -->
 		<!-- Version numbers updated 18 Feb 2023 -->
-		<zenna.version>0.11-SNAPSHOT</zenna.version>
-		<zevra.version>0.11-SNAPSHOT</zevra.version>
+		<zenna.version>0.11</zenna.version>
+		<zevra.version>0.11</zevra.version>
 		<openjfx.version>22.0.2</openjfx.version>
 
 		<!-- Plugin versions -->
-		<cameo.version>2.12-SNAPSHOT</cameo.version>
+		<cameo.version>2.12</cameo.version>
 	</properties>
 
 	<dependencies>
